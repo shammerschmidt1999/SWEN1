@@ -10,10 +10,7 @@ namespace SWEN1_MCTG
     public class Stack
     {
         // Fields
-        private List<Card> Cards
-        {
-            get;
-        } = new List<Card>();
+        private List<Card> Cards { get; } = [];
 
         // Methods
         public void AddCardToStack(Card newCard)
@@ -21,14 +18,18 @@ namespace SWEN1_MCTG
             Cards.Add(newCard);
         }
 
-        public Card GetCardFromStack(string CardName)
+        public Card? GetCardFromStack(string cardName)
         {
-            return Cards.Find(x => x.Name == CardName);
+            return Cards.Find(x => x.Name == cardName);
         }
 
-        public void RemoveCardFromStack(string CardName)
+        public void RemoveCardFromStack(string cardName)
         {
-            Cards.Remove(Cards.Find(x => x.Name == CardName));
+            Card? cardToRemove = Cards.Find(x => x.Name == cardName);
+            if (cardToRemove != null)
+            {
+                Cards.Remove(cardToRemove);
+            }
         }
     }
 }

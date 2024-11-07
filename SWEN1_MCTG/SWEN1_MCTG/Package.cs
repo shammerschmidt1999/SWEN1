@@ -10,15 +10,7 @@ namespace SWEN1_MCTG
     public class Package
     {
         // Fields
-        public int Price
-        {
-            get;
-            private set;
-        }
-        public List<Card> Cards
-        {
-            get;
-            private set;
-        } = new List<Card>();
+        public int Price { get; private set; }
+        public List<Card> Cards { get; private set; } = [];
     }
 }

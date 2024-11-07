@@ -7,8 +7,7 @@ public static class GlobalEnums
     {
         Fire,
         Water,
-        Earth,
-        Air
+        Normal
     }
 
     // Coin types

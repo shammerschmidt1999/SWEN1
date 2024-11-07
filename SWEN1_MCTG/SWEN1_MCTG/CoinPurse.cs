@@ -10,16 +10,12 @@ namespace SWEN1_MCTG
     public class CoinPurse
     {
         // Fields
-        public List<Coin> Coins
-        {
-            get;
-            private set;
-        } = new List<Coin>();
+        public List<Coin> Coins { get; private set; } = [];
 
         // Methods
         public void AddCoins(Coin newCoin)
         {
-            Coins.Add(newCoin);
+           Coins.Add(newCoin);
         }
 
         public void RemoveCoins(Coin newCoin)

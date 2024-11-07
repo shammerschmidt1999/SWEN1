@@ -7,12 +7,13 @@ using System.Threading.Tasks;
 namespace SWEN1_MCTG
 {
     // Derived class from Card, MonsterCard
-    public class MonsterCard : Card
+    public class MonsterCard(string name, GlobalEnums.ElementType element, double damage)
+        : Card(name, element, damage)
     {
         // Methods
         public override void Action()
         {
-            base.Action();
+            Console.WriteLine("MonsterCard Action");
         }
     }
 }

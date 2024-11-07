@@ -7,20 +7,12 @@ using System.Threading.Tasks;
 namespace SWEN1_MCTG
 {
     // Used by the User to buy Cards
-    public class Coin
+    public class Coin(GlobalEnums.CoinType coinType)
     {
         // Fields
-        public int Value
-        {
-            get;
-            private set;
-        }
+        public int Value { get; private set; } = CoinValueMap[coinType];
 
-        public GlobalEnums.CoinType CoinType
-        {
-            get;
-            private set;
-        }
+        public GlobalEnums.CoinType CoinType { get; private set; } = coinType;
 
         // Dictionary to map CoinType to Value
         private static readonly Dictionary<GlobalEnums.CoinType, int> CoinValueMap = new()
@@ -30,12 +22,5 @@ namespace SWEN1_MCTG
             { GlobalEnums.CoinType.Gold, 5 },
             { GlobalEnums.CoinType.Platinum, 10 }
         };
-
-        // Constructor
-        public Coin(GlobalEnums.CoinType coinType)
-        {
-            CoinType = coinType;
-            Value = CoinValueMap[coinType];
-        }
     }
 }
