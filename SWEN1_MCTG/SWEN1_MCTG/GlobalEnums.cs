@@ -13,9 +13,10 @@ public static class GlobalEnums
     // Coin types
     public enum CoinType
     {
-        Bronze,
-        Silver,
-        Gold,
-        Platinum
+        Bronze = 1,
+        Silver = 3,
+        Gold = 5,
+        Platinum = 10
     }
+
 }
