@@ -22,6 +22,7 @@ namespace SWEN1_MCTG.Classes
         // Fields
         private string _username;
         private string _password;
+        private int _elo;
         private Stack _userStack;
         private CoinPurse _userCoinPurse;
 
@@ -48,6 +49,12 @@ namespace SWEN1_MCTG.Classes
         {
             get => _userCoinPurse;
             private set => _userCoinPurse = value;
+        }
+
+        public int Elo
+        {
+            get => _elo;
+            private set => _elo = value;
         }
 
         // Methods

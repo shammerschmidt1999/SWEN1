@@ -18,5 +18,4 @@ public static class GlobalEnums
         Gold = 5,
         Platinum = 10
     }
-
 }
