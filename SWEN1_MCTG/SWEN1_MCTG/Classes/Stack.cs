@@ -17,7 +17,7 @@ namespace SWEN1_MCTG.Classes
         public List<Card> Cards
         {
             get => _cards;
-            set => _cards = value;
+            private set => _cards = value;
         }
 
         // Methods

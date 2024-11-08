@@ -29,25 +29,25 @@ namespace SWEN1_MCTG.Classes
         public string Username
         {
             get => _username;
-            set => _username = value;
+            private set => _username = value;
         }
 
         public string Password
         {
             get => _password;
-            set => _password = value;
+            private set => _password = value;
         }
 
         public Stack UserStack
         {
             get => _userStack;
-            set => _userStack = value;
+            private set => _userStack = value;
         }
 
         public CoinPurse UserCoinPurse
         {
             get => _userCoinPurse;
-            set => _userCoinPurse = value;
+            private set => _userCoinPurse = value;
         }
 
         // Methods

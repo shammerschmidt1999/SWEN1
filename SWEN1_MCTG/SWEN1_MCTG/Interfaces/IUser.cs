@@ -9,11 +9,6 @@ namespace SWEN1_MCTG.Interfaces
 {
     public interface IUser
     {
-        string Username { get; set; }
-        string Password { get; set; }
-        Stack UserStack { get; set; }
-        CoinPurse UserCoinPurse { get; set; }
-
         void PrintUser();
         void PrintStack();
     }

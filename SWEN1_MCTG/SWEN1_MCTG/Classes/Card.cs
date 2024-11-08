@@ -27,17 +27,17 @@ namespace SWEN1_MCTG.Classes
         public string Name
         {
             get => _name;
-            set => _name = value;
+            private set => _name = value;
         }
         public double Damage
         {
             get => _damage;
-            set => _damage = value;
+            private set => _damage = value;
         }
         public GlobalEnums.ElementType Element
         {
             get => _element;
-            set => _element = value;
+            private set => _element = value;
         }
 
         // Methods

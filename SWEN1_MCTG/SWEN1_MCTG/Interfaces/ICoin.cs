@@ -8,7 +8,5 @@ namespace SWEN1_MCTG.Interfaces
 {
     public interface ICoin
     {
-        int Value { get; }
-        GlobalEnums.CoinType CoinType { get; set; }
     }
 }

@@ -17,7 +17,7 @@ namespace SWEN1_MCTG.Classes
         public List<Coin> Coins
         {
             get => _coins;
-            set => _coins = value;
+            private set => _coins = value;
         }
 
         // Methods

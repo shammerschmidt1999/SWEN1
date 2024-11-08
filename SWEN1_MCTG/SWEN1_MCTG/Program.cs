@@ -14,15 +14,15 @@ namespace SWEN1_MCTG
         private static void Main(string[] args)
         {
             // Test Coin class
-            Coin testCoin = new Coin(GlobalEnums.CoinType.Bronze);
+            Coin bronzeTestCoin = new Coin(GlobalEnums.CoinType.Bronze);
             Console.WriteLine("------- COIN TEST ------");
-            Console.WriteLine("Coin type: " + testCoin.CoinType);
-            Console.WriteLine("Coin value: " + testCoin.Value);
+            Console.WriteLine("Coin type: " + bronzeTestCoin.CoinType);
+            Console.WriteLine("Coin value: " + bronzeTestCoin.Value);
 
             Console.WriteLine("------- COIN 2ND TEST ------");
-            testCoin.CoinType = GlobalEnums.CoinType.Silver;
-            Console.WriteLine("Coin type: " + testCoin.CoinType);
-            Console.WriteLine("Coin value: " + testCoin.Value);
+            Coin silverTestCoin = new Coin(GlobalEnums.CoinType.Silver);
+            Console.WriteLine("Coin type: " + silverTestCoin.CoinType);
+            Console.WriteLine("Coin value: " + silverTestCoin.Value);
 
             // Test Spell Card class
             SpellCard testSpellCard = new SpellCard("Test SpellCard", GlobalEnums.ElementType.Normal, 10);
@@ -41,12 +41,12 @@ namespace SWEN1_MCTG
             Console.WriteLine("------- USER TEST ------");
             testUser.UserStack.AddCardToStack(testSpellCard);
             testUser.UserStack.AddCardToStack((testMonsterCard));
-            testUser.UserCoinPurse.AddCoin(testCoin);
+            testUser.UserCoinPurse.AddCoin(bronzeTestCoin);
             testUser.UserCoinPurse.AddCoin(new Coin(GlobalEnums.CoinType.Platinum));
             testUser.PrintUser();
             Console.WriteLine("------- USER 2ND TEST ------");
             testUser.UserStack.RemoveCardFromStack(testSpellCard.Name);
-            testUser.UserCoinPurse.RemoveCoin(testCoin);
+            testUser.UserCoinPurse.RemoveCoin(bronzeTestCoin);
             testUser.PrintUser();
 
 
