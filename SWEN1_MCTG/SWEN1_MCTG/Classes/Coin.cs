@@ -8,7 +8,7 @@ using SWEN1_MCTG.Interfaces;
 namespace SWEN1_MCTG.Classes
 {
     // Used by the User to buy Cards
-    public class Coin // : ICoin
+    public class Coin // : ICoin -> Coin does not need to implement any methods currently
     {
         // Constructor
         public Coin(GlobalEnums.CoinType coinType)

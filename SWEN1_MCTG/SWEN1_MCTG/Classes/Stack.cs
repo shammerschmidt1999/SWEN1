@@ -52,5 +52,19 @@ namespace SWEN1_MCTG.Classes
                 card.PrintInformation();
             }
         }
+
+        public void ShuffleStack()
+        {
+            Random rng = new Random();
+            int n = _cards.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                Card value = _cards[k];
+                _cards[k] = _cards[n];
+                _cards[n] = value;
+            }
+        }
     }
 }

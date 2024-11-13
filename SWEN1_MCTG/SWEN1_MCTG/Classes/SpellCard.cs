@@ -11,8 +11,19 @@ namespace SWEN1_MCTG.Classes
     {
         // Constructor
         public SpellCard(string name, GlobalEnums.ElementType element, double damage)
-            : base(name, element, damage)
+            : base(name, damage)
         {
+            _element = element;
+        }
+
+        // Fields
+        private GlobalEnums.ElementType _element;
+
+        // Properties
+        public GlobalEnums.ElementType Element
+        {
+            get => _element;
+            private set => _element = value;
         }
 
         // Methods

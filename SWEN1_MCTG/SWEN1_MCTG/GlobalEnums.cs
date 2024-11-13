@@ -2,12 +2,24 @@
 
 public static class GlobalEnums
 {
-    // Card element types
+    // Spell element types
     public enum ElementType
     {
         Fire,
         Water,
         Normal
+    }
+
+    // Monster types
+    public enum MonsterType
+    {
+        Dragon,
+        Goblin,
+        Wizard,
+        Knight,
+        Ork,
+        FireElve,
+        Kraken
     }
 
     // Coin types
@@ -16,6 +28,7 @@ public static class GlobalEnums
         Bronze = 1,
         Silver = 3,
         Gold = 5,
-        Platinum = 10
+        Platinum = 10,
+        Diamond = 20
     }
 }

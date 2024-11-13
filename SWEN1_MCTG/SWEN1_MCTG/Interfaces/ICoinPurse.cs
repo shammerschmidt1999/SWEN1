@@ -10,8 +10,9 @@ namespace SWEN1_MCTG.Interfaces
     public interface ICoinPurse
     {
         void AddCoin(Coin newCoin);
-        void RemoveCoin(Coin newCoin);
+        void RemoveCoin(Coin coinToRemove);
         int GetCoinsValue();
+        void PrintCoins();
     }
 
 }

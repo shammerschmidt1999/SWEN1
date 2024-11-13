@@ -17,6 +17,7 @@ namespace SWEN1_MCTG.Classes
             _password = password;
             _userStack = new Stack();
             _userCoinPurse = new CoinPurse();
+            _elo = 0;
         }
 
         // Fields
@@ -24,6 +25,8 @@ namespace SWEN1_MCTG.Classes
         private string _password;
         private int _elo;
         private Stack _userStack;
+        private Stack _userDeck;
+        private Stack _userHand;
         private CoinPurse _userCoinPurse;
 
         // Properties
@@ -57,6 +60,18 @@ namespace SWEN1_MCTG.Classes
             private set => _elo = value;
         }
 
+        public Stack UserDeck
+        {
+            get => _userDeck;
+            private set => _userDeck = value;
+        }
+
+        public Stack UserHand
+        {
+            get => _userHand;
+            private set => _userHand = value;
+        }
+
         // Methods
         public void PrintUser()
         {
@@ -70,6 +85,5 @@ namespace SWEN1_MCTG.Classes
         {
             _userStack.PrintStack();
         }
-
     }
 }

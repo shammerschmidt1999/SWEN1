@@ -12,7 +12,8 @@ namespace SWEN1_MCTG.Interfaces
         void AddCardToStack(Card newCard);
         Card? GetCardFromStack(string cardName);
         void RemoveCardFromStack(string cardName);
-
         void PrintStack();
+
+        void ShuffleStack();
     }
 }
