@@ -8,7 +8,6 @@ namespace SWEN1_MCTG.Interfaces
 {
     public interface ICard
     {
-        void Action();
         void PrintInformation();
     }
 

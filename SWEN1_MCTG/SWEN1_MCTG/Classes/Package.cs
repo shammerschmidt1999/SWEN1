@@ -5,14 +5,8 @@ namespace SWEN1_MCTG.Classes
     // Package class for user to buy
     public class Package : IPackage
     {
-        // Constructor
-        public Package(int price)
-        {
-            _price = price;
-        }
-
         // Fields
-        private int _price;
+        private int _price = 5;
         private List<Card> _cards = new List<Card>();
 
         // Properties

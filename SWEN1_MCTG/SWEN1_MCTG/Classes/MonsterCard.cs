@@ -10,8 +10,8 @@ namespace SWEN1_MCTG.Classes
     public class MonsterCard : Card
     {
         // Constructor
-        public MonsterCard(string name, GlobalEnums.MonsterType monsterType, double damage)
-            : base(name, damage)
+        public MonsterCard(string name, GlobalEnums.MonsterType monsterType, double damage, GlobalEnums.ElementType elementType)
+            : base(name, damage, elementType)
         {
             _monsterType = monsterType;
         }
@@ -27,15 +27,14 @@ namespace SWEN1_MCTG.Classes
         }
 
         // Methods
-        public override void Action()
-        {
-            Console.WriteLine("MonsterCard action");
-        }
-
+        /// <summary>
+        /// Displays Information of the card
+        /// </summary>
         public override void PrintInformation()
         {
             Console.WriteLine("MonsterCard Name: " + _name);
             Console.WriteLine("MonsterCard Type: " + _monsterType);
+            Console.WriteLine("MonsterCard Element: " + _elementType);
             Console.WriteLine("MonsterCard Damage: " + _damage);
         }
     }

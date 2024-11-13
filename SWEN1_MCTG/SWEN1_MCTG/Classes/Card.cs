@@ -11,15 +11,17 @@ namespace SWEN1_MCTG.Classes
     public abstract class Card : ICard
     {
         // Constructor
-        protected Card(string name, double damage)
+        protected Card(string name, double damage, GlobalEnums.ElementType elementType)
         {
             _name = name;
             _damage = damage;
+            _elementType = elementType;
         }
 
         // Fields
         protected string _name;
         protected double _damage;
+        protected GlobalEnums.ElementType _elementType;
 
         // Properties
         public string Name
@@ -33,8 +35,13 @@ namespace SWEN1_MCTG.Classes
             private set => _damage = value;
         }
 
+        public GlobalEnums.ElementType ElementType
+        {
+            get => _elementType;
+            private set => _elementType = value;
+        }
+
         // Methods
-        public abstract void Action();
         public abstract void PrintInformation();
     }
 }

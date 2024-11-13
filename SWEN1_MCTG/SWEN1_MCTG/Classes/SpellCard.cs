@@ -13,25 +13,12 @@ namespace SWEN1_MCTG.Classes
         public SpellCard(string name, GlobalEnums.ElementType element, double damage)
             : base(name, damage)
         {
-            _element = element;
-        }
-
-        // Fields
-        private GlobalEnums.ElementType _element;
-
-        // Properties
-        public GlobalEnums.ElementType Element
-        {
-            get => _element;
-            private set => _element = value;
         }
 
         // Methods
-        public override void Action()
-        {
-            Console.WriteLine("SpellCard action");
-        }
-
+        /// <summary>
+        /// Displays Information of SpellCard
+        /// </summary>
         public override void PrintInformation()
         {
             Console.WriteLine("SpellCard Name: " + _name);

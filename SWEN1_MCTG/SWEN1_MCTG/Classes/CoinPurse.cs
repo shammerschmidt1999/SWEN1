@@ -29,21 +29,35 @@ namespace SWEN1_MCTG.Classes
         }
 
         // Methods
+        /// <summary>
+        /// Adds a coin object to the Coin List
+        /// </summary>
+        /// <param name="newCoin"> The Coin object to be added to the Coin list </param>
         public void AddCoin(Coin newCoin)
         {
             _coins.Add(newCoin);
         }
-
+        /// <summary>
+        /// Removes a coin object from the Coin List
+        /// </summary>
+        /// <param name="coinToRemove"> Coin to be removed from the Coin List </param>
         public void RemoveCoin(Coin coinToRemove)
         {
             _coins.Remove(coinToRemove);
         }
 
+        /// <summary>
+        /// Gets the sum of the coin values in the Coin List
+        /// </summary>
+        /// <returns> Integer sum of the Coin Values in the Coin List</returns>
         public int GetCoinsValue()
         {
             return _coins.Sum(coin => coin.Value);
         }
 
+        /// <summary>
+        /// Displays amount of coins and sum of coin value for each coin type
+        /// </summary>
         public void PrintCoins()
         {
             int bronzeValue = 0;
@@ -73,11 +87,11 @@ namespace SWEN1_MCTG.Classes
                         break;
                 }
             }
-            Console.WriteLine($"Bronze: { bronzeValue }");
-            Console.WriteLine($"Silver: { silverValue }");
-            Console.WriteLine($"Gold: { goldValue }");
-            Console.WriteLine($"Platinum: { platinumValue }");
-            Console.WriteLine($"Diamond: { diamondValue }");
+            Console.WriteLine($"{ bronzeValue / GlobalEnums.CoinType.Bronze }x Bronze: { bronzeValue }");
+            Console.WriteLine($"{ silverValue / GlobalEnums.CoinType.Silver }x Silver: { silverValue }");
+            Console.WriteLine($"{ goldValue / GlobalEnums.CoinType.Gold }x Gold: { goldValue }");
+            Console.WriteLine($"{ platinumValue / GlobalEnums.CoinType.Platinum }x Platinum: { platinumValue }");
+            Console.WriteLine($"{ diamondValue / GlobalEnums.CoinType.Diamond }x Diamond: { diamondValue }");
             Console.WriteLine($"Total: { GetCoinsValue() }");
         }
     }

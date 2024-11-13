@@ -15,7 +15,10 @@ namespace SWEN1_MCTG.Classes
         {
             _username = username;
             _password = password;
-            _userStack = new Stack();
+            _userCards = new Stack();
+            _userDeck = new Stack();
+            _userHand = new Stack();
+            _userDiscard= new Stack();
             _userCoinPurse = new CoinPurse();
             _elo = 0;
         }
@@ -24,9 +27,10 @@ namespace SWEN1_MCTG.Classes
         private string _username;
         private string _password;
         private int _elo;
-        private Stack _userStack;
-        private Stack _userDeck;
-        private Stack _userHand;
+        private Stack _userCards; // All current cards
+        private Stack _userDeck; // Cards in played deck
+        private Stack _userHand; // Cards in hand
+        private Stack _userDiscard; // Discarded cards
         private CoinPurse _userCoinPurse;
 
         // Properties
@@ -42,10 +46,10 @@ namespace SWEN1_MCTG.Classes
             private set => _password = value;
         }
 
-        public Stack UserStack
+        public Stack UserCards
         {
-            get => _userStack;
-            private set => _userStack = value;
+            get => _userCards;
+            private set => _userCards = value;
         }
 
         public CoinPurse UserCoinPurse
@@ -73,6 +77,9 @@ namespace SWEN1_MCTG.Classes
         }
 
         // Methods
+        /// <summary>
+        /// Prints User Information
+        /// </summary>
         public void PrintUser()
         {
             Console.WriteLine("Username: " + _username);
@@ -81,9 +88,13 @@ namespace SWEN1_MCTG.Classes
             PrintStack();
         }
 
-        public void PrintStack()
+        /// <summary>
+        /// Prints information of chosen User stack (e.g. Cards, Hand,...)
+        /// </summary>
+        /// <param name="stack"> The Stack of Cards that should be printed </param>
+        public void PrintStack(Stack stack)
         {
-            _userStack.PrintStack();
+            stack.PrintStack();
         }
     }
 }

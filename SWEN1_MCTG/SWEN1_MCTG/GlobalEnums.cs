@@ -31,4 +31,12 @@ public static class GlobalEnums
         Platinum = 10,
         Diamond = 20
     }
+
+    // Round results
+    public enum RoundResults
+    {
+        Loss,
+        Draw,
+        Win
+    }
 }
