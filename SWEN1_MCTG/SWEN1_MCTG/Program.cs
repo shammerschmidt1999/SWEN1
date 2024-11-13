@@ -31,7 +31,7 @@ namespace SWEN1_MCTG
 
             // Test Monster Card class
             Console.WriteLine("\n------- MONSTERCARD TEST ------");
-            MonsterCard testMonsterCard = new MonsterCard("Test MonsterCard", GlobalEnums.ElementType.Fire, 20, 30);
+            MonsterCard testMonsterCard = new MonsterCard("Test MonsterCard", GlobalEnums.MonsterType.Goblin, 20);
             testMonsterCard.PrintInformation();
             testMonsterCard.Action();
 
