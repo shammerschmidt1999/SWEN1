@@ -34,7 +34,6 @@ namespace SWEN1_MCTG.Classes
             get => _damage;
             private set => _damage = value;
         }
-
         public GlobalEnums.ElementType ElementType
         {
             get => _elementType;

@@ -85,7 +85,7 @@ namespace SWEN1_MCTG.Classes
             Console.WriteLine("Username: " + _username);
             Console.WriteLine("Password: " + _password);
             Console.WriteLine("Coins: " + _userCoinPurse.GetCoinsValue());
-            PrintStack();
+            PrintStack(_userCards);
         }
 
         /// <summary>

@@ -10,8 +10,8 @@ namespace SWEN1_MCTG.Classes
     public class SpellCard : Card
     {
         // Constructor
-        public SpellCard(string name, GlobalEnums.ElementType element, double damage)
-            : base(name, damage)
+        public SpellCard(string name, double damage, GlobalEnums.ElementType elementType)
+            : base(name, damage, elementType)
         {
         }
 
@@ -22,7 +22,7 @@ namespace SWEN1_MCTG.Classes
         public override void PrintInformation()
         {
             Console.WriteLine("SpellCard Name: " + _name);
-            Console.WriteLine("SpellCard Element: " + _element);
+            Console.WriteLine("SpellCard Element: " + _elementType);
             Console.WriteLine("SpellCard Damage: " + _damage);
         }
     }

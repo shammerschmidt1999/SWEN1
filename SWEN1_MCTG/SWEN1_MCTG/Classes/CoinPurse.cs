@@ -87,11 +87,11 @@ namespace SWEN1_MCTG.Classes
                         break;
                 }
             }
-            Console.WriteLine($"{ bronzeValue / GlobalEnums.CoinType.Bronze }x Bronze: { bronzeValue }");
-            Console.WriteLine($"{ silverValue / GlobalEnums.CoinType.Silver }x Silver: { silverValue }");
-            Console.WriteLine($"{ goldValue / GlobalEnums.CoinType.Gold }x Gold: { goldValue }");
-            Console.WriteLine($"{ platinumValue / GlobalEnums.CoinType.Platinum }x Platinum: { platinumValue }");
-            Console.WriteLine($"{ diamondValue / GlobalEnums.CoinType.Diamond }x Diamond: { diamondValue }");
+            Console.WriteLine($"{ bronzeValue / ((int)GlobalEnums.CoinType.Bronze) }x Bronze: { bronzeValue }");
+            Console.WriteLine($"{ silverValue / ((int)GlobalEnums.CoinType.Silver) }x Silver: { silverValue }");
+            Console.WriteLine($"{ goldValue / ((int)GlobalEnums.CoinType.Gold) }x Gold: { goldValue }");
+            Console.WriteLine($"{ platinumValue / ((int)GlobalEnums.CoinType.Platinum) }x Platinum: { platinumValue }");
+            Console.WriteLine($"{ diamondValue / ((int)GlobalEnums.CoinType.Diamond) }x Diamond: { diamondValue }");
             Console.WriteLine($"Total: { GetCoinsValue() }");
         }
     }

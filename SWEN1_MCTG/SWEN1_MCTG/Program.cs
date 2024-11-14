@@ -13,7 +13,9 @@ namespace SWEN1_MCTG
         private static void Main(string[] args)
         {
 
-            Console.WriteLine("Hello, World!");
+            User testUser = new User("TestUser", "TestPassword");
+            testUser.PrintUser();
+            testUser.UserCoinPurse.PrintCoins();
 
         }
     }
