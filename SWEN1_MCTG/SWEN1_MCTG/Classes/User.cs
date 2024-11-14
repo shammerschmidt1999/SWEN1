@@ -18,7 +18,7 @@ namespace SWEN1_MCTG.Classes
             _userCards = new Stack();
             _userDeck = new Stack();
             _userHand = new Stack();
-            _userDiscard= new Stack();
+            _userDiscard = new Stack();
             _userCoinPurse = new CoinPurse();
             _elo = 0;
         }
@@ -50,6 +50,12 @@ namespace SWEN1_MCTG.Classes
         {
             get => _userCards;
             private set => _userCards = value;
+        }
+
+        public Stack UserDiscard
+        {
+            get => _userDiscard;
+            private set => _userDiscard = value;
         }
 
         public CoinPurse UserCoinPurse

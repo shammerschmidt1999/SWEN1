@@ -57,15 +57,80 @@ namespace SWEN1_MCTG.Classes
         }
 
         // Methods
-        private void BattleRound(ICard card1, ICard card2, List<ICard> deck1, List<ICard> deck2)
+        public void BattleRound(Card card1, Card card2, List<ICard> deck1, List<ICard> deck2)
         {
-            int card1Damage = CalculateDamage(card1, card2);
-            int card2Damage = CalculateDamage(card2, card1);
+
+            double card1Damage;
+            double card2Damage;
+
+            card1Damage = CalculateDamage(card1, card2, card1.Damage);
+            card2Damage = CalculateDamage(card2, card1, card2.Damage);
+
         }
 
-        private int CalculateDamage(ICard card1, ICard card2)
+        public double CalculateDamage(Card card1, Card card2, double card1Damage)
         {
-            return 0;
+            double calculatedDamage = card1Damage;
+
+            if (card1 is SpellCard && card2 is SpellCard)
+                calculatedDamage = CalculateSpellVsSpellDamage((SpellCard)card1, card2.ElementType, card1Damage);
+
+            if (card1 is SpellCard && card2 is MonsterCard)
+                calculatedDamage = CalculateSpellVsMonsterDamage((SpellCard)card1, (MonsterCard)card2, card1Damage);
+
+            if (card1 is MonsterCard && card2 is MonsterCard)
+                calculatedDamage = CalculateMonsterVsMonsterDamage((MonsterCard)card1, (MonsterCard)card2, card1Damage);
+
+            return calculatedDamage;
+        }
+
+        public double CalculateSpellVsSpellDamage(SpellCard card1, GlobalEnums.ElementType card2ElementType, double card1Damage)
+        {
+            if (card1.ElementType == GlobalEnums.ElementType.Water && card2ElementType == GlobalEnums.ElementType.Fire)
+                return card1Damage * 2;
+
+            if (card1.ElementType == GlobalEnums.ElementType.Fire && card2ElementType == GlobalEnums.ElementType.Normal)
+                return card1Damage * 2;
+
+            if (card1.ElementType == GlobalEnums.ElementType.Normal && card2ElementType == GlobalEnums.ElementType.Water)
+                return card1Damage * 2;
+
+            if (card1.ElementType == GlobalEnums.ElementType.Fire && card2ElementType == GlobalEnums.ElementType.Water)
+                return card1Damage / 2;
+
+            if (card1.ElementType == GlobalEnums.ElementType.Normal && card2ElementType == GlobalEnums.ElementType.Fire)
+                return card1Damage / 2;
+
+            if (card1.ElementType == GlobalEnums.ElementType.Water && card2ElementType == GlobalEnums.ElementType.Normal)
+                return card1Damage / 2;
+
+            return card1Damage;
+        }
+
+        public double CalculateSpellVsMonsterDamage(SpellCard card1, MonsterCard card2, double card1Damage)
+        {
+            if (card2.MonsterType == GlobalEnums.MonsterType.Kraken)
+                return 0;
+
+            if (card2.MonsterType == GlobalEnums.MonsterType.Knight && card1.ElementType == GlobalEnums.ElementType.Water)
+                return 99999;
+
+            return CalculateSpellVsSpellDamage(card1, card2.ElementType, card1Damage);
+        }
+
+        public double CalculateMonsterVsMonsterDamage(MonsterCard card1, MonsterCard card2, double card1Damage)
+        {
+            if (card1.MonsterType == GlobalEnums.MonsterType.Goblin && card2.MonsterType == GlobalEnums.MonsterType.Dragon)
+                return 0;
+
+            if (card1.MonsterType == GlobalEnums.MonsterType.Ork && card2.MonsterType == GlobalEnums.MonsterType.Wizard)
+                return 0;
+
+            if (card1.MonsterType == GlobalEnums.MonsterType.Dragon && card2.MonsterType == GlobalEnums.MonsterType.FireElve)
+                return 0;
+
+            return card1Damage;
+
         }
 
     }
