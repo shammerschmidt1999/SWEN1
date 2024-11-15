@@ -4,7 +4,7 @@
 
 namespace SWEN1_MCTG.Classes.HttpSvr
 {
-    /// <summary>This class represents a HTTP header.</summary>
+    /// <summary>This class represents an HTTP header.</summary>
     public class HttpHeader
     {
         // Constructor

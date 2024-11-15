@@ -56,7 +56,7 @@ namespace SWEN1_MCTG.Classes
         }
 
         // Methods
-        public void BattleRound(Stack player1Hand, Stack player2Hand)
+        public void BattleRound(User player1, User player2, Stack player1Hand, Stack player2Hand)
         {
 
             double card1Damage;
@@ -68,6 +68,25 @@ namespace SWEN1_MCTG.Classes
             card1Damage = CalculateDamage(card1, card2, card1.Damage);
             card2Damage = CalculateDamage(card2, card1, card2.Damage);
 
+            CompareDamage(card1Damage, card2Damage);
+
+        }
+
+        /// <summary>
+        /// Compares the calculated damage of two cards
+        /// </summary>
+        /// <param name="player1Damage"> Damage of player 1 </param>
+        /// <param name="player2Damage"> Damage of player 2 </param>
+        /// <returns> RoundResult Enum Value </returns>
+        public GlobalEnums.RoundResults CompareDamage(double player1Damage, double player2Damage)
+        {
+            if (player1Damage > player2Damage)
+                return GlobalEnums.RoundResults.Victory;
+
+            if (player1Damage < player2Damage)
+                return GlobalEnums.RoundResults.Defeat;
+
+            return GlobalEnums.RoundResults.Draw;
         }
 
         /// <summary>

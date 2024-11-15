@@ -35,8 +35,8 @@ public static class GlobalEnums
     // Round results
     public enum RoundResults
     {
-        Loss,
+        Defeat,
         Draw,
-        Win
+        Victory
     }
 }

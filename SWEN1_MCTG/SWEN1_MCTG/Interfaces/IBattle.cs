@@ -9,10 +9,11 @@ namespace SWEN1_MCTG.Interfaces
 {
     public interface IBattle
     { 
-        void BattleRound(Stack player1Hand, Stack player2Hand);
+        void BattleRound(User player1, User player2, Stack player1Hand, Stack player2Hand);
         double CalculateDamage(Card card1, Card card2, double card1Damage);
         double CalculateSpellVsSpellDamage(SpellCard card1, GlobalEnums.ElementType card2ElementType, double card1Damage);
         double CalculateSpellVsMonsterDamage(SpellCard card1, MonsterCard card2, double card1Damage);
         double CalculateMonsterVsMonsterDamage(MonsterCard card1, MonsterCard card2, double card1Damage);
+        GlobalEnums.RoundResults CompareDamage(double player1Damage, double player2Damage);
     }
 }

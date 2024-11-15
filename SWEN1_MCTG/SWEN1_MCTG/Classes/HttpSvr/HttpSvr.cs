@@ -25,7 +25,6 @@ namespace SWEN1_MCTG.Classes.HttpSvr
         public event HttpSvrEventHandler? Incoming;
 
         // Methods
-
         /// <summary>
         /// Starts the HTTP server and listens for incoming TCP connections.
         /// </summary>

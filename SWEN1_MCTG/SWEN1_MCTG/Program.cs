@@ -4,15 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System;
+using System.ComponentModel.Design;
 using SWEN1_MCTG.Classes;
 using SWEN1_MCTG.Classes.HttpSvr;
+using System.Text.Json;
+using SWEN1_MCTG.Classes.HttpSvr.Handlers;
 
 namespace SWEN1_MCTG
 {
     internal class Program
     {
-        // To start, press play, open another terminal, get curl script from Moodle, paste under #create user, server is empty console,
-        // paste curl script into second terminal with correct data (Port)
         static void Main(string[] args)
         {
             HttpSvr svr = new();
@@ -30,10 +31,25 @@ namespace SWEN1_MCTG
             {
                 Console.WriteLine(i.Name + ": " + i.Value);
             }
-            Console.WriteLine();
-            Console.WriteLine(e.Payload);
 
-            e.Reply(HttpStatusCode.OK, "Yo Baby!");
+            if (e.Path.Contains("/users"))
+            {
+
+                UserHandler userHandler = new();
+
+                try
+                {
+                    userHandler.Handle(e);
+                }
+                catch (Exception ex)
+                {
+                    e.Reply(HttpStatusCode.BAD_REQUEST, $"Error processing request: {ex.Message}");
+                }
+            }
+            else
+            {
+                e.Reply(HttpStatusCode.NOT_FOUND, "Endpoint not found");
+            }
         }
     }
 }

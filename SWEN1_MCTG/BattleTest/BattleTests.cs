@@ -223,6 +223,7 @@ public class BattleTests
         Assert.AreEqual(goblinDamageAgainstDragon, calculatedDamage);
     }
 
+    [TestMethod]
     public void CalculateDamage_MonsterlVsMonsterDamage_OrkAttackAgainstWizardNullifiesDamage()
     {
         string player1Username = "Player1Name";
@@ -251,6 +252,7 @@ public class BattleTests
         Assert.AreEqual(orkDamageAgainstWizard, calculatedDamage);
     }
 
+    [TestMethod]
     public void CalculateDamage_MonsterlVsMonsterDamage_DragonAttackAgainstFireElvesNullifiesDamage()
     {
         string player1Username = "Player1Name";
@@ -279,6 +281,7 @@ public class BattleTests
         Assert.AreEqual(dragonDamageAgainstFireElve, calculatedDamage);
     }
 
+    [TestMethod]
     public void CalculateDamage_MonsterlVsMonsterDamage_AttackWithoutSynergyDamageDoesNotChange()
     {
         string player1Username = "Player1Name";
@@ -306,5 +309,67 @@ public class BattleTests
         Assert.AreEqual(player1CardDamage, calculatedDamage);
     }
 
+    [TestMethod]
+    public void CompareDamage_Player1Wins_ReturnsVictory()
+    {
+        int player1Damage = 20;
+        int player2Damage = 10;
+        string player1Username = "Player1Name";
+        string player1Password = "Player1Password";
+        string player2Username = "Player2Name";
+        string player2Password = "Player2Password";
+
+        User player1 = new User(player1Username, player1Password);
+        User player2 = new User(player2Username, player2Password);
+
+        Battle testBattle = new Battle(player1, player2);
+
+        GlobalEnums.RoundResults result = testBattle.CompareDamage(player1Damage, player2Damage);
+        GlobalEnums.RoundResults victory = GlobalEnums.RoundResults.Victory;
+
+        Assert.AreEqual(result, victory);
+    }
+
+    [TestMethod]
+    public void CompareDamage_Player1Draws_ReturnsDraw()
+    {
+        int player1Damage = 10;
+        int player2Damage = 10;
+        string player1Username = "Player1Name";
+        string player1Password = "Player1Password";
+        string player2Username = "Player2Name";
+        string player2Password = "Player2Password";
+
+        User player1 = new User(player1Username, player1Password);
+        User player2 = new User(player2Username, player2Password);
+
+        Battle testBattle = new Battle(player1, player2);
+
+        GlobalEnums.RoundResults result = testBattle.CompareDamage(player1Damage, player2Damage);
+        GlobalEnums.RoundResults draw = GlobalEnums.RoundResults.Draw;
+
+        Assert.AreEqual(result, draw);
+    }
+
+    [TestMethod]
+    public void CompareDamage_Player1Looses_ReturnsDefeat()
+    {
+        int player1Damage = 10;
+        int player2Damage = 20;
+        string player1Username = "Player1Name";
+        string player1Password = "Player1Password";
+        string player2Username = "Player2Name";
+        string player2Password = "Player2Password";
+
+        User player1 = new User(player1Username, player1Password);
+        User player2 = new User(player2Username, player2Password);
+
+        Battle testBattle = new Battle(player1, player2);
+
+        GlobalEnums.RoundResults result = testBattle.CompareDamage(player1Damage, player2Damage);
+        GlobalEnums.RoundResults defeat = GlobalEnums.RoundResults.Defeat;
+
+        Assert.AreEqual(result, defeat);
+    }
 }
 
