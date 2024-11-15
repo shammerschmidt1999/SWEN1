@@ -11,8 +11,8 @@ namespace SWEN1_MCTG
 {
     internal class Program
     {
-        // To start, press play, get curl script from Moodle, paste under #create user, server is empty console,
-        // paste curl script into its own console with correct data (Port)
+        // To start, press play, open another terminal, get curl script from Moodle, paste under #create user, server is empty console,
+        // paste curl script into second terminal with correct data (Port)
         static void Main(string[] args)
         {
             HttpSvr svr = new();

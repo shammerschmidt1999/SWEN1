@@ -9,22 +9,14 @@ namespace SWEN1_MCTG.Classes.HttpSvr
     /// <summary>This class defines event arguments for the <see cref="HttpSvrEventHandler"/> event handler.</summary>
     public class HttpSvrEventArgs: EventArgs
     {
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // protected members                                                                                                //
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
-        /// <summary>TCP client.</summary>
+        // Members   
+        /// <summary> TCP client. </summary>
         protected TcpClient _Client;
 
-
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // constructors                                                                                                     //
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
-        /// <summary>Creates a new instance of this class.</summary>
-        /// <param name="client">TCP client.</param>
-        /// <param name="plainMessage">Plain HTTP message.</param>
+        // Constructor
+        /// <summary> Creates a new instance of this class. </summary>
+        /// <param name="client"> TCP client. </param>
+        /// <param name="plainMessage"> Plain HTTP message. </param>
         public HttpSvrEventArgs(TcpClient client, string plainMessage) 
         {
             _Client = client;
@@ -64,55 +56,51 @@ namespace SWEN1_MCTG.Classes.HttpSvr
             Headers = headers.ToArray();
         }
 
-
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // public properties                                                                                                //
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
-        /// <summary>Gets the plain message.</summary>
+        // Properties
+        /// <summary> Gets the plain message. </summary>
         public string PlainMessage
         {
             get; protected set;
         } = string.Empty;
 
 
-        /// <summary>Gets the HTTP method.</summary>
+        /// <summary> Gets the HTTP method. </summary>
         public virtual string Method
         {
             get; protected set;
         } = string.Empty;
 
 
-        /// <summary>Gets the HTTP path.</summary>
+        /// <summary> Gets the HTTP path. </summary>
         public virtual string Path
         {
             get; protected set;
         } = string.Empty;
 
 
-        /// <summary>Gets the HTTP headers.</summary>
+        /// <summary> Gets the HTTP headers. </summary>
         public virtual HttpHeader[] Headers
         {
             get; protected set;
         } = Array.Empty<HttpHeader>();
 
 
-        /// <summary>Gets the payload.</summary>
+        /// <summary> Gets the payload. </summary>
         public virtual string Payload
         {
             get; protected set;
         } = string.Empty;
 
-
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // public methods                                                                                                   //
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
-        /// <summary>Replies the request</summary>
-        /// <param name="status">HTTP Status code.</param>
-        /// <param name="msg">Reply body.</param>
+        // Methods
+        /// <summary>
+        /// Sends an HTTP response to the client with the specified status code and optional body content.
+        /// </summary>
+        /// <param name="status">The HTTP status code to send in the response.</param>
+        /// <param name="body">The optional body content to include in the response. If null or empty, the response will have a Content-Length of 0.</param>
+        /// <remarks>
+        /// This method constructs an HTTP response message based on the provided status code and body content.
+        /// It writes the response to the client's network stream and then closes and disposes of the client connection.
+        /// </remarks>
         public void Reply(int status, string? body = null)
         {
             string data;

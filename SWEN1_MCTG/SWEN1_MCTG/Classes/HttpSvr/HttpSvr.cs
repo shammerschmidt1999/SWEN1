@@ -7,44 +7,34 @@ using System.Text;
 
 namespace SWEN1_MCTG.Classes.HttpSvr
 {
-    /// <summary>This class implements a HTTP server.</summary>
+    /// <summary>This class implements an HTTP server.</summary>
     public sealed class HttpSvr
     {
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // private members                                                                                                  //
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
-        /// <summary>TCP listener instance.</summary>
+        // Properties
         private TcpListener? _Listener;
 
-
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // public events                                                                                                    //
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
-        /// <summary>Is raised when incoming data is available.</summary>
-        public event HttpSvrEventHandler? Incoming;
-
-
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // public properties                                                                                                //
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
-        /// <summary>Gets if the server is available.</summary>
+        /// <summary> Gets if the server is available. </summary>
         public bool Active
         {
             get; private set;
         } = false;
 
+        // Events
+        /// <summary> Is raised when incoming data is available. </summary>
+        public event HttpSvrEventHandler? Incoming;
 
+        // Methods
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // public methods                                                                                                   //
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
-        /// <summary>Runs the server.</summary>
+        /// <summary>
+        /// Starts the HTTP server and listens for incoming TCP connections.
+        /// </summary>
+        /// <remarks>
+        /// This method initializes the TCP listener and starts it on the local IP address (127.0.0.1) and port 12000.
+        /// It continuously accepts incoming TCP connections and reads data from them.
+        /// When data is available, it raises the Incoming event with the received data.
+        /// The server remains active until the Stop method is called.
+        /// </remarks>
         public void Run()
         {
             if(Active) return;
@@ -71,7 +61,9 @@ namespace SWEN1_MCTG.Classes.HttpSvr
         }
 
 
-        /// <summary>Stops the server.</summary>
+        /// <summary>
+        /// Stops the server
+        /// </summary>
         public void Stop()
         {
             Active = false;
