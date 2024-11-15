@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SWEN1_MCTG.Interfaces;
-using static SWEN1_MCTG.GlobalEnums;
 
 namespace SWEN1_MCTG.Classes
 {
@@ -57,17 +56,27 @@ namespace SWEN1_MCTG.Classes
         }
 
         // Methods
-        public void BattleRound(Card card1, Card card2, List<ICard> deck1, List<ICard> deck2)
+        public void BattleRound(Stack player1Hand, Stack player2Hand)
         {
 
             double card1Damage;
             double card2Damage;
+
+            Card? card1 = player1Hand.GetRandomCardFromStack();
+            Card? card2 = player2Hand.GetRandomCardFromStack();
 
             card1Damage = CalculateDamage(card1, card2, card1.Damage);
             card2Damage = CalculateDamage(card2, card1, card2.Damage);
 
         }
 
+        /// <summary>
+        /// Calculates the damage of a card against another card
+        /// </summary>
+        /// <param name="card1"></param>
+        /// <param name="card2"></param>
+        /// <param name="card1Damage"></param>
+        /// <returns></returns>
         public double CalculateDamage(Card card1, Card card2, double card1Damage)
         {
             double calculatedDamage = card1Damage;
@@ -84,6 +93,13 @@ namespace SWEN1_MCTG.Classes
             return calculatedDamage;
         }
 
+        /// <summary>
+        /// Calculates the damage of a spell card against another spell card
+        /// </summary>
+        /// <param name="card1"> Card that needs damage calculation </param>
+        /// <param name="card2ElementType"> Type of element the first card plays against </param>
+        /// <param name="card1Damage"> Damage of card1 </param>
+        /// <returns> The damage with consideration of element synergies </returns>
         public double CalculateSpellVsSpellDamage(SpellCard card1, GlobalEnums.ElementType card2ElementType, double card1Damage)
         {
             if (card1.ElementType == GlobalEnums.ElementType.Water && card2ElementType == GlobalEnums.ElementType.Fire)
@@ -106,7 +122,13 @@ namespace SWEN1_MCTG.Classes
 
             return card1Damage;
         }
-
+        /// <summary>
+        /// Calculates the damage of a spell card against a monster card
+        /// </summary>
+        /// <param name="card1"> Card that needs damage calculation </param>
+        /// <param name="card2"> Card that the first card plays against </param>
+        /// <param name="card1Damage"> Damage of card1 </param>
+        /// <returns> The damage with consideration of element synergies and monster synergies </returns>
         public double CalculateSpellVsMonsterDamage(SpellCard card1, MonsterCard card2, double card1Damage)
         {
             if (card2.MonsterType == GlobalEnums.MonsterType.Kraken)
@@ -118,6 +140,13 @@ namespace SWEN1_MCTG.Classes
             return CalculateSpellVsSpellDamage(card1, card2.ElementType, card1Damage);
         }
 
+        /// <summary>
+        /// Calculates the damage of a monster card against another monster card
+        /// </summary>
+        /// <param name="card1"> Card that needs damage calculation </param>
+        /// <param name="card2"> Card that the first card plays against </param>
+        /// <param name="card1Damage"> Damage of card1 </param>
+        /// <returns> The damage with consideration of monster synergies </returns>
         public double CalculateMonsterVsMonsterDamage(MonsterCard card1, MonsterCard card2, double card1Damage)
         {
             if (card1.MonsterType == GlobalEnums.MonsterType.Goblin && card2.MonsterType == GlobalEnums.MonsterType.Dragon)
