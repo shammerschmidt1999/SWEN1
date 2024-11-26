@@ -6,6 +6,8 @@ using System.Text.Json;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using SWEN1_MCTG.Interfaces;
+using SWEN1_MCTG.Classes.Exceptions;
+using System.Text.Json.Nodes;
 
 namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
 {
@@ -18,37 +20,103 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
         /// <returns> bool if request was successful or not </returns>
         public override bool Handle(HttpSvrEventArgs e)
         {
-            if (e.Path.StartsWith("/users/create")) // Creates user in memory
+            if ((e.Path.TrimEnd('/', ' ', '\t') == "/users") && (e.Method == "POST"))
+            {                                                                   
+                return _CreateUser(e);
+            }
+            else if (e.Path.StartsWith("/users/") && (e.Method == "GET"))        
             {
-                if (e.Method == "POST")
-                {
-                    var user = JsonSerializer.Deserialize<User>(e.Payload);
-                    if (user != null)
+                return _QueryUser(e);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Creates a new user
+        /// </summary>
+        /// <param name="e"> Server Event Arguments </param>
+        /// <returns> True on successful user creation, false on unsuccessful user creation </returns>
+        private static bool _CreateUser(HttpSvrEventArgs e)
+        {
+            JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
+            int status = HttpStatusCode.BAD_REQUEST;                            
+
+            try
+            {
+                JsonNode? json = JsonNode.Parse(e.Payload);                     
+                if (json != null)
+                {                                                               
+                    User.Create((string)json["Username"]!, 
+                        (string)json["Password"]!);
+                    status = HttpStatusCode.OK;
+                    reply = new JsonObject()
                     {
-                        User newUser = new User(user.Username, user.Password);
-                        Console.WriteLine($"User created: {user.Username}, Password: {user.Password}");
-                        e.Reply(HttpStatusCode.OK, "User created successfully");
-                        Console.WriteLine("-------- USER PROFILE --------");
-                        user.PrintUser();
+                        ["success"] = true,
+                        ["message"] = "User created successfully."
+                    };
+                }
+            }
+            catch (UserException ex)
+            {                                                                  
+                reply = new JsonObject() { ["success"] = false, ["message"] = ex.Message };
+            }
+            catch (Exception)
+            {                                                                   
+                reply = new JsonObject() { ["success"] = false, ["message"] = "Unexpected error." };
+            }
+
+            e.Reply(status, reply?.ToJsonString());                            
+            return true;
+        }
+
+        /// <summary>
+        /// Gets user information
+        /// </summary>
+        /// <param name="e"> Server Event Arguments </param>
+        /// <returns> True on successful query, false on unsuccessful query </returns>
+        private static bool _QueryUser(HttpSvrEventArgs e)
+        {
+            JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
+            int status = HttpStatusCode.BAD_REQUEST;                         
+
+            try
+            {
+                (bool Success, User? User) ses = Token.Authenticate(e);        
+
+                if (ses.Success)
+                {                                                              
+                    User? user = User.Get(e.Path[7..]);                      
+
+                    if (user == null)
+                    {                                                          
+                        status = HttpStatusCode.NOT_FOUND;
+                        reply = new JsonObject() { ["success"] = false, ["message"] = "User not found." };
                     }
                     else
                     {
-                        e.Reply(HttpStatusCode.BAD_REQUEST, "Invalid user data");
-                        return false;
+                        status = HttpStatusCode.OK;
+                        reply = new JsonObject()
+                        {
+                            ["success"] = true,          
+                            ["username"] = user!.Username,
+                        };
                     }
                 }
-
-                return true;
-            }
-
-            if (e.Path.StartsWith("/users/sessions")) // Logs user in
-            {
-                if (e.Method == "POST")
+                else
                 {
-                    // Implement user in memory login
+                    status = HttpStatusCode.UNAUTHORIZED;
+                    reply = new JsonObject() { ["success"] = false, ["message"] = "Unauthorized." };
                 }
             }
-            return false;
+            catch (Exception)
+            {                                                                  
+                reply = new JsonObject() { ["success"] = false, ["message"] = "Unexpected error." };
+            }
+
+            e.Reply(status, reply?.ToJsonString());
+            return true;
         }
+    
     }
 }

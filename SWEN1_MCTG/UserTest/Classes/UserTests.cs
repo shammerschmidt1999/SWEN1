@@ -11,46 +11,53 @@ namespace UserTest.Classes;
 [TestClass]
 public class UserTests
 {
+    private User createdUser;
+
+    private string player1Username;
+    private string player1Password;
+    private string player2Username;
+    private string player2Password;
+
+    [TestInitialize]
+    public void Setup()
+    {
+        // Initialize the fields
+        player1Username = "createdUserUsername";
+        player1Password = "createdUserPassword";
+
+        // Create the users
+        
+        User.Create(player1Username, player1Password);
+
+        // Retrieve the users
+        createdUser = User.Get(player1Username);
+    }
+
     [TestMethod]
     public void Constructor_CreateUser_UsernameAndPasswordEqualToStringParameters()
     {
-        // Arrange (Prepare code for thest)
-        string username = "TestUsername";
-        string password = "TestPassword";
-
-        // Act (Perform Method)
-        var user = new User(username, password);
-
-        // Assert (Check for expected outcome)
-        Assert.AreEqual(username, user.Username);
-        Assert.AreEqual(password, user.Password);
+        Assert.AreEqual(player1Username, createdUser.Username);
+        Assert.AreEqual(player1Password, createdUser.Password);
     }
 
     [TestMethod]
     public void Constructor_CreateUser_UserStacksAreEmptyCardLists()
     {
-        string username = "TestUsername";
-        string password = "TestPassword";
-
-        var user = new User(username, password);
         bool expectedEmpty = false;
 
-        Assert.AreEqual(expectedEmpty, user.UserCards.Cards.Any());
-        Assert.AreEqual(expectedEmpty, user.UserDeck.Cards.Any());
-        Assert.AreEqual(expectedEmpty, user.UserHand.Cards.Any());
-        Assert.AreEqual(expectedEmpty, user.UserDiscard.Cards.Any());
+
+        Assert.AreEqual(expectedEmpty, createdUser.UserCards.Cards.Any());
+        Assert.AreEqual(expectedEmpty, createdUser.UserDeck.Cards.Any());
+        Assert.AreEqual(expectedEmpty, createdUser.UserHand.Cards.Any());
+        Assert.AreEqual(expectedEmpty, createdUser.UserDiscard.Cards.Any());
     }
 
     [TestMethod]
     public void Constructor_CreateUser_UserHasTwentyCoins()
     {
-        string username = "TestUsername";
-        string password = "TestPassword";
         int expectedCoins = 20;
 
-        var user = new User(username, password);
-
-        Assert.AreEqual(expectedCoins, user.UserCoinPurse.GetCoinsValue());
+        Assert.AreEqual(expectedCoins, createdUser.UserCoinPurse.GetCoinsValue());
     }
 
 }

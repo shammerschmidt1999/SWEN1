@@ -1,37 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using SWEN1_MCTG.Interfaces;
+using SWEN1_MCTG.Classes.Exceptions;
 
 namespace SWEN1_MCTG.Classes
 {
     // Represents a user in game
-    public class User : IUser
+    public sealed class User : IUser
     {
+        // Used temporarily to store users in memory
+        private static Dictionary<string, User> _Users = new Dictionary<string, User>();
+
         // Constructor
-        public User(string username, string password)
+        private User()
         {
-            _username = username;
-            _password = password;
-            _userCards = new Stack();
-            _userDeck = new Stack();
-            _userHand = new Stack();
-            _userDiscard = new Stack();
-            _userCoinPurse = new CoinPurse();
-            _elo = 0;
         }
 
         // Fields
-        private string _username;
-        private string _password;
-        private int _elo;
-        private Stack _userCards; // All current cards
-        private Stack _userDeck; // Cards in played deck
-        private Stack _userHand; // Cards in hand
-        private Stack _userDiscard; // Discarded cards
-        private CoinPurse _userCoinPurse;
+        private string _username = string.Empty;
+        private string _password = string.Empty;
+        private int _elo = 1000;
+        private Stack _userCards = new Stack(); // All current cards
+        private Stack _userDeck = new Stack(); // Cards in played deck
+        private Stack _userHand = new Stack(); // Cards in hand
+        private Stack _userDiscard = new Stack(); // Discarded cards
+        private CoinPurse _userCoinPurse = new CoinPurse();
 
         // Properties
         public string Username
@@ -101,6 +98,65 @@ namespace SWEN1_MCTG.Classes
         public void PrintStack(Stack stack)
         {
             stack.PrintStack();
+        }
+
+        public static void Create(string username, string password)
+        {
+            if (_Users.ContainsKey(username))
+            {
+                throw new UserException("Username already exists");
+            }
+
+            User user = new();
+            {
+                user._username = username;
+                user._password = password;
+                user._userCards = new Stack();
+                user._userDeck = new Stack();
+                user._userHand = new Stack();
+                user._userDiscard = new Stack();
+                user._userCoinPurse = new CoinPurse();
+                user._elo = 1000;
+            }
+            _Users.Add(user.Username, user);
+        }
+
+        public static (bool Success, string Token) Logon(string username, string password)
+        {
+            if (_Users.ContainsKey(username) && _Users[username].Password == password)
+            {
+                return (true, Token._CreateTokenFor(_Users[username]));
+            }
+
+            return (false, string.Empty);
+        }
+
+        public void Save(string token)
+        {
+            (bool Success, User? User) auth = Token.Authenticate(token);
+            if (auth.Success)
+            {
+                if (auth.User!.Username != _username)
+                {
+                    throw new UserException("Trying to change other user's data.");
+                }
+
+            }
+            else
+            {
+                throw new UserException("Authentication failed");
+            }
+        }
+
+        public static User? Get(string userName)
+        {
+            _Users.TryGetValue(userName, out User? user);
+            return user;
+        }
+
+        public static void ClearList()
+        {
+            _Users.Clear();
         }
     }
 }

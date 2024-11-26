@@ -11,21 +11,43 @@ namespace BattleTest;
 [TestClass]
 public class BattleTests
 {
+
+    private User player1;
+    private User player2;
+
+    private string player1Username;
+    private string player1Password;
+    private string player2Username;
+    private string player2Password;
+
+    [TestInitialize]
+    public void Setup()
+    {
+        player1Username = "Player1Name";
+        player1Password = "Player1Password";
+        player2Username = "Player2Name";
+        player2Password = "Player2Password";
+
+        // Create the users
+        User.ClearList(); // Ensure list is clear before creating users
+        User.Create(player1Username, player1Password);
+        User.Create(player2Username, player2Password);
+
+        // Retrieve the users
+        player1 = User.Get(player1Username);
+        player2 = User.Get(player2Username);
+    }
+
     [TestMethod]
     public void Constructor_CreateBattle_PropertiesAreSetCorrectly()
     {
-        string player1Username = "Player1Name";
-        string player1Password = "Player1Password";
-        string player2Username = "Player2Name";
-        string player2Password = "Player2Password";
         int roundCount = 0;
         int maxRounds = 100;
 
-        User player1 = new User(player1Username, player1Password);
-        User player2 = new User(player2Username, player2Password);
-
+        // Create the battle
         Battle testBattle = new Battle(player1, player2);
 
+        // Assert the properties
         Assert.AreEqual(player1Username, testBattle.Player1.Username);
         Assert.AreEqual(player1Password, testBattle.Player1.Password);
         Assert.AreEqual(player2Username, testBattle.Player2.Username);
@@ -37,10 +59,6 @@ public class BattleTests
     [TestMethod]
     public void CalculateDamage_SpellVsSpellDamage_SpellAttackAgainstEffectiveElementDoublesCardDamage()
     {
-        string player1Username = "Player1Name";
-        string player1Password = "Player1Password";
-        string player2Username = "Player2Name";
-        string player2Password = "Player2Password";
         string player1CardName = "Player1SpellCard";
         string player2CardName = "Player2SpellCard";
         double player1CardDamage = 20;
@@ -48,8 +66,6 @@ public class BattleTests
         GlobalEnums.ElementType player1CardElementType = GlobalEnums.ElementType.Water;
         GlobalEnums.ElementType player2CardElementType = GlobalEnums.ElementType.Fire;
 
-        User player1 = new User(player1Username, player1Password);
-        User player2 = new User(player2Username, player2Password);
         SpellCard player1SpellCard = new SpellCard(player1CardName, player1CardDamage, player1CardElementType);
         SpellCard player2SpellCard = new SpellCard(player2CardName, player2CardDamage, player2CardElementType);
 
@@ -63,10 +79,6 @@ public class BattleTests
     [TestMethod]
     public void CalculateDamage_SpellVsSpellDamage_SpellAttackAgainstNotEffectiveElementHalvesCardDamage()
     {
-        string player1Username = "Player1Name";
-        string player1Password = "Player1Password";
-        string player2Username = "Player2Name";
-        string player2Password = "Player2Password";
         string player1CardName = "Player1SpellCard";
         string player2CardName = "Player2SpellCard";
         double player1CardDamage = 20;
@@ -74,8 +86,6 @@ public class BattleTests
         GlobalEnums.ElementType player1CardElementType = GlobalEnums.ElementType.Fire;
         GlobalEnums.ElementType player2CardElementType = GlobalEnums.ElementType.Water;
 
-        User player1 = new User(player1Username, player1Password);
-        User player2 = new User(player2Username, player2Password);
         SpellCard player1SpellCard = new SpellCard(player1CardName, player1CardDamage, player1CardElementType);
         SpellCard player2SpellCard = new SpellCard(player2CardName, player2CardDamage, player2CardElementType);
 
@@ -89,10 +99,6 @@ public class BattleTests
     [TestMethod]
     public void CalculateDamage_SpellVsSpellDamage_SpellAttackAgainstSameElementDoesNotChangeDamage()
     {
-        string player1Username = "Player1Name";
-        string player1Password = "Player1Password";
-        string player2Username = "Player2Name";
-        string player2Password = "Player2Password";
         string player1CardName = "Player1SpellCard";
         string player2CardName = "Player2SpellCard";
         double player1CardDamage = 20;
@@ -100,8 +106,6 @@ public class BattleTests
         GlobalEnums.ElementType player1CardElementType = GlobalEnums.ElementType.Fire;
         GlobalEnums.ElementType player2CardElementType = GlobalEnums.ElementType.Fire;
 
-        User player1 = new User(player1Username, player1Password);
-        User player2 = new User(player2Username, player2Password);
         SpellCard player1SpellCard = new SpellCard(player1CardName, player1CardDamage, player1CardElementType);
         SpellCard player2SpellCard = new SpellCard(player2CardName, player2CardDamage, player2CardElementType);
 
@@ -115,10 +119,6 @@ public class BattleTests
     [TestMethod]
     public void CalculateDamage_SpellVsMonsterDamage_SpellAttackAgainstKrakenNullifiesDamage()
     {
-        string player1Username = "Player1Name";
-        string player1Password = "Player1Password";
-        string player2Username = "Player2Name";
-        string player2Password = "Player2Password";
         string player1CardName = "Player1SpellCard";
         string player2CardName = "Player2MonsterCard";
         double player1CardDamage = 20;
@@ -128,8 +128,6 @@ public class BattleTests
         GlobalEnums.MonsterType player2CardMonsterType = GlobalEnums.MonsterType.Kraken;
         double spellDamageAgainstKraken = 0;
 
-        User player1 = new User(player1Username, player1Password);
-        User player2 = new User(player2Username, player2Password);
         SpellCard player1SpellCard = new SpellCard(player1CardName, player1CardDamage, player1CardElementType);
         MonsterCard player2MonsterCard = new MonsterCard(player2CardName, player2CardMonsterType, player2CardDamage, player2CardElementType);
 
@@ -143,10 +141,6 @@ public class BattleTests
     [TestMethod]
     public void CalculateDamage_SpellVsMonsterDamage_SpellAttackAgainstMonsterWithEffectiveElementDoublesDamage()
     {
-        string player1Username = "Player1Name";
-        string player1Password = "Player1Password";
-        string player2Username = "Player2Name";
-        string player2Password = "Player2Password";
         string player1CardName = "Player1SpellCard";
         string player2CardName = "Player2MonsterCard";
         double player1CardDamage = 20;
@@ -155,8 +149,6 @@ public class BattleTests
         GlobalEnums.ElementType player2CardElementType = GlobalEnums.ElementType.Fire;
         GlobalEnums.MonsterType player2CardMonsterType = GlobalEnums.MonsterType.Goblin;
 
-        User player1 = new User(player1Username, player1Password);
-        User player2 = new User(player2Username, player2Password);
         SpellCard player1SpellCard = new SpellCard(player1CardName, player1CardDamage, player1CardElementType);
         MonsterCard player2MonsterCard = new MonsterCard(player2CardName, player2CardMonsterType, player2CardDamage, player2CardElementType);
 
@@ -170,10 +162,6 @@ public class BattleTests
     [TestMethod]
     public void CalculateDamage_SpellVsMonsterDamage_SpellAttackAgainstSameElementDoesNotChangeDamage()
     {
-        string player1Username = "Player1Name";
-        string player1Password = "Player1Password";
-        string player2Username = "Player2Name";
-        string player2Password = "Player2Password";
         string player1CardName = "Player1SpellCard";
         string player2CardName = "Player2MonsterCard";
         double player1CardDamage = 20;
@@ -182,8 +170,6 @@ public class BattleTests
         GlobalEnums.ElementType player2CardElementType = GlobalEnums.ElementType.Fire;
         GlobalEnums.MonsterType player2CardMonsterType = GlobalEnums.MonsterType.Goblin;
 
-        User player1 = new User(player1Username, player1Password);
-        User player2 = new User(player2Username, player2Password);
         SpellCard player1SpellCard = new SpellCard(player1CardName, player1CardDamage, player1CardElementType);
         MonsterCard player2MonsterCard = new MonsterCard(player2CardName, player2CardMonsterType, player2CardDamage, player2CardElementType);
 
@@ -197,10 +183,6 @@ public class BattleTests
     [TestMethod]
     public void CalculateDamage_MonsterlVsMonsterDamage_GoblinAttackAgainstDragonNullifiesDamage()
     {
-        string player1Username = "Player1Name";
-        string player1Password = "Player1Password";
-        string player2Username = "Player2Name";
-        string player2Password = "Player2Password";
         string player1CardName = "Player1SpellCard";
         string player2CardName = "Player2MonsterCard";
         double player1CardDamage = 20;
@@ -211,8 +193,6 @@ public class BattleTests
         GlobalEnums.MonsterType player2CardMonsterType = GlobalEnums.MonsterType.Dragon;
         double goblinDamageAgainstDragon = 0;
 
-        User player1 = new User(player1Username, player1Password);
-        User player2 = new User(player2Username, player2Password);
         MonsterCard player1MonsterCard = new MonsterCard(player1CardName, player1CardMonsterType, player1CardDamage, player1CardElementType);
         MonsterCard player2MonsterCard = new MonsterCard(player2CardName, player2CardMonsterType, player2CardDamage, player2CardElementType);
 
@@ -226,10 +206,6 @@ public class BattleTests
     [TestMethod]
     public void CalculateDamage_MonsterlVsMonsterDamage_OrkAttackAgainstWizardNullifiesDamage()
     {
-        string player1Username = "Player1Name";
-        string player1Password = "Player1Password";
-        string player2Username = "Player2Name";
-        string player2Password = "Player2Password";
         string player1CardName = "Player1SpellCard";
         string player2CardName = "Player2MonsterCard";
         double player1CardDamage = 20;
@@ -240,8 +216,6 @@ public class BattleTests
         GlobalEnums.MonsterType player2CardMonsterType = GlobalEnums.MonsterType.Wizard;
         double orkDamageAgainstWizard = 0;
 
-        User player1 = new User(player1Username, player1Password);
-        User player2 = new User(player2Username, player2Password);
         MonsterCard player1MonsterCard = new MonsterCard(player1CardName, player1CardMonsterType, player1CardDamage, player1CardElementType);
         MonsterCard player2MonsterCard = new MonsterCard(player2CardName, player2CardMonsterType, player2CardDamage, player2CardElementType);
 
@@ -255,10 +229,6 @@ public class BattleTests
     [TestMethod]
     public void CalculateDamage_MonsterlVsMonsterDamage_DragonAttackAgainstFireElvesNullifiesDamage()
     {
-        string player1Username = "Player1Name";
-        string player1Password = "Player1Password";
-        string player2Username = "Player2Name";
-        string player2Password = "Player2Password";
         string player1CardName = "Player1SpellCard";
         string player2CardName = "Player2MonsterCard";
         double player1CardDamage = 20;
@@ -269,8 +239,6 @@ public class BattleTests
         GlobalEnums.MonsterType player2CardMonsterType = GlobalEnums.MonsterType.FireElve;
         double dragonDamageAgainstFireElve = 0;
 
-        User player1 = new User(player1Username, player1Password);
-        User player2 = new User(player2Username, player2Password);
         MonsterCard player1MonsterCard = new MonsterCard(player1CardName, player1CardMonsterType, player1CardDamage, player1CardElementType);
         MonsterCard player2MonsterCard = new MonsterCard(player2CardName, player2CardMonsterType, player2CardDamage, player2CardElementType);
 
@@ -284,10 +252,6 @@ public class BattleTests
     [TestMethod]
     public void CalculateDamage_MonsterlVsMonsterDamage_AttackWithoutSynergyDamageDoesNotChange()
     {
-        string player1Username = "Player1Name";
-        string player1Password = "Player1Password";
-        string player2Username = "Player2Name";
-        string player2Password = "Player2Password";
         string player1CardName = "Player1SpellCard";
         string player2CardName = "Player2MonsterCard";
         double player1CardDamage = 20;
@@ -297,8 +261,6 @@ public class BattleTests
         GlobalEnums.ElementType player2CardElementType = GlobalEnums.ElementType.Fire;
         GlobalEnums.MonsterType player2CardMonsterType = GlobalEnums.MonsterType.FireElve;
 
-        User player1 = new User(player1Username, player1Password);
-        User player2 = new User(player2Username, player2Password);
         MonsterCard player1MonsterCard = new MonsterCard(player1CardName, player1CardMonsterType, player1CardDamage, player1CardElementType);
         MonsterCard player2MonsterCard = new MonsterCard(player2CardName, player2CardMonsterType, player2CardDamage, player2CardElementType);
 
@@ -314,13 +276,6 @@ public class BattleTests
     {
         int player1Damage = 20;
         int player2Damage = 10;
-        string player1Username = "Player1Name";
-        string player1Password = "Player1Password";
-        string player2Username = "Player2Name";
-        string player2Password = "Player2Password";
-
-        User player1 = new User(player1Username, player1Password);
-        User player2 = new User(player2Username, player2Password);
 
         Battle testBattle = new Battle(player1, player2);
 
@@ -335,13 +290,6 @@ public class BattleTests
     {
         int player1Damage = 10;
         int player2Damage = 10;
-        string player1Username = "Player1Name";
-        string player1Password = "Player1Password";
-        string player2Username = "Player2Name";
-        string player2Password = "Player2Password";
-
-        User player1 = new User(player1Username, player1Password);
-        User player2 = new User(player2Username, player2Password);
 
         Battle testBattle = new Battle(player1, player2);
 
@@ -356,13 +304,6 @@ public class BattleTests
     {
         int player1Damage = 10;
         int player2Damage = 20;
-        string player1Username = "Player1Name";
-        string player1Password = "Player1Password";
-        string player2Username = "Player2Name";
-        string player2Password = "Player2Password";
-
-        User player1 = new User(player1Username, player1Password);
-        User player2 = new User(player2Username, player2Password);
 
         Battle testBattle = new Battle(player1, player2);
 

@@ -14,6 +14,8 @@ namespace SWEN1_MCTG
 {
     internal class Program
     {
+        public const bool ALLOW_DEBUG_TOKEN = true;
+
         static void Main(string[] args)
         {
             HttpSvr svr = new();
@@ -40,6 +42,20 @@ namespace SWEN1_MCTG
                 try
                 {
                     userHandler.Handle(e);
+                }
+                catch (Exception ex)
+                {
+                    e.Reply(HttpStatusCode.BAD_REQUEST, $"Error processing request: {ex.Message}");
+                }
+            }
+
+            else if (e.Path.Contains("/sessions"))
+            {
+                SessionHandler sessionHandler = new();
+
+                try
+                {
+                    sessionHandler.Handle(e);
                 }
                 catch (Exception ex)
                 {

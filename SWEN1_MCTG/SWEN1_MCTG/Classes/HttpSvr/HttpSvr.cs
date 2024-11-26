@@ -39,7 +39,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr
             if(Active) return;
 
             Active = true;
-            _Listener = new(IPAddress.Parse("127.0.0.1"), 12000);
+            _Listener = new(IPAddress.Parse("127.0.0.1"), 10001);
             _Listener.Start();
 
             byte[] buf = new byte[256];
