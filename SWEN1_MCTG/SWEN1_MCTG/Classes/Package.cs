@@ -23,11 +23,19 @@ namespace SWEN1_MCTG.Classes
         }
 
         // Methods
+        /// <summary>
+        /// Adds a card to the package
+        /// </summary>
+        /// <param name="card"> The card to be added </param>
         public void AddCard(Card card)
         {
             _cards.Add(card);
         }
 
+        /// <summary>
+        /// Removes from the package
+        /// </summary>
+        /// <param name="card"> The card to be removed </param>
         public void RemoveCard(Card card)
         {
             _cards.Remove(card);

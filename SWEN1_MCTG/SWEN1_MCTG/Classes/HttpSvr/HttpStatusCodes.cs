@@ -4,12 +4,10 @@
 
 namespace SWEN1_MCTG.Classes.HttpSvr
 {
-    /// <summary>
-    /// Contains the most common HTTP status codes.
-    /// </summary>
+    // Contains the most common HTTP status codes.
     public static class HttpStatusCode
     {
-        public const int OK = 200;
+        public const int OK = 201;
 
         public const int BAD_REQUEST = 400;
 

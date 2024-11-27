@@ -40,35 +40,52 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
         private static bool _CreateUser(HttpSvrEventArgs e)
         {
             JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
-            int status = HttpStatusCode.BAD_REQUEST;                            
+            int status = HttpStatusCode.BAD_REQUEST;
 
             try
             {
-                JsonNode? json = JsonNode.Parse(e.Payload);                     
+                JsonNode? json = JsonNode.Parse(e.Payload);
                 if (json != null)
-                {                                                               
-                    User.Create((string)json["Username"]!, 
-                        (string)json["Password"]!);
-                    status = HttpStatusCode.OK;
-                    reply = new JsonObject()
+                {
+                    string username = (string)json["Username"]!;
+                    string password = (string)json["Password"]!;
+
+                    // Check if the user already exists
+                    if (User.Exists(username))
                     {
-                        ["success"] = true,
-                        ["message"] = "User created successfully."
-                    };
+                        status = HttpStatusCode.BAD_REQUEST;
+                        reply = new JsonObject()
+                        {
+                            ["success"] = false,
+                            ["message"] = "User already exists."
+                        };
+                    }
+                    else
+                    {
+                        // Create the new user
+                        User.Create(username, password);
+                        status = HttpStatusCode.OK;
+                        reply = new JsonObject()
+                        {
+                            ["success"] = true,
+                            ["message"] = "User created successfully."
+                        };
+                    }
                 }
             }
             catch (UserException ex)
-            {                                                                  
+            {
                 reply = new JsonObject() { ["success"] = false, ["message"] = ex.Message };
             }
             catch (Exception)
-            {                                                                   
+            {
                 reply = new JsonObject() { ["success"] = false, ["message"] = "Unexpected error." };
             }
 
-            e.Reply(status, reply?.ToJsonString());                            
+            e.Reply(status, reply?.ToJsonString());
             return true;
         }
+
 
         /// <summary>
         /// Gets user information

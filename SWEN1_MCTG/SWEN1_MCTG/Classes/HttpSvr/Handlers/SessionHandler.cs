@@ -58,7 +58,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                         reply = new JsonObject()
                         {
                             ["success"] = false,
-                            ["message"] = "Login failed. Unauthorized."
+                            ["message"] = "Login failed"
                         };
                     }
                 }

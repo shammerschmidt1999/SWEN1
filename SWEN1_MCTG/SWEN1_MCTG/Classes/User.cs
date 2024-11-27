@@ -102,11 +102,6 @@ namespace SWEN1_MCTG.Classes
 
         public static void Create(string username, string password)
         {
-            if (_Users.ContainsKey(username))
-            {
-                throw new UserException("Username already exists");
-            }
-
             User user = new();
             {
                 user._username = username;
@@ -121,6 +116,12 @@ namespace SWEN1_MCTG.Classes
             _Users.Add(user.Username, user);
         }
 
+        /// <summary>
+        /// Compares the given username and password with the stored ones, creates Token on success
+        /// </summary>
+        /// <param name="username"> Provided username </param>
+        /// <param name="password"> Provided password </param>
+        /// <returns> Success status and created token </returns>
         public static (bool Success, string Token) Logon(string username, string password)
         {
             if (_Users.ContainsKey(username) && _Users[username].Password == password)
@@ -131,6 +132,11 @@ namespace SWEN1_MCTG.Classes
             return (false, string.Empty);
         }
 
+        /// <summary>
+        /// Changes user data if the token is valid
+        /// </summary>
+        /// <param name="token"> Token string </param>
+        /// <exception cref="UserException"> Exception on wrong token </exception>
         public void Save(string token)
         {
             (bool Success, User? User) auth = Token.Authenticate(token);
@@ -148,12 +154,30 @@ namespace SWEN1_MCTG.Classes
             }
         }
 
+        /// <summary>
+        /// Gets a user object by username
+        /// </summary>
+        /// <param name="userName"> Username to search for </param>
+        /// <returns> User object with provided username </returns>
         public static User? Get(string userName)
         {
             _Users.TryGetValue(userName, out User? user);
             return user;
         }
 
+        /// <summary>
+        /// Checks if user exists in User list
+        /// </summary>
+        /// <param name="userName"> Username to search for </param>
+        /// <returns> True if user exists, else false </returns>
+        public static bool Exists(string userName)
+        {
+            return _Users.ContainsKey(userName);
+        }
+
+        /// <summary>
+        /// Clears user list
+        /// </summary>
         public static void ClearList()
         {
             _Users.Clear();

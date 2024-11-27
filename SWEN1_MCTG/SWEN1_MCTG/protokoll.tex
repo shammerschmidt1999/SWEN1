@@ -1,0 +1,42 @@
+\documentclass{article}
+\usepackage[top=3cm, margin=1cm]{geometry}
+\usepackage[german]{babel}
+
+\title{myFind Protokoll}
+\author{Paul Passauer, Samuel Hammerschmidt}
+\date{November 2024}
+
+\begin{document}
+
+\maketitle
+
+\section*{Konzept der Parallelisierung}
+Das Programm soll nach Einlesen der Suchoptionen pro angegebenen Dateinamen einen Kindprozess erstellen. Diese suchen alle am selben Suchpfad, der durch den User angegeben wird, parallel nach den unterschiedlichen Dateinnamen.
+Dies reduziert die Bearbeitungszeit des Programms. Durch die Verwendung von Message Queues senden die Kindprozesse die Ergebnisse an den Elternprozess, der diese dann ausgibt.
+
+\section*{Ablauf der Parallelisierung}
+\begin{enumerate}
+    \item Der Elternprozess erstellt für jeden Dateinamen einen Kindprozess. Dies passiert in einer \texttt{foreach Schleife}, die über die Dateinamen iteriert und mit \texttt{fork()} einen Kindprozess erstellt.
+    \item Über einen \texttt{Switch-Case} wird geprüft ob es sich um den Eltern- oder Kindprozess handelt.
+    \item Sollte es beim Abspalten der Kindprozesse zu Problemen kommen kommt es zu \texttt{case: -1} (Error-Case). In diesem Fall wird die Message Queue gelöscht und eine Fehlermeldung wird ausgegeben.
+    \item Die Kindprozesse arbeiten in \texttt{case: 0} und rufen darin die Funktion \texttt{search\_file()} auf, die im angegebenen Verzeichnis nach dem Dateinamen sucht.
+    \item Der Elternprozess arbeitet in \texttt{case: default} und wartet durch \texttt{wait()} auf den Abschluss der Kindprozesse. Die Ergebnisse der Suche werden über eine Message Queue empfangen.
+    \item Der Elternprozess gibt die Ergebnisse auf \texttt{stdout} aus.
+\end{enumerate}
+
+\section*{Verwendung von Message Queues}
+Bei der Message Queue handelt es sich um eine Sammlung von Messages. Eine Message wird druch ein \texttt{Struct} repräsentiert, welches aus einem \texttt{long msg\_type} (verwendet für die Zuordnung von Kindprozess zu Nachricht) und einem \texttt{char msg\_text[100]} (der eigentliche Inhalt der Nachricht) besteht.
+\begin{enumerate}
+    \item Die Message Queue wird noch vor dem \texttt{fork()} für die Kindprozesse durch den zuvor erwähnten \texttt{foreach Loop} erstellt. Die Funktion \texttt{search\_file()} erhält die ID der Message Queue \texttt{msg\_id} als Parameter.
+    \item Nach der Suche wird die Nachricht \texttt{msg} über die Message Queue mit \texttt{msgsnd()} an den Elternprozess gesendet. Dieser empfängt die Message mit \texttt{msgrcv()}.
+    \item Um eine eindeutige Identifikation der Nachrichten und eine korrekte Reihenfolge zu garantieren, wird der \texttt{msg\_type} auf die PID des Kindprozesses gesetzt.
+    \item Nachdem alle Kindprozesse ihre Ergebnisse an den Elternprozess gesendet haben (garantiert durch \texttt{wait()} im Elternprozess), gibt der Elternprozess die Ergebnisse auf \texttt{stdout} aus.
+    Dies passiert durch eine \texttt{while-Schleife}, die über die Einträge der Message Queue iteriert und die Nachrichten ausgibt. Da die Kindprozesse nicht direkt mit \texttt{stdout} arbeiten, sondern über die Message Queue, hat letztendlich nur der Elternprozess die Möglichkeit, die Nachrichten über \texttt{stdout} auszugeben.
+    \item Schließlich wird die Message Queue mit \texttt{msgctl()} gelöscht.
+\end{enumerate}
+
+\section*{Zusammenfassung}
+Die Verwendung von Kindprozessen im Zusammenspiel mit dem \texttt{wait()} des Elternprozesses garantiert eine parallele Suche.
+Die Message Queue sorgt für eine geordnete und mit Parallelisierung kompatible Möglichkeit für die Ausgabe der Ergebnisse auf \texttt{stdout}.
+
+\end{document}

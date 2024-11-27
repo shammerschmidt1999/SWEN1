@@ -7,21 +7,21 @@ using System.Text;
 
 namespace SWEN1_MCTG.Classes.HttpSvr
 {
-    /// <summary>This class implements an HTTP server.</summary>
+    // Implements an HTTP server
     public sealed class HttpSvr
     {
         
         // Properties
         private TcpListener? _Listener;
 
-        /// <summary> Gets if the server is available. </summary>
+        // Gets if the server is available
         public bool Active
         {
             get; private set;
         } = false;
 
         // Events
-        /// <summary> Is raised when incoming data is available. </summary>
+        // Is raised when incoming data is available
         public event HttpSvrEventHandler? Incoming;
 
         // Methods

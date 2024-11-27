@@ -4,12 +4,10 @@
 
 namespace SWEN1_MCTG.Classes.HttpSvr
 {
-    /// <summary>This class represents an HTTP header.</summary>
+    // Represents an HTTP header
     public class HttpHeader
     {
         // Constructor
-        /// <summary> Creates a new instance of this class. </summary>
-        /// <param name="header"> Raw header string. </param>
         public HttpHeader(string header)
         {
             Name = Value = string.Empty;
@@ -24,13 +22,11 @@ namespace SWEN1_MCTG.Classes.HttpSvr
         }
 
         // Properties
-        /// <summary> Gets the header name. </summary>
         public string Name
         {
             get; protected set;
         }
 
-        /// <summary> Gets the header value. </summary>
         public string Value
         {
             get; protected set;

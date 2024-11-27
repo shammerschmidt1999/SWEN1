@@ -11,5 +11,6 @@ namespace SWEN1_MCTG.Interfaces
     {
         void PrintUser();
         void PrintStack(Stack stack);
+        void Save(string token);
     }
 }

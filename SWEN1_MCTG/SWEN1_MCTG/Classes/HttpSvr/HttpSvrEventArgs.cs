@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Text;
-
+using System.Text.Json.Nodes;
 
 
 namespace SWEN1_MCTG.Classes.HttpSvr
@@ -9,14 +9,10 @@ namespace SWEN1_MCTG.Classes.HttpSvr
     /// <summary>This class defines event arguments for the <see cref="HttpSvrEventHandler"/> event handler.</summary>
     public class HttpSvrEventArgs: EventArgs
     {
-        // Members   
-        /// <summary> TCP client. </summary>
+        // TCP client
         protected TcpClient _Client;
 
         // Constructor
-        /// <summary> Creates a new instance of this class. </summary>
-        /// <param name="client"> TCP client. </param>
-        /// <param name="plainMessage"> Plain HTTP message. </param>
         public HttpSvrEventArgs(TcpClient client, string plainMessage) 
         {
             _Client = client;
@@ -57,35 +53,26 @@ namespace SWEN1_MCTG.Classes.HttpSvr
         }
 
         // Properties
-        /// <summary> Gets the plain message. </summary>
         public string PlainMessage
         {
             get; protected set;
         } = string.Empty;
 
-
-        /// <summary> Gets the HTTP method. </summary>
         public virtual string Method
         {
             get; protected set;
         } = string.Empty;
 
-
-        /// <summary> Gets the HTTP path. </summary>
         public virtual string Path
         {
             get; protected set;
         } = string.Empty;
 
-
-        /// <summary> Gets the HTTP headers. </summary>
         public virtual HttpHeader[] Headers
         {
             get; protected set;
         } = Array.Empty<HttpHeader>();
 
-
-        /// <summary> Gets the payload. </summary>
         public virtual string Payload
         {
             get; protected set;
@@ -105,31 +92,68 @@ namespace SWEN1_MCTG.Classes.HttpSvr
         {
             string data;
 
-            switch(status)
+            switch (status)
             {
-                case 200:
-                    data = "HTTP/1.1 200 OK\n"; break;
-                case 400:
-                    data = "HTTP/1.1 400 Bad Request\n"; break;
-                case 401:
-                    data = "HTTP/1.1 401 Unauthorized\n"; break;
-                case 404:
-                    data = "HTTP/1.1 404 Not found\n"; break;
+                case HttpStatusCode.OK:
+                    data = $"HTTP/1.1 {HttpStatusCode.OK} OK\n";
+                    break;
+                case HttpStatusCode.BAD_REQUEST:
+                    data = $"HTTP/1.1 {HttpStatusCode.BAD_REQUEST} Bad Request\n";
+                    break;
+                case HttpStatusCode.UNAUTHORIZED:
+                    data = $"HTTP/1.1 {HttpStatusCode.UNAUTHORIZED} Unauthorized\n";
+                    break;
+                case HttpStatusCode.NOT_FOUND:
+                    data = $"HTTP/1.1 {HttpStatusCode.NOT_FOUND} Not Found\n";
+                    break;
                 default:
-                    data = $"HTTP/1.1 {status} Status unknown\n"; break;
+                    data = $"HTTP/1.1 {status} Status Unknown\n";
+                    break;
             }
 
-            if(string.IsNullOrEmpty(body)) 
+            string message = string.Empty;
+            if (!string.IsNullOrEmpty(body))
+            {
+                try
+                {
+                    JsonNode? json = JsonNode.Parse(body);
+                    if (json != null)
+                    {
+                        if (json["message"] != null)
+                        {
+                            message = json["message"]!.ToString();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error parsing body: {ex.Message}");
+                }
+            }
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                data += $"Message: {message}\n";
+            }
+
+            if (string.IsNullOrEmpty(body))
             {
                 data += "Content-Length: 0\n";
             }
             data += "Content-Type: text/plain\n\n";
-            if(!string.IsNullOrEmpty(body)) { data += body; }
+            if (!string.IsNullOrEmpty(body))
+            {
+                data += body;
+            }
+
+            data += "\n";
 
             byte[] buf = Encoding.ASCII.GetBytes(data);
             _Client.GetStream().Write(buf, 0, buf.Length);
             _Client.Close();
             _Client.Dispose();
         }
+
+
     }
 }
