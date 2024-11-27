@@ -115,12 +115,15 @@ Der HTTP-Server funktioniert folgendermaßen:
     \item In der \texttt{Program}-Klasse wird ein \texttt{HttpSvr}-Objekt erstellt und gestartet. Der Server lauscht auf eingehende HTTP-Anfragen.
     \item Das Incoming-Event des Servers wird mit der Methode \texttt{Svr\_Incoming} verknüpft, die aufgerufen wird, wenn eine Anfrage eingeht.
     \item Die Methode \texttt{Svr\_Incoming} empfängt die Anfrage und gibt die HTTP-Methode, den Pfad und die Header der Anfrage auf der Konsole aus.
-    \item Basierend auf dem Pfad der Anfrage wird entschieden, welcher \texttt{Handler} die Anfrage weiterverarbeiten soll. Dies geschieht durch eine Zuordnung von Pfaden zu Handler-Methoden.
+    \item Basierend auf dem Pfad der Anfrage wird entschieden, welcher \texttt{Handler} die Anfrage weiterverarbeiten soll. Dies geschieht durch die \texttt{HandleEvent}-Methode der {Handler}-Klasse.
     \item Wenn der Pfad \texttt{/users} enthält, wird die Anfrage an den \texttt{UserHandler} weitergeleitet. Wenn der Pfad \texttt{/sessions} enthält, wird die Anfrage an den \texttt{SessionHandler} weitergeleitet. Andernfalls wird eine 404-Fehlermeldung zurückgegeben.
     \item Jeder spezifische \texttt{Handler} erbt von der \texttt{Handler}-Klasse und kann die \texttt{Handle}-Methode überschreiben, um spezifische Logik für die Verarbeitung der Anfrage zu implementieren.
     \item Die \texttt{HttpSvrEventArgs}-Klasse enthält Informationen über die eingehende HTTP-Anfrage, einschließlich Methode, Pfad, Header und Payload.
     \item Die Methode \texttt{Reply} der \texttt{HttpSvrEventArgs}-Klasse wird verwendet, um eine HTTP-Antwort an den Client zu senden, einschließlich Statuscode und optionalem Antworttext.
 \end{enumerate}
+
+\subsection{Tokens}
+Für die Authentifizierung der Benutzer wird ein Token-System verwendet. Beim Einloggen wird ein Token generiert und an den Client zurückgegeben. Dieses Token wird bei jeder Anfrage des Clients an den Server mitgeschickt und dient zur Authentifizierung des Benutzers. Das Token wird im Arbeitsspeicher gespeichert und ist nur für die Dauer der Sitzung gültig. Das Token wird beim Ausloggen oder nach einer gewissen Zeit ungültig.
 
 \subsection{Interfaces}
 Für die meisten Klassen wurden Interfaces implementiert. Dies hat den Grund, dass die Klassen dadurch flexibler und austauschbarer werden. So kann z.B. ein \texttt{MonsterCard}-Objekt als \texttt{Card}-Objekt behandelt werden, wenn es das \texttt{ICard}-Interface implementiert. Dadurch können Methoden, die ein \texttt{Card}-Objekt erwarten, auch ein \texttt{MonsterCard}-Objekt akzeptieren.

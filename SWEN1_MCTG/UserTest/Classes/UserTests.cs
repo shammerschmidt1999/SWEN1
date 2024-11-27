@@ -11,40 +11,35 @@ namespace UserTest.Classes;
 [TestClass]
 public class UserTests
 {
-    private User createdUser;
+    private static User createdUser;
+    private static string playerUsername;
+    private static string playerPassword;
 
-    private string player1Username;
-    private string player1Password;
-    private string player2Username;
-    private string player2Password;
-
-    [TestInitialize]
-    public void Setup()
+    [ClassInitialize]
+    public static void Setup(TestContext context)
     {
         // Initialize the fields
-        player1Username = "createdUserUsername";
-        player1Password = "createdUserPassword";
+        playerUsername = "createdUserUsername";
+        playerPassword = "createdUserPassword";
 
-        // Create the users
-        
-        User.Create(player1Username, player1Password);
+        // Create the user
+        User.Create(playerUsername, playerPassword);
 
-        // Retrieve the users
-        createdUser = User.Get(player1Username);
+        // Retrieve the user
+        createdUser = User.Get(playerUsername);
     }
 
     [TestMethod]
     public void Constructor_CreateUser_UsernameAndPasswordEqualToStringParameters()
     {
-        Assert.AreEqual(player1Username, createdUser.Username);
-        Assert.AreEqual(player1Password, createdUser.Password);
+        Assert.AreEqual(playerUsername, createdUser.Username);
+        Assert.AreEqual(playerPassword, createdUser.Password);
     }
 
     [TestMethod]
     public void Constructor_CreateUser_UserStacksAreEmptyCardLists()
     {
         bool expectedEmpty = false;
-
 
         Assert.AreEqual(expectedEmpty, createdUser.UserCards.Cards.Any());
         Assert.AreEqual(expectedEmpty, createdUser.UserDeck.Cards.Any());
@@ -59,6 +54,5 @@ public class UserTests
 
         Assert.AreEqual(expectedCoins, createdUser.UserCoinPurse.GetCoinsValue());
     }
-
 }
 

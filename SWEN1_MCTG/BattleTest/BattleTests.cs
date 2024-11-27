@@ -12,16 +12,16 @@ namespace BattleTest;
 public class BattleTests
 {
 
-    private User player1;
-    private User player2;
+    private static User player1;
+    private static User player2;
 
-    private string player1Username;
-    private string player1Password;
-    private string player2Username;
-    private string player2Password;
+    private static string player1Username;
+    private static string player1Password;
+    private static string player2Username;
+    private static string player2Password;
 
-    [TestInitialize]
-    public void Setup()
+    [ClassInitialize]
+    public static void Setup(TestContext context)
     {
         player1Username = "Player1Name";
         player1Password = "Player1Password";
@@ -29,7 +29,6 @@ public class BattleTests
         player2Password = "Player2Password";
 
         // Create the users
-        User.ClearList(); // Ensure list is clear before creating users
         User.Create(player1Username, player1Password);
         User.Create(player2Username, player2Password);
 

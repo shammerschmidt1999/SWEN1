@@ -34,49 +34,8 @@ namespace SWEN1_MCTG
                 Console.WriteLine(i.Name + ": " + i.Value);
             }
 
-            var pathHandlers = new Dictionary<string, Action<HttpSvrEventArgs>>
-            {
-                { "/users", HandleUserRequest },
-                { "/sessions", HandleSessionRequest }
-            };
+            Handler.HandleEvent(e);
 
-            foreach (var pathHandler in pathHandlers)
-            {
-                if (e.Path.Contains(pathHandler.Key))
-                {
-                    pathHandler.Value(e);
-                    return;
-                }
-            }
-
-            e.Reply(HttpStatusCode.NOT_FOUND, "Endpoint not found");
         }
-
-        private static void HandleUserRequest(HttpSvrEventArgs e)
-        {
-            UserHandler userHandler = new();
-            try
-            {
-                userHandler.Handle(e);
-            }
-            catch (Exception ex)
-            {
-                e.Reply(HttpStatusCode.BAD_REQUEST, $"Error processing request: {ex.Message}");
-            }
-        }
-
-        private static void HandleSessionRequest(HttpSvrEventArgs e)
-        {
-            SessionHandler sessionHandler = new();
-            try
-            {
-                sessionHandler.Handle(e);
-            }
-            catch (Exception ex)
-            {
-                e.Reply(HttpStatusCode.BAD_REQUEST, $"Error processing request: {ex.Message}");
-            }
-        }
-
     }
 }
