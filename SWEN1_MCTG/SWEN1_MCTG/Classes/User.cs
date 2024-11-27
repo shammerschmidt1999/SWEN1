@@ -174,13 +174,5 @@ namespace SWEN1_MCTG.Classes
         {
             return _Users.ContainsKey(userName);
         }
-
-        /// <summary>
-        /// Clears user list
-        /// </summary>
-        public static void ClearList()
-        {
-            _Users.Clear();
-        }
     }
 }

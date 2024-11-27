@@ -12,7 +12,7 @@
 \titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
 
 % Custom Title
-\title{\vspace{-1cm}SWEN1 - Intermediate Protokoll}
+\title{\vspace{-1cm}SWEN1 - Intermediate Protokoll MCTG}
 \author{
     \textbf{Samuel Hammerschmidt} \\
     \href{https://github.com/shammerschmidt1999/SWEN1}{\texttt{GitHub: github.com/shammerschmidt1999/SWEN1}}
@@ -25,10 +25,8 @@
 
 \section{Einführung}
 \subsection{Projektstruktur}
-Das Projekt ist in mehrere Klassen aufgeteilt. Durch Vererbung und Polymorphismus wird eine einfache Erweiterung des Spiels ermöglicht. Die Klassen sind in verschiedene Dateien aufgeteilt, um die Struktur des Projekts übersichtlich zu halten. Die Klassen sind in verschiedene Namespaces aufgeteilt, um eine klare Struktur zu gewährleisten. Die Klassen sind in verschiedene Namespaces aufgeteilt, um eine klare Struktur zu gewährleisten. Die Klassen sind in verschiedene Namespaces aufgeteilt, um eine klare Struktur zu gewährleisten.
-Die Klassen sind in verschiedene Namespaces aufgeteilt, um eine klare Struktur zu garantieren.
-Weiters wurden Interfaces implementiert, um die Klassen flexibler und austauschbarer zu machen.
-Klassen haben neben ihren Properties auch private Fields, dies dient der Steuerung des Zugriffs auf die Eigenschaften.
+Das Projekt MCTG ist in mehrere Klassen aufgeteilt. Durch Vererbung und Polymorphismus wird eine einfache Erweiterung des Spiels ermöglicht. Die Klassen sind in verschiedene Dateien und Namespaces aufgeteilt, um die Struktur des Projekts übersichtlich zu halten. Weiters wurden Interfaces implementiert, um die Klassen flexibler und austauschbarer zu machen.
+Neben ihren Properties besitzen Klassen auch private Fields, dies dient der Steuerung des Zugriffs auf die Eigenschaften.
 Die Verwendung von Enumerationen verbessert die Lesbarkeit des Codes und ermöglicht eine einfache Erweiterung des Spiels.
 Der integrierte HTTP-Server ermöglicht die Benutzerregistrierung und -anmeldung. Benutzer werden derzeit noch nicht in einer Datenbank gespeichert, sondern nur im Arbeitsspeicher. Die Implementierung der Datenbankanbindung ist für das Final Hand-In geplant.
 
@@ -103,27 +101,39 @@ Die \texttt{GlobalEnums}-Klasse ist eine statische Klasse, die alle Enumeratione
 Die Verwendung einer globalen Klasse für die Enumerationen ermöglicht eine einfache Anwendung der Enumerationen in verschiedenen Bereichen des Spiels.
 Weiters führt die Verwendung von Enumerationen zu einer verbesserten Lesbarkeit des Codes und die globale Sammlung der Enumerationen ermöglicht eine einfache Erweiterung und eine übersichtliche Struktur.
 
+\subsection{Unit Tests}
+Für die Klassen \texttt{User, Card} und \texttt{Battle} wurden bereits Unit Tests implementiert.
+Diese überprüfen vor allem die korrekte Konstruktion der Klassenobjekte.
+Die \texttt{Battle}-Klasse Unit Tests achten auf die korrekte Berechnung des Schadens und des Gewinners der Runde. Allerdings ist die \texttt{Battle}-Klasse und die Tests dafür nicht für diese Abgabe relevant.
+Weitere Unit Tests werden für das Final Hand-In implementiert.
+
+
 \subsection{HTTP-Server}
-Der HTTP-Server wurde implementiert, um die Benutzerregistrierung und -anmeldung zu ermöglichen. Der Server verwendet die \texttt{HttpListener}-Klasse, um HTTP-Anfragen zu empfangen und zu verarbeiten. Der Server enthält die folgenden Endpunkte:
+Der HTTP-Server wurde implementiert, um die Benutzerregistrierung und -anmeldung zu ermöglichen. Der Server enthält die folgenden Endpunkte:
 \begin{itemize}
-    \item \texttt{POST /user/}: Erstellt einen neuen Benutzer.
-    \item \texttt{POST /session/}: Loggt einen Benutzer ein.
+    \item \texttt{POST /user}: Erstellt einen neuen Benutzer.
+    \item \texttt{POST /sessions}: Loggt einen Benutzer ein.
 \end{itemize}
 
 Der HTTP-Server funktioniert folgendermaßen:
 \begin{enumerate}
-    \item In der \texttt{Program}-Klasse wird ein \texttt{HttpSvr}-Objekt erstellt und gestartet. Der Server lauscht auf eingehende HTTP-Anfragen.
-    \item Das Incoming-Event des Servers wird mit der Methode \texttt{Svr\_Incoming} verknüpft, die aufgerufen wird, wenn eine Anfrage eingeht.
-    \item Die Methode \texttt{Svr\_Incoming} empfängt die Anfrage und gibt die HTTP-Methode, den Pfad und die Header der Anfrage auf der Konsole aus.
-    \item Basierend auf dem Pfad der Anfrage wird entschieden, welcher \texttt{Handler} die Anfrage weiterverarbeiten soll. Dies geschieht durch die \texttt{HandleEvent}-Methode der {Handler}-Klasse.
-    \item Wenn der Pfad \texttt{/users} enthält, wird die Anfrage an den \texttt{UserHandler} weitergeleitet. Wenn der Pfad \texttt{/sessions} enthält, wird die Anfrage an den \texttt{SessionHandler} weitergeleitet. Andernfalls wird eine 404-Fehlermeldung zurückgegeben.
+    \item In der \texttt{Program}-Klasse wird ein \texttt{HttpSvr}-Objekt erstellt und mittels der Methode \texttt{Run()}gestartet. Der Server lauscht auf eingehende HTTP-Anfragen.
+    \item Das Incoming-Event des Servers wird mit der Methode \texttt{Svr\_Incoming()} verknüpft, die aufgerufen wird, wenn eine Anfrage eingeht.
+    \item Die Methode \texttt{Svr\_Incoming()} empfängt die Anfrage und gibt die HTTP-Methode, den Pfad und die Header der Anfrage auf der Konsole aus.
+    \item Basierend auf dem Pfad der Anfrage wird entschieden, welcher \texttt{Handler} die Anfrage weiterverarbeiten soll. Dies geschieht durch die \texttt{HandleEvent()} Methode der {Handler}-Klasse.
+    \item Wenn der Pfad \texttt{/users/} enthält, wird die Anfrage an den \texttt{UserHandler} weitergeleitet. Wenn der Pfad \texttt{/sessions} enthält, wird die Anfrage an den \texttt{SessionHandler} weitergeleitet. Andernfalls wird eine 404-Fehlermeldung zurückgegeben.
     \item Jeder spezifische \texttt{Handler} erbt von der \texttt{Handler}-Klasse und kann die \texttt{Handle}-Methode überschreiben, um spezifische Logik für die Verarbeitung der Anfrage zu implementieren.
     \item Die \texttt{HttpSvrEventArgs}-Klasse enthält Informationen über die eingehende HTTP-Anfrage, einschließlich Methode, Pfad, Header und Payload.
     \item Die Methode \texttt{Reply} der \texttt{HttpSvrEventArgs}-Klasse wird verwendet, um eine HTTP-Antwort an den Client zu senden, einschließlich Statuscode und optionalem Antworttext.
 \end{enumerate}
 
 \subsection{Tokens}
-Für die Authentifizierung der Benutzer wird ein Token-System verwendet. Beim Einloggen wird ein Token generiert und an den Client zurückgegeben. Dieses Token wird bei jeder Anfrage des Clients an den Server mitgeschickt und dient zur Authentifizierung des Benutzers. Das Token wird im Arbeitsspeicher gespeichert und ist nur für die Dauer der Sitzung gültig. Das Token wird beim Ausloggen oder nach einer gewissen Zeit ungültig.
+Beim Einloggen eines Users wird ein Token generiert und an den Client zurückgegeben. Dieser Token wird im weiteren Verlauf des Projektes bei jeder Anfrage des Clients an den Server mitgeschickt und dient zur Authentifizierung des Benutzers. Der Token wird derzeit im Arbeitsspeicher gespeichert. Der Token wird wie folgt generiert:
+\begin{enumerate}
+    \item Nach dem der entsprechende Endpunkt (\texttt{/sessions}) vom Client erhalten wurde, wird die \texttt{\_CreateSession()}-Methode des \texttt{SessionHandler} aufgerufen.
+    \item In der Anfrage sind ein username und password string enthalten, diese werden mit den Daten in der \texttt{\_Users}-Liste verglichen.
+    \item Bei einem Match wird die \texttt{\_CreateTokenFor()}-Methode der \texttt{Token}-Klasse aufgerufen, die einen zufälligen Token erstellt und im \texttt{internal static Dictionary<string, User> \_Tokens} gespeichert. Der generierte Token wird in der Reply mitgeschickt. Ansonsten wird eine 401-Statuscode Fehlermeldung als Reply returniert.
+\end{enumerate}
 
 \subsection{Interfaces}
 Für die meisten Klassen wurden Interfaces implementiert. Dies hat den Grund, dass die Klassen dadurch flexibler und austauschbarer werden. So kann z.B. ein \texttt{MonsterCard}-Objekt als \texttt{Card}-Objekt behandelt werden, wenn es das \texttt{ICard}-Interface implementiert. Dadurch können Methoden, die ein \texttt{Card}-Objekt erwarten, auch ein \texttt{MonsterCard}-Objekt akzeptieren.
