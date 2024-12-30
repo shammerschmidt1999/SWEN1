@@ -19,11 +19,18 @@ namespace SWEN1_MCTG.Classes
         }
 
         // Fields
+        protected int _id;
         protected string _name;
         protected double _damage;
         protected GlobalEnums.ElementType _elementType;
 
         // Properties
+
+        public int Id
+        {
+            get => _id;
+            set => _id = value;
+        }
         public string Name
         {
             get => _name;

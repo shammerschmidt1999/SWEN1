@@ -251,6 +251,7 @@ public class BattleTests
     [TestMethod]
     public void CalculateDamage_MonsterlVsMonsterDamage_AttackWithoutSynergyDamageDoesNotChange()
     {
+
         string player1CardName = "Player1SpellCard";
         string player2CardName = "Player2MonsterCard";
         double player1CardDamage = 20;
