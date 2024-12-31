@@ -16,11 +16,24 @@ namespace SWEN1_MCTG.Classes
         private static Dictionary<string, User> _Users = new Dictionary<string, User>();
 
         // Constructor
-        private User()
+        public User()
         {
         }
 
+        public User(string username, string password)
+        {
+            _username = username;
+            _password = password;
+            _userCards = new Stack();
+            _userDeck = new Stack();
+            _userHand = new Stack();
+            _userDiscard = new Stack();
+            _userCoinPurse = new CoinPurse();
+            _elo = 1000;
+        }
+
         // Fields
+        private int _id;
         private string _username = string.Empty;
         private string _password = string.Empty;
         private int _elo = 1000;
@@ -31,22 +44,27 @@ namespace SWEN1_MCTG.Classes
         private CoinPurse _userCoinPurse = new CoinPurse();
 
         // Properties
+        public int Id
+        {
+            get => _id;
+            set => _id = value;
+        }
         public string Username
         {
             get => _username;
-            private set => _username = value;
+            set => _username = value;
         }
 
         public string Password
         {
             get => _password;
-            private set => _password = value;
+            set => _password = value;
         }
 
         public Stack UserCards
         {
             get => _userCards;
-            private set => _userCards = value;
+            set => _userCards = value;
         }
 
         public Stack UserDiscard
@@ -64,7 +82,7 @@ namespace SWEN1_MCTG.Classes
         public int Elo
         {
             get => _elo;
-            private set => _elo = value;
+            set => _elo = value;
         }
 
         public Stack UserDeck
@@ -197,6 +215,24 @@ namespace SWEN1_MCTG.Classes
         public void PrintCoins()
         {
             _userCoinPurse.PrintCoins();
+        }
+
+        // Wrapper method to add a card to the user's stack
+        public void AddCard(Card newCard, Stack stack)
+        {
+            stack.AddCardToStack(newCard);
+        }
+
+        // Wrapper method to remove a card from the user's stack
+        public void RemoveCard(string cardName, Stack stack)
+        {
+            stack.RemoveCardFromStack(cardName);
+        }
+
+        // Wrapper method to get a card from the user's stack
+        public Card GetCard(string cardName, Stack stack)
+        {
+            return stack.GetCardFromStack(cardName);
         }
 
     }

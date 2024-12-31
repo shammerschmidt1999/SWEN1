@@ -18,6 +18,8 @@ namespace SWEN1_MCTG.Classes
             _elementType = elementType;
         }
 
+        public Card() {}
+
         // Fields
         protected int _id;
         protected string _name;

@@ -8,6 +8,7 @@ using SWEN1_MCTG.Data.Repositories;
 
 namespace SWEN1_MCTG.Data
 {
+    // TODO: CLEAN THIS UP
     public class CardRepository : ICardRepository
     {
         private readonly string _connectionString;
@@ -21,7 +22,7 @@ namespace SWEN1_MCTG.Data
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            var tableName = "Cards";
+            var tableName = "cards";
             var insertQuery = GenerateInsertQuery(tableName, entity) + " RETURNING Id";
 
             using var command = new NpgsqlCommand(insertQuery, connection);
@@ -38,7 +39,7 @@ namespace SWEN1_MCTG.Data
         }
         public IEnumerable<Card> GetAll()
         {
-            var tableName = "Cards";
+            var tableName = "cards";
             var query = $"SELECT * FROM {tableName}";
 
             using var connection = new NpgsqlConnection(_connectionString);
@@ -51,7 +52,7 @@ namespace SWEN1_MCTG.Data
         }
         public Card GetById(int id)
         {
-            var tableName = "Cards";
+            var tableName = "cards";
             var query = $"SELECT * FROM {tableName} WHERE Id = @Id";
 
             using var connection = new NpgsqlConnection(_connectionString);
@@ -70,7 +71,7 @@ namespace SWEN1_MCTG.Data
         }
         public Card GetByName(string name)
         {
-            var tableName = "Cards";
+            var tableName = "cards";
             var query = $"SELECT * FROM {tableName} WHERE Name = @Name";
 
             using var connection = new NpgsqlConnection(_connectionString);
@@ -92,7 +93,7 @@ namespace SWEN1_MCTG.Data
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            var tableName = "Cards";
+            var tableName = "cards";
             var updateQuery = GenerateUpdateQuery(tableName, entity);
 
             using var command = new NpgsqlCommand(updateQuery, connection);
@@ -102,7 +103,7 @@ namespace SWEN1_MCTG.Data
         }
         public void Delete(int id)
         {
-            var tableName = "Cards";
+            var tableName = "cards";
             var query = $"DELETE FROM {tableName} WHERE Id = @Id";
 
             using var connection = new NpgsqlConnection(_connectionString);

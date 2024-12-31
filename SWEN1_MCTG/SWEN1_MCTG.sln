@@ -17,7 +17,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RepositoryTests", "Reposito
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ClassTests", "ClassTests", "{6A658A28-1385-4633-AE98-2330E6A9788A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardRepositoryTest", "CardRepositoryTest\CardRepositoryTest.csproj", "{2AD41F1E-C60A-4F19-AEF5-606E7F7D339A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CardRepositoryTest", "CardRepositoryTest\CardRepositoryTest.csproj", "{2AD41F1E-C60A-4F19-AEF5-606E7F7D339A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserRepositoryTest.cs", "UserRepositoryTest.cs\UserRepositoryTest.cs.csproj", "{FAF27B48-F0B9-448F-8EE3-1B29C069A976}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{2AD41F1E-C60A-4F19-AEF5-606E7F7D339A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2AD41F1E-C60A-4F19-AEF5-606E7F7D339A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2AD41F1E-C60A-4F19-AEF5-606E7F7D339A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FAF27B48-F0B9-448F-8EE3-1B29C069A976}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAF27B48-F0B9-448F-8EE3-1B29C069A976}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAF27B48-F0B9-448F-8EE3-1B29C069A976}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAF27B48-F0B9-448F-8EE3-1B29C069A976}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -56,6 +62,7 @@ Global
 		{B559E207-E8EE-4EAE-81C6-F6FFA2D82989} = {A5245774-16BF-4A0C-96B3-0B51B5BFD4DB}
 		{6A658A28-1385-4633-AE98-2330E6A9788A} = {A5245774-16BF-4A0C-96B3-0B51B5BFD4DB}
 		{2AD41F1E-C60A-4F19-AEF5-606E7F7D339A} = {B559E207-E8EE-4EAE-81C6-F6FFA2D82989}
+		{FAF27B48-F0B9-448F-8EE3-1B29C069A976} = {B559E207-E8EE-4EAE-81C6-F6FFA2D82989}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {03A6ABD7-FB71-4AF3-B4C3-D5FD9B94256A}

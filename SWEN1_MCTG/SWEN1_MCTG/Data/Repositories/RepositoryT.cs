@@ -1,146 +1,167 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using Newtonsoft.Json;
 using Npgsql;
-using System.Reflection;
 
-namespace SWEN1_MCTG.Data.Repositories;
-
-public class RepositoryT<T> : IRepository<T> where T : class, new()
+namespace SWEN1_MCTG.Data.Repositories
 {
-    private readonly string _connectionString;
-    public RepositoryT(string connectionString)
+    public abstract class Repository<T> : IRepository<T> where T : class, new()
     {
-        _connectionString = connectionString;
-    }
+        protected readonly string _connectionString;
+        protected readonly string _tableName;
 
-    public void Add(T entity)
-    {
-        using var connection = new NpgsqlConnection(_connectionString);
-        connection.Open();
-
-        var tableName = typeof(T).Name + "s"; // Assumes table name is pluralized
-        var insertQuery = GenerateInsertQuery(tableName, entity);
-
-        using var command = new NpgsqlCommand(insertQuery, connection);
-        AddParameters(command, entity);
-
-        command.ExecuteNonQuery();
-    }
-
-    public IEnumerable<T> GetAll()
-    {
-        var tableName = typeof(T).Name + "s"; // Assumes table name is pluralized
-        var query = $"SELECT * FROM {tableName}";
-
-        using var connection = new NpgsqlConnection(_connectionString);
-        connection.Open();
-
-        using var command = new NpgsqlCommand(query, connection);
-        using var reader = command.ExecuteReader();
-
-        return MapReaderToEntities(reader);
-    }
-
-    public T GetById(int id)
-    {
-        var tableName = typeof(T).Name + "s"; // Assumes table name is pluralized
-        var query = $"SELECT * FROM {tableName} WHERE Id = @Id";
-
-        using var connection = new NpgsqlConnection(_connectionString);
-        connection.Open();
-
-        using var command = new NpgsqlCommand(query, connection);
-        command.Parameters.AddWithValue("@Id", id);
-
-        using var reader = command.ExecuteReader();
-        if (reader.Read())
+        protected Repository(string connectionString, string tableName)
         {
-            return MapReaderToEntity(reader);
+            _connectionString = connectionString;
+            _tableName = tableName;
         }
 
-        return null;
-    }
-
-    public void Update(T entity)
-    {
-        using var connection = new NpgsqlConnection(_connectionString);
-        connection.Open();
-
-        var tableName = typeof(T).Name + "s"; // Assumes table name is pluralized
-        var updateQuery = GenerateUpdateQuery(tableName, entity);
-
-        using var command = new NpgsqlCommand(updateQuery, connection);
-        AddParameters(command, entity);
-
-        command.ExecuteNonQuery();
-    }
-
-    public void Delete(int id)
-    {
-        var tableName = typeof(T).Name + "s"; // Assumes table name is pluralized
-        var query = $"DELETE FROM {tableName} WHERE Id = @Id";
-
-        using var connection = new NpgsqlConnection(_connectionString);
-        connection.Open();
-
-        using var command = new NpgsqlCommand(query, connection);
-        command.Parameters.AddWithValue("@Id", id);
-
-        command.ExecuteNonQuery();
-    }
-
-    private static string GenerateInsertQuery(string tableName, T entity)
-    {
-        var properties = typeof(T).GetProperties();
-        var columnNames = string.Join(", ", properties.Select(p => p.Name));
-        var parameterNames = string.Join(", ", properties.Select(p => $"@{p.Name}"));
-
-        return $"INSERT INTO {tableName} ({columnNames}) VALUES ({parameterNames})";
-    }
-
-    private static string GenerateUpdateQuery(string tableName, T entity)
-    {
-        var properties = typeof(T).GetProperties();
-        var setClause = string.Join(", ", properties.Select(p => $"{p.Name} = @{p.Name}"));
-
-        return $"UPDATE {tableName} SET {setClause} WHERE Id = @Id";
-    }
-
-    private static void AddParameters(NpgsqlCommand command, T entity)
-    {
-        var properties = typeof(T).GetProperties();
-
-        foreach (var property in properties)
+        public void Add(T entity)
         {
-            var value = property.GetValue(entity) ?? DBNull.Value;
-            command.Parameters.AddWithValue($"@{property.Name}", value);
-        }
-    }
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
 
-    private static IEnumerable<T> MapReaderToEntities(IDataReader reader)
-    {
-        var entities = new List<T>();
-        while (reader.Read())
-        {
-            entities.Add(MapReaderToEntity(reader));
-        }
-        return entities;
-    }
+            var insertQuery = GenerateInsertQuery(entity) + " RETURNING Id";
 
-    private static T MapReaderToEntity(IDataReader reader)
-    {
-        var entity = new T();
-        var properties = typeof(T).GetProperties();
+            using var command = new NpgsqlCommand(insertQuery, connection);
+            AddParameters(command, entity);
 
-        foreach (var property in properties)
-        {
-            if (reader[property.Name] != DBNull.Value)
+            var idProperty = entity.GetType().GetProperty("Id");
+            if (idProperty != null)
             {
-                property.SetValue(entity, reader[property.Name]);
+                idProperty.SetValue(entity, Convert.ToInt32(command.ExecuteScalar()));
             }
         }
 
-        return entity;
+        public IEnumerable<T> GetAll()
+        {
+            var query = $"SELECT * FROM {_tableName}";
+
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            using var command = new NpgsqlCommand(query, connection);
+            using var reader = command.ExecuteReader();
+
+            return MapReaderToEntities(reader);
+        }
+
+        public T GetById(int id)
+        {
+            var query = $"SELECT * FROM {_tableName} WHERE Id = @Id";
+
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            using var command = new NpgsqlCommand(query, connection);
+            command.Parameters.AddWithValue("@Id", id);
+
+            using var reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                return MapReaderToEntity(reader);
+            }
+
+            throw new InvalidOperationException($"{typeof(T).Name} with Id {id} not found.");
+        }
+
+        public void Update(T entity)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            var updateQuery = GenerateUpdateQuery(entity);
+
+            using var command = new NpgsqlCommand(updateQuery, connection);
+            AddParameters(command, entity);
+
+            command.ExecuteNonQuery();
+        }
+
+        public void Delete(int id)
+        {
+            var query = $"DELETE FROM {_tableName} WHERE Id = @Id";
+
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            using var command = new NpgsqlCommand(query, connection);
+            command.Parameters.AddWithValue("@Id", id);
+
+            command.ExecuteNonQuery();
+        }
+
+        protected string GenerateInsertQuery(T entity)
+        {
+            var properties = entity.GetType().GetProperties();
+            var columns = properties
+                .Where(p => p.Name == "Username" || p.Name == "Password" || p.Name == "Elo")
+                .Select(p => p.Name);
+            var values = properties
+                .Where(p => p.Name == "Username" || p.Name == "Password" || p.Name == "Elo")
+                .Select(p => $"@{p.Name}");
+
+            if (!columns.Any() || !values.Any())
+            {
+                throw new InvalidOperationException("No valid properties found to insert.");
+            }
+
+            return $"INSERT INTO {_tableName} ({string.Join(", ", columns)}) VALUES ({string.Join(", ", values)})";
+        }
+
+
+        protected string GenerateUpdateQuery(T entity)
+        {
+            var properties = entity.GetType().GetProperties().Where(p => p.Name != "Id");
+            var setStatements = properties.Select(p => $"{p.Name} = @{p.Name}");
+
+            return $"UPDATE {_tableName} SET {string.Join(", ", setStatements)} WHERE Id = @Id";
+        }
+
+        private void AddParameters(NpgsqlCommand command, T entity)
+        {
+            var properties = entity.GetType().GetProperties();
+            foreach (var property in properties)
+            {
+                var value = property.GetValue(entity);
+
+                // Only consider specific properties
+                if (property.Name != "Username" && property.Name != "Password" && property.Name != "Elo")
+                {
+                    continue;
+                }
+
+                // Handle basic types
+                var parameter = new NpgsqlParameter(property.Name, value ?? DBNull.Value);
+                command.Parameters.Add(parameter);
+            }
+        }
+
+        protected IEnumerable<T> MapReaderToEntities(NpgsqlDataReader reader)
+        {
+            var entities = new List<T>();
+            while (reader.Read())
+            {
+                entities.Add(MapReaderToEntity(reader));
+            }
+
+            return entities;
+        }
+
+        protected virtual T MapReaderToEntity(NpgsqlDataReader reader)
+        {
+            var entity = new T();
+            foreach (var property in typeof(T).GetProperties())
+            {
+                // Skip complex types
+                if (property.PropertyType.IsClass && property.PropertyType != typeof(string))
+                {
+                    continue;
+                }
+
+                var value = reader[property.Name];
+                property.SetValue(entity, value == DBNull.Value ? null : value);
+            }
+
+            return entity;
+        }
     }
 }
