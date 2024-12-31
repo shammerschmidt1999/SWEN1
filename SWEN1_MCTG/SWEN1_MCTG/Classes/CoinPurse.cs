@@ -37,6 +37,75 @@ namespace SWEN1_MCTG.Classes
         {
             _coins.Add(newCoin);
         }
+
+        /// <summary>
+        /// Adds multiple coins at once to the CoinPurse.
+        /// </summary>
+        /// <param name="coins">List of coins to add.</param>
+        public void AddCoins(IEnumerable<Coin> coins)
+        {
+            _coins.AddRange(coins);
+        }
+
+        /// <summary>
+        /// Removes coins of a specific type.
+        /// </summary>
+        /// <param name="coinType">The type of coin to remove.</param>
+        /// <param name="count">Number of coins to remove.</param>
+        /// <returns>True if successful; otherwise, false.</returns>
+        public bool RemoveCoins(GlobalEnums.CoinType coinType, int count)
+        {
+            var coinsToRemove = _coins.Where(c => c.CoinType == coinType).Take(count).ToList();
+
+            if (coinsToRemove.Count < count)
+            {
+                return false; // Not enough coins of the specified type
+            }
+
+            foreach (var coin in coinsToRemove)
+            {
+                _coins.Remove(coin);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Converts coins of a lower value to a higher value if possible.
+        /// </summary>
+        /// <param name="fromType">The type of coin to convert from.</param>
+        /// <param name="toType">The type of coin to convert to.</param>
+        /// <returns>True if conversion was successful; otherwise, false.</returns>
+        public bool ConvertCoins(GlobalEnums.CoinType fromType, GlobalEnums.CoinType toType)
+        {
+            int fromValue = (int)fromType;
+            int toValue = (int)toType;
+
+            if (toValue <= fromValue || GetCoinsValueByType(fromType) < toValue)
+            {
+                return false; // Cannot convert
+            }
+
+            int requiredCount = toValue / fromValue;
+            if (RemoveCoins(fromType, requiredCount))
+            {
+                AddCoin(new Coin(toType));
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the total value of coins of a specific type.
+        /// </summary>
+        /// <param name="coinType">The type of coin.</param>
+        /// <returns>Total value of coins of the specified type.</returns>
+        private int GetCoinsValueByType(GlobalEnums.CoinType coinType)
+        {
+            return _coins.Where(c => c.CoinType == coinType).Sum(c => c.Value);
+        }
+
         /// <summary>
         /// Removes a coin object from the Coin List
         /// </summary>

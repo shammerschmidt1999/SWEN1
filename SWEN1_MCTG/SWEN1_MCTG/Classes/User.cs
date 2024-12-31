@@ -174,5 +174,30 @@ namespace SWEN1_MCTG.Classes
         {
             return _Users.ContainsKey(userName);
         }
+
+        // Wrapper method to add a coin to the user's CoinPurse
+        public void AddCoin(Coin newCoin)
+        {
+            _userCoinPurse.AddCoin(newCoin);
+        }
+
+        // Wrapper method to remove a coin from the user's CoinPurse
+        public void RemoveCoin(Coin coinToRemove)
+        {
+            _userCoinPurse.RemoveCoin(coinToRemove);
+        }
+
+        // Wrapper method to get the total value of coins
+        public int GetTotalCoinValue()
+        {
+            return _userCoinPurse.GetCoinsValue();
+        }
+
+        // Wrapper method to print the coins
+        public void PrintCoins()
+        {
+            _userCoinPurse.PrintCoins();
+        }
+
     }
 }

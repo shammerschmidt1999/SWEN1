@@ -16,13 +16,12 @@ namespace SWEN1_MCTG.Data
         {
             _connectionString = connectionString;
         }
-
         public void Add(Card entity)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            var tableName = "Cards"; // Assumes table name is 'Cards'
+            var tableName = "Cards";
             var insertQuery = GenerateInsertQuery(tableName, entity) + " RETURNING Id";
 
             using var command = new NpgsqlCommand(insertQuery, connection);
@@ -37,12 +36,9 @@ namespace SWEN1_MCTG.Data
             // Execute the command and get the generated Id
             entity.Id = Convert.ToInt32(command.ExecuteScalar());
         }
-
-
-
         public IEnumerable<Card> GetAll()
         {
-            var tableName = "Cards"; // Assumes table name is 'Cards'
+            var tableName = "Cards";
             var query = $"SELECT * FROM {tableName}";
 
             using var connection = new NpgsqlConnection(_connectionString);
@@ -53,10 +49,9 @@ namespace SWEN1_MCTG.Data
 
             return MapReaderToEntities(reader);
         }
-
         public Card GetById(int id)
         {
-            var tableName = "Cards"; // Assumes table name is 'Cards'
+            var tableName = "Cards";
             var query = $"SELECT * FROM {tableName} WHERE Id = @Id";
 
             using var connection = new NpgsqlConnection(_connectionString);
@@ -73,10 +68,9 @@ namespace SWEN1_MCTG.Data
 
             throw new InvalidOperationException($"Card with Id {id} not found.");
         }
-
         public Card GetByName(string name)
         {
-            var tableName = "Cards"; // Assumes table name is 'Cards'
+            var tableName = "Cards";
             var query = $"SELECT * FROM {tableName} WHERE Name = @Name";
 
             using var connection = new NpgsqlConnection(_connectionString);
@@ -93,13 +87,12 @@ namespace SWEN1_MCTG.Data
 
             throw new InvalidOperationException($"Card with Name {name} not found.");
         }
-
         public void Update(Card entity)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            var tableName = "Cards"; // Assumes table name is 'Cards'
+            var tableName = "Cards";
             var updateQuery = GenerateUpdateQuery(tableName, entity);
 
             using var command = new NpgsqlCommand(updateQuery, connection);
@@ -107,10 +100,9 @@ namespace SWEN1_MCTG.Data
 
             command.ExecuteNonQuery();
         }
-
         public void Delete(int id)
         {
-            var tableName = "Cards"; // Assumes table name is 'Cards'
+            var tableName = "Cards";
             var query = $"DELETE FROM {tableName} WHERE Id = @Id";
 
             using var connection = new NpgsqlConnection(_connectionString);
@@ -121,7 +113,6 @@ namespace SWEN1_MCTG.Data
 
             command.ExecuteNonQuery();
         }
-
         private static string GenerateInsertQuery(string tableName, Card entity)
         {
             var properties = typeof(Card).GetProperties().Where(p => p.Name != "Id");
@@ -142,8 +133,6 @@ namespace SWEN1_MCTG.Data
             return $"INSERT INTO {tableName} ({columnNames}) VALUES ({parameterNames})";
         }
 
-
-
         private static string GenerateUpdateQuery(string tableName, Card entity)
         {
             var properties = typeof(Card).GetProperties();
@@ -151,7 +140,6 @@ namespace SWEN1_MCTG.Data
 
             return $"UPDATE {tableName} SET {setClause} WHERE Id = @Id";
         }
-
         private static void AddParameters(NpgsqlCommand command, Card entity)
         {
             var properties = typeof(Card).GetProperties();
@@ -180,12 +168,6 @@ namespace SWEN1_MCTG.Data
                 command.Parameters.AddWithValue("@monstertype", NpgsqlTypes.NpgsqlDbType.Unknown, monsterCard.MonsterType.ToString());
             }
         }
-
-
-
-
-
-
 
         private static IEnumerable<Card> MapReaderToEntities(IDataReader reader)
         {
@@ -229,7 +211,5 @@ namespace SWEN1_MCTG.Data
 
             return card;
         }
-
-
     }
 }
