@@ -1,62 +1,81 @@
-﻿using Newtonsoft.Json;
+﻿using System.Reflection;
+using Newtonsoft.Json;
 using Npgsql;
 
 namespace SWEN1_MCTG.Data.Repositories
 {
+    /// <summary>
+    /// Repository for a specific entity type.
+    /// </summary>
+    /// <typeparam name="T"> The class of the entity </typeparam>
     public abstract class Repository<T> : IRepository<T> where T : class
     {
-        protected readonly string _connectionString;
-        protected readonly string _tableName;
+        protected readonly string _connectionString; // Connection string to the database
+        protected readonly string _tableName; // Name of the table in the database
+        protected readonly string _getAllQuery;
+        protected readonly string _getByIdQuery;
+        protected readonly string _deleteQuery;
 
+        // Constructor to set the connection string, table name and queries
         protected Repository(string connectionString, string tableName)
         {
             _connectionString = connectionString;
             _tableName = tableName;
+            _getAllQuery = $"SELECT * FROM {_tableName}";
+            _getByIdQuery = $"SELECT * FROM {_tableName} WHERE Id = @Id";
+            _deleteQuery = $"DELETE FROM {_tableName} WHERE Id = @Id";
         }
 
+        // Abstract method to create an entity of the specific type
         protected abstract T CreateEntity();
 
+        /// <summary>
+        /// Method to add an entity to the database.
+        /// </summary>
+        /// <param name="entity"> The entity which has the data to be stored in the DB</param>
         public void Add(T entity)
         {
-            using var connection = new NpgsqlConnection(_connectionString);
+            // Open a connection to the database
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            var insertQuery = GenerateInsertQuery(entity) + " RETURNING Id";
+            // Generate the insert query
+            string insertQuery = GenerateInsertQuery(entity);
 
-            using var command = new NpgsqlCommand(insertQuery, connection);
-            AddParameters(command, entity);
+            // Create a command with the insert query and the connection
+            NpgsqlCommand command = new NpgsqlCommand(insertQuery, connection);
+            AddParameters(command, entity); // Add the parameters to the command
 
-            var idProperty = entity.GetType().GetProperty("Id");
+            // Execute the command
+            PropertyInfo idProperty = entity.GetType().GetProperty("Id");
             if (idProperty != null)
             {
                 idProperty.SetValue(entity, Convert.ToInt32(command.ExecuteScalar()));
             }
         }
 
+        // Method to get all entities from the database
         public IEnumerable<T> GetAll()
         {
-            var query = $"SELECT * FROM {_tableName}";
-
-            using var connection = new NpgsqlConnection(_connectionString);
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            using var command = new NpgsqlCommand(query, connection);
-            using var reader = command.ExecuteReader();
+            NpgsqlCommand command = new NpgsqlCommand(_getAllQuery, connection);
+            NpgsqlDataReader reader = command.ExecuteReader();
 
             return MapReaderToEntities(reader);
         }
 
+        // Method to get an entity by its Id
         public T GetById(int id)
         {
-            var query = $"SELECT * FROM {_tableName} WHERE Id = @Id";
-
-            using var connection = new NpgsqlConnection(_connectionString);
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            using var command = new NpgsqlCommand(query, connection);
+            NpgsqlCommand command = new NpgsqlCommand(_getByIdQuery, connection);
             command.Parameters.AddWithValue("@Id", id);
 
-            using var reader = command.ExecuteReader();
+            NpgsqlDataReader reader = command.ExecuteReader();
             if (reader.Read())
             {
                 return MapReaderToEntity(reader);
@@ -65,27 +84,27 @@ namespace SWEN1_MCTG.Data.Repositories
             throw new InvalidOperationException($"{typeof(T).Name} with Id {id} not found.");
         }
 
+        // Method to update an entity in the database
         public void Update(T entity)
         {
-            using var connection = new NpgsqlConnection(_connectionString);
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            var updateQuery = GenerateUpdateQuery(entity);
+            string updateQuery = GenerateUpdateQuery(entity);
 
-            using var command = new NpgsqlCommand(updateQuery, connection);
+            NpgsqlCommand command = new NpgsqlCommand(updateQuery, connection);
             AddParameters(command, entity);
 
             command.ExecuteNonQuery();
         }
 
+        // Method to delete an entity from the database
         public void Delete(int id)
         {
-            var query = $"DELETE FROM {_tableName} WHERE Id = @Id";
-
-            using var connection = new NpgsqlConnection(_connectionString);
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            using var command = new NpgsqlCommand(query, connection);
+            NpgsqlCommand command = new NpgsqlCommand(_deleteQuery, connection);
             command.Parameters.AddWithValue("@Id", id);
 
             command.ExecuteNonQuery();
@@ -93,20 +112,23 @@ namespace SWEN1_MCTG.Data.Repositories
 
         // Abstract for now, will be implemented as general method later
         protected abstract string GenerateInsertQuery(T entity);
+
+        // Method to generate the update query for an entity
         protected string GenerateUpdateQuery(T entity)
         {
-            var properties = entity.GetType().GetProperties().Where(p => p.Name != "Id");
-            var setStatements = properties.Select(p => $"{p.Name} = @{p.Name}");
+            IEnumerable<PropertyInfo> properties = entity.GetType().GetProperties().Where(p => p.Name != "Id");
+            IEnumerable<string> setStatements = properties.Select(p => $"{p.Name} = @{p.Name}");
 
             return $"UPDATE {_tableName} SET {string.Join(", ", setStatements)} WHERE Id = @Id";
         }
 
+        // Method to add parameters to a command
         protected virtual void AddParameters(NpgsqlCommand command, T entity)
         {
-            var properties = entity.GetType().GetProperties();
-            foreach (var property in properties)
+            PropertyInfo[] properties = entity.GetType().GetProperties();
+            foreach (PropertyInfo property in properties)
             {
-                var value = property.GetValue(entity);
+                object? value = property.GetValue(entity);
 
                 // Only consider specific properties
                 if (property.Name != "Username" && property.Name != "Password" && property.Name != "Elo")
@@ -115,14 +137,15 @@ namespace SWEN1_MCTG.Data.Repositories
                 }
 
                 // Handle basic types
-                var parameter = new NpgsqlParameter(property.Name, value ?? DBNull.Value);
+                NpgsqlParameter parameter = new NpgsqlParameter(property.Name, value ?? DBNull.Value);
                 command.Parameters.Add(parameter);
             }
         }
 
+        // Method to map a reader to entities
         protected IEnumerable<T> MapReaderToEntities(NpgsqlDataReader reader)
         {
-            var entities = new List<T>();
+            List<T> entities = new List<T>();
             while (reader.Read())
             {
                 entities.Add(MapReaderToEntity(reader));
@@ -131,6 +154,7 @@ namespace SWEN1_MCTG.Data.Repositories
             return entities;
         }
 
+        // Abstract method to map a reader to an entity
         protected abstract T MapReaderToEntity(NpgsqlDataReader reader);
     }
 }

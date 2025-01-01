@@ -13,13 +13,13 @@ namespace SWEN1_MCTG.Tests
         {
             // Arrange
             IUserRepository userRepository = new UserRepository(ConnectionString);
-            var user = new User("Samuel", "Anotherpassword");
+            User user = new User($"TestUser_{Guid.NewGuid()}", "Anotherpassword");
 
             // Act
             userRepository.Add(user);
 
             // Assert
-            var fetchedUser = userRepository.GetByUsername(user.Username);
+            User fetchedUser = userRepository.GetByUsername(user.Username);
             Assert.IsNotNull(fetchedUser);
             Assert.AreEqual(user.Username, fetchedUser.Username);
         }
@@ -29,11 +29,12 @@ namespace SWEN1_MCTG.Tests
         {
             // Arrange
             IUserRepository userRepository = new UserRepository(ConnectionString);
-            var user = new User("Marius", "Password");
+            User user = new User($"TestUser_{Guid.NewGuid()}", "Anotherpassword");
+
             userRepository.Add(user);
 
             // Act
-            var fetchedUser = userRepository.GetById(user.Id);
+            User fetchedUser = userRepository.GetById(user.Id);
 
             // Assert
             Assert.IsNotNull(fetchedUser);
@@ -45,16 +46,37 @@ namespace SWEN1_MCTG.Tests
         {
             // Arrange
             IUserRepository userRepository = new UserRepository(ConnectionString);
-            var user = new User("Bena", "WordPass");
+            User user = new User($"TestUser_{Guid.NewGuid()}", "Anotherpassword");
+
             userRepository.Add(user);
 
             // Act
-            var userToDelete = userRepository.GetByUsername(user.Username);
+            User userToDelete = userRepository.GetByUsername(user.Username);
             userRepository.Delete(userToDelete.Id); // Now delete by ID
 
             // Assert
             Assert.ThrowsException<InvalidOperationException>(() => userRepository.GetById(userToDelete.Id)); // Ensure that the user is deleted
         }
 
+        [TestMethod]
+        public void TestCreateUserWithCorrectData()
+        {
+            // Arrange
+            IUserRepository userRepository = new UserRepository(ConnectionString);
+            string username = $"TestUser_{Guid.NewGuid()}";
+            string password = "Anotherpassword";
+            string hashedPassword = PasswordHelper.HashPassword(password);
+            User user = new User(username, password);
+
+            userRepository.Add(user);
+
+            // Act
+            User fetchedUser = userRepository.GetByUsername(username);
+
+            // Assert
+            Assert.IsNotNull(fetchedUser);
+            Assert.AreEqual(username, fetchedUser.Username);
+            Assert.AreEqual(hashedPassword, fetchedUser.Password);
+        }
     }
 }

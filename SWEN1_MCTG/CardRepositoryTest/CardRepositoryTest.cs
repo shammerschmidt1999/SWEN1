@@ -15,19 +15,44 @@ namespace SWEN1_MCTG.Tests
         private readonly string ConnectionString = AppSettings.GetConnectionString("DefaultConnection");
 
         [TestMethod]
-        public void TestAddCard()
+        public void TestAddCardMonsterCard()
         {
             // Arrange
             ICardRepository cardRepository = new CardRepository(ConnectionString);
-            var card = new MonsterCard("Dragon", GlobalEnums.MonsterType.Dragon, 100, GlobalEnums.ElementType.Fire);
+            Card card = new MonsterCard($"TestMonsterCard_{Guid.NewGuid()}", GlobalEnums.MonsterType.Dragon, 100, GlobalEnums.ElementType.Fire);
 
             // Act
             cardRepository.Add(card);
 
             // Assert
-            var fetchedCard = cardRepository.GetByName(card.Name);
+            Card fetchedCard = cardRepository.GetByName(card.Name);
             Assert.IsNotNull(fetchedCard);
             Assert.AreEqual(card.Name, fetchedCard.Name);
+            Assert.AreEqual(card.Damage, fetchedCard.Damage);
+            Assert.AreEqual(card.ElementType, fetchedCard.ElementType);
+
+            // Cast to MonsterCard to assert MonsterType
+            MonsterCard fetchedMonsterCard = fetchedCard as MonsterCard;
+            Assert.IsNotNull(fetchedMonsterCard);
+            Assert.AreEqual(((MonsterCard)card).MonsterType, fetchedMonsterCard.MonsterType);
+        }
+
+        [TestMethod]
+        public void TestAddSpellCard()
+        {
+            // Arrange
+            ICardRepository cardRepository = new CardRepository(ConnectionString);
+            Card card = new SpellCard($"TestSpellCard{Guid.NewGuid()}", 50, GlobalEnums.ElementType.Fire);
+            cardRepository.Add(card);
+
+            // Act
+            Card fetchedCard = cardRepository.GetByName(card.Name);
+
+            // Assert
+            Assert.IsNotNull(fetchedCard);
+            Assert.AreEqual(card.Name, fetchedCard.Name);
+            Assert.AreEqual(card.Damage, fetchedCard.Damage);
+            Assert.AreEqual(card.ElementType, fetchedCard.ElementType);
         }
 
         [TestMethod]
@@ -35,8 +60,8 @@ namespace SWEN1_MCTG.Tests
         {
             // Arrange
             ICardRepository cardRepository = new CardRepository(ConnectionString);
-            var card = new MonsterCard("Knight", GlobalEnums.MonsterType.Knight, 75, GlobalEnums.ElementType.Normal);
-            cardRepository.Add(card); // Create the card first
+            var card = new MonsterCard($"TestMonsterCard_{Guid.NewGuid()}", GlobalEnums.MonsterType.Knight, 75, GlobalEnums.ElementType.Normal);
+            cardRepository.Add(card);
 
             // Act
             var fetchedCard = cardRepository.GetById(card.Id);
@@ -51,15 +76,15 @@ namespace SWEN1_MCTG.Tests
         {
             // Arrange
             ICardRepository cardRepository = new CardRepository(ConnectionString);
-            var card = new MonsterCard("DeletedGoblin", GlobalEnums.MonsterType.Goblin, 50, GlobalEnums.ElementType.Normal);
+            var card = new MonsterCard($"TestMonsterCard_{Guid.NewGuid()}", GlobalEnums.MonsterType.Goblin, 50, GlobalEnums.ElementType.Normal);
             cardRepository.Add(card); // Create the card first
 
             // Act
-            var cardToDelete = cardRepository.GetByName(card.Name); // Fetch by name to get the card details
-            cardRepository.Delete(cardToDelete.Id); // Now delete by ID
+            var cardToDelete = cardRepository.GetByName(card.Name);
+            cardRepository.Delete(cardToDelete.Id);
 
             // Assert
-            Assert.ThrowsException<InvalidOperationException>(() => cardRepository.GetById(cardToDelete.Id)); // Ensure that the card is deleted
+            Assert.ThrowsException<InvalidOperationException>(() => cardRepository.GetById(cardToDelete.Id));
         }
 
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Reflection;
 using Npgsql;
 using SWEN1_MCTG.Classes;
 using SWEN1_MCTG.Data.Repositories;
@@ -10,8 +11,12 @@ namespace SWEN1_MCTG.Data
 {
     public class CardRepository : Repository<Card>, ICardRepository
     {
-        public CardRepository(string connectionString) : base(connectionString, "cards")
+        private readonly string _getByNameQuery;
+
+        public CardRepository(string connectionString)
+            : base(connectionString, "cards")
         {
+            _getByNameQuery = $"SELECT * FROM {_tableName} WHERE name = @name";
         }
 
         protected override Card CreateEntity()
@@ -22,13 +27,12 @@ namespace SWEN1_MCTG.Data
 
         public new void Add(Card entity)
         {
-            using var connection = new NpgsqlConnection(_connectionString);
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            var tableName = "cards";
-            var insertQuery = GenerateInsertQuery(entity);
+            string insertQuery = GenerateInsertQuery(entity);
 
-            using var command = new NpgsqlCommand(insertQuery, connection);
+            NpgsqlCommand command = new NpgsqlCommand(insertQuery, connection);
 
             // Add the parameters for the entity
             AddParameters(command, entity);
@@ -43,7 +47,7 @@ namespace SWEN1_MCTG.Data
 
         protected override void AddParameters(NpgsqlCommand command, Card entity)
         {
-            var properties = typeof(Card).GetProperties();
+            PropertyInfo[] properties = typeof(Card).GetProperties();
 
             // Set the card_type explicitly
             string cardType = entity is MonsterCard ? "MonsterCard" : "SpellCard";
@@ -51,7 +55,7 @@ namespace SWEN1_MCTG.Data
 
             foreach (var property in properties)
             {
-                var value = property.GetValue(entity);
+                object? value = property.GetValue(entity);
                 if (value is Enum)
                 {
                     // Convert enums to their underlying string values for PostgreSQL
@@ -74,9 +78,9 @@ namespace SWEN1_MCTG.Data
 
         protected override string GenerateInsertQuery(Card entity)
         {
-            var properties = typeof(Card).GetProperties().Where(p => p.Name != "Id");
-            var columnNames = string.Join(", ", properties.Select(p => p.Name));
-            var parameterNames = string.Join(", ", properties.Select(p => $"@{p.Name}"));
+            IEnumerable<PropertyInfo> properties = typeof(Card).GetProperties().Where(p => p.Name != "Id");
+            string columnNames = string.Join(", ", properties.Select(p => p.Name));
+            string parameterNames = string.Join(", ", properties.Select(p => $"@{p.Name}"));
 
             if (entity is MonsterCard)
             {
@@ -94,7 +98,7 @@ namespace SWEN1_MCTG.Data
 
         protected override Card MapReaderToEntity(NpgsqlDataReader reader)
         {
-            var cardType = reader["card_type"].ToString() ?? throw new InvalidOperationException("Card type is null.");
+            string cardType = reader["card_type"].ToString() ?? throw new InvalidOperationException("Card type is null.");
             Card card;
 
             if (cardType == "MonsterCard")
@@ -133,15 +137,13 @@ namespace SWEN1_MCTG.Data
 
         public Card GetByName(string name)
         {
-            var query = $"SELECT * FROM {_tableName} WHERE name = @name";
-
-            using var connection = new NpgsqlConnection(_connectionString);
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            using var command = new NpgsqlCommand(query, connection);
+            NpgsqlCommand command = new NpgsqlCommand(_getByNameQuery, connection);
             command.Parameters.AddWithValue("@name", name);
 
-            using var reader = command.ExecuteReader();
+            NpgsqlDataReader reader = command.ExecuteReader();
             if (reader.Read())
             {
                 return MapReaderToEntity(reader);
