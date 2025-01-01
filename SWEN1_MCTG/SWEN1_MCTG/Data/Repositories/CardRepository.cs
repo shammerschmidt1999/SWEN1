@@ -2,28 +2,31 @@
 using System.Collections.Generic;
 using System.Data;
 using Npgsql;
-using System.Linq;
 using SWEN1_MCTG.Classes;
 using SWEN1_MCTG.Data.Repositories;
+using SWEN1_MCTG.Interfaces;
 
 namespace SWEN1_MCTG.Data
 {
-    // TODO: CLEAN THIS UP
-    public class CardRepository : ICardRepository
+    public class CardRepository : Repository<Card>, ICardRepository
     {
-        private readonly string _connectionString;
-
-        public CardRepository(string connectionString)
+        public CardRepository(string connectionString) : base(connectionString, "cards")
         {
-            _connectionString = connectionString;
         }
-        public void Add(Card entity)
+
+        protected override Card CreateEntity()
+        {
+            // Method should not be called for abstract class
+            throw new NotImplementedException();
+        }
+
+        public new void Add(Card entity)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
             var tableName = "cards";
-            var insertQuery = GenerateInsertQuery(tableName, entity) + " RETURNING Id";
+            var insertQuery = GenerateInsertQuery(entity);
 
             using var command = new NpgsqlCommand(insertQuery, connection);
 
@@ -37,84 +40,39 @@ namespace SWEN1_MCTG.Data
             // Execute the command and get the generated Id
             entity.Id = Convert.ToInt32(command.ExecuteScalar());
         }
-        public IEnumerable<Card> GetAll()
+
+        protected override void AddParameters(NpgsqlCommand command, Card entity)
         {
-            var tableName = "cards";
-            var query = $"SELECT * FROM {tableName}";
+            var properties = typeof(Card).GetProperties();
 
-            using var connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
+            // Set the card_type explicitly
+            string cardType = entity is MonsterCard ? "MonsterCard" : "SpellCard";
+            command.Parameters.AddWithValue("@card_type", NpgsqlTypes.NpgsqlDbType.Unknown, cardType);
 
-            using var command = new NpgsqlCommand(query, connection);
-            using var reader = command.ExecuteReader();
-
-            return MapReaderToEntities(reader);
-        }
-        public Card GetById(int id)
-        {
-            var tableName = "cards";
-            var query = $"SELECT * FROM {tableName} WHERE Id = @Id";
-
-            using var connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
-
-            using var command = new NpgsqlCommand(query, connection);
-            command.Parameters.AddWithValue("@Id", id);
-
-            using var reader = command.ExecuteReader();
-            if (reader.Read())
+            foreach (var property in properties)
             {
-                return MapReaderToEntity(reader);
+                var value = property.GetValue(entity);
+                if (value is Enum)
+                {
+                    // Convert enums to their underlying string values for PostgreSQL
+                    command.Parameters.AddWithValue($"@{property.Name}", NpgsqlTypes.NpgsqlDbType.Unknown,
+                        value != null ? value.ToString() : DBNull.Value);
+                }
+                else
+                {
+                    command.Parameters.AddWithValue($"@{property.Name}", value ?? DBNull.Value);
+                }
             }
 
-            throw new InvalidOperationException($"Card with Id {id} not found.");
-        }
-        public Card GetByName(string name)
-        {
-            var tableName = "cards";
-            var query = $"SELECT * FROM {tableName} WHERE Name = @Name";
-
-            using var connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
-
-            using var command = new NpgsqlCommand(query, connection);
-            command.Parameters.AddWithValue("@Name", name);
-
-            using var reader = command.ExecuteReader();
-            if (reader.Read())
+            // Handle specific properties for MonsterCard
+            if (entity is MonsterCard monsterCard)
             {
-                return MapReaderToEntity(reader);
+                command.Parameters.AddWithValue("@monstertype", NpgsqlTypes.NpgsqlDbType.Unknown,
+                    monsterCard.MonsterType.ToString());
             }
-
-            throw new InvalidOperationException($"Card with Name {name} not found.");
         }
-        public void Update(Card entity)
-        {
-            using var connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
 
-            var tableName = "cards";
-            var updateQuery = GenerateUpdateQuery(tableName, entity);
-
-            using var command = new NpgsqlCommand(updateQuery, connection);
-            AddParameters(command, entity);
-
-            command.ExecuteNonQuery();
-        }
-        public void Delete(int id)
-        {
-            var tableName = "cards";
-            var query = $"DELETE FROM {tableName} WHERE Id = @Id";
-
-            using var connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
-
-            using var command = new NpgsqlCommand(query, connection);
-            command.Parameters.AddWithValue("@Id", id);
-
-            command.ExecuteNonQuery();
-        }
-        private static string GenerateInsertQuery(string tableName, Card entity)
+        protected override string GenerateInsertQuery(Card entity)
         {
             var properties = typeof(Card).GetProperties().Where(p => p.Name != "Id");
             var columnNames = string.Join(", ", properties.Select(p => p.Name));
@@ -131,56 +89,10 @@ namespace SWEN1_MCTG.Data
                 parameterNames += ", @card_type";
             }
 
-            return $"INSERT INTO {tableName} ({columnNames}) VALUES ({parameterNames})";
+            return $"INSERT INTO {_tableName} ({columnNames}) VALUES ({parameterNames}) RETURNING Id";
         }
 
-        private static string GenerateUpdateQuery(string tableName, Card entity)
-        {
-            var properties = typeof(Card).GetProperties();
-            var setClause = string.Join(", ", properties.Select(p => $"{p.Name} = @{p.Name}"));
-
-            return $"UPDATE {tableName} SET {setClause} WHERE Id = @Id";
-        }
-        private static void AddParameters(NpgsqlCommand command, Card entity)
-        {
-            var properties = typeof(Card).GetProperties();
-
-            // Set the card_type explicitly
-            string cardType = entity is MonsterCard ? "MonsterCard" : "SpellCard";
-            command.Parameters.AddWithValue("@card_type", NpgsqlTypes.NpgsqlDbType.Unknown, cardType);
-
-            foreach (var property in properties)
-            {
-                var value = property.GetValue(entity);
-                if (value is Enum)
-                {
-                    // Convert enums to their underlying string values for PostgreSQL
-                    command.Parameters.AddWithValue($"@{property.Name}", NpgsqlTypes.NpgsqlDbType.Unknown, value != null ? value.ToString() : DBNull.Value);
-                }
-                else
-                {
-                    command.Parameters.AddWithValue($"@{property.Name}", value ?? DBNull.Value);
-                }
-            }
-
-            // Handle specific properties for MonsterCard
-            if (entity is MonsterCard monsterCard)
-            {
-                command.Parameters.AddWithValue("@monstertype", NpgsqlTypes.NpgsqlDbType.Unknown, monsterCard.MonsterType.ToString());
-            }
-        }
-
-        private static IEnumerable<Card> MapReaderToEntities(IDataReader reader)
-        {
-            var cards = new List<Card>();
-            while (reader.Read())
-            {
-                cards.Add(MapReaderToEntity(reader));
-            }
-            return cards;
-        }
-
-        private static Card MapReaderToEntity(IDataReader reader)
+        protected override Card MapReaderToEntity(NpgsqlDataReader reader)
         {
             var cardType = reader["card_type"].ToString() ?? throw new InvalidOperationException("Card type is null.");
             Card card;
@@ -189,9 +101,13 @@ namespace SWEN1_MCTG.Data
             {
                 card = new MonsterCard(
                     reader["Name"].ToString() ?? throw new InvalidOperationException("Name is null."),
-                    (GlobalEnums.MonsterType)Enum.Parse(typeof(GlobalEnums.MonsterType), reader["monstertype"].ToString() ?? throw new InvalidOperationException("Monster type is null.")),
+                    (GlobalEnums.MonsterType)Enum.Parse(typeof(GlobalEnums.MonsterType),
+                        reader["monstertype"].ToString() ??
+                        throw new InvalidOperationException("Monster type is null.")),
                     Convert.ToDouble(reader["Damage"]),
-                    (GlobalEnums.ElementType)Enum.Parse(typeof(GlobalEnums.ElementType), reader["elementtype"].ToString() ?? throw new InvalidOperationException("Element type is null."))
+                    (GlobalEnums.ElementType)Enum.Parse(typeof(GlobalEnums.ElementType),
+                        reader["elementtype"].ToString() ??
+                        throw new InvalidOperationException("Element type is null."))
                 );
             }
             else if (cardType == "SpellCard")
@@ -199,7 +115,9 @@ namespace SWEN1_MCTG.Data
                 card = new SpellCard(
                     reader["Name"].ToString() ?? throw new InvalidOperationException("Name is null."),
                     Convert.ToDouble(reader["Damage"]),
-                    (GlobalEnums.ElementType)Enum.Parse(typeof(GlobalEnums.ElementType), reader["elementtype"].ToString() ?? throw new InvalidOperationException("Element type is null."))
+                    (GlobalEnums.ElementType)Enum.Parse(typeof(GlobalEnums.ElementType),
+                        reader["elementtype"].ToString() ??
+                        throw new InvalidOperationException("Element type is null."))
                 );
             }
             else
@@ -211,6 +129,25 @@ namespace SWEN1_MCTG.Data
             card.Id = Convert.ToInt32(reader["Id"]);
 
             return card;
+        }
+
+        public Card GetByName(string name)
+        {
+            var query = $"SELECT * FROM {_tableName} WHERE name = @name";
+
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            using var command = new NpgsqlCommand(query, connection);
+            command.Parameters.AddWithValue("@name", name);
+
+            using var reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                return MapReaderToEntity(reader);
+            }
+
+            throw new InvalidOperationException($"Card with Name {name} not found.");
         }
     }
 }

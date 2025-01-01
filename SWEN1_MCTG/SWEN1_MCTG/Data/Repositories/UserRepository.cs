@@ -9,6 +9,47 @@ namespace SWEN1_MCTG.Data.Repositories
         {
         }
 
+        protected override User CreateEntity()
+        {
+            return new User();
+        }
+
+        protected override User MapReaderToEntity(NpgsqlDataReader reader)
+        {
+            var entity = CreateEntity();
+            foreach (var property in typeof(User).GetProperties())
+            {
+                // Skip complex types
+                if (property.PropertyType.IsClass && property.PropertyType != typeof(string))
+                {
+                    continue;
+                }
+
+                var value = reader[property.Name];
+                property.SetValue(entity, value == DBNull.Value ? null : value);
+            }
+
+            return entity;
+        }
+
+        protected override string GenerateInsertQuery(User entity)
+        {
+            var properties = entity.GetType().GetProperties();
+            var columns = properties
+                .Where(p => p.Name == "Username" || p.Name == "Password" || p.Name == "Elo")
+                .Select(p => p.Name);
+            var values = properties
+                .Where(p => p.Name == "Username" || p.Name == "Password" || p.Name == "Elo")
+                .Select(p => $"@{p.Name}");
+
+            if (!columns.Any() || !values.Any())
+            {
+                throw new InvalidOperationException("No valid properties found to insert.");
+            }
+
+            return $"INSERT INTO {_tableName} ({string.Join(", ", columns)}) VALUES ({string.Join(", ", values)})";
+        }
+
         public new void Add(User entity)
         {
             // Hash the password before adding the user

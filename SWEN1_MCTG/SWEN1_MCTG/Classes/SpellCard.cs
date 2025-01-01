@@ -16,6 +16,8 @@ namespace SWEN1_MCTG.Classes
         {
         }
 
+        public SpellCard() { }
+
         // Methods
         /// <summary>
         /// Displays Information of SpellCard

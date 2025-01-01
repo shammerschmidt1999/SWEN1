@@ -17,7 +17,7 @@ namespace SWEN1_MCTG.Classes
             _monsterType = monsterType;
         }
 
-        public MonsterCard() : base() {}
+        public MonsterCard() { }
 
         // Fields
         private GlobalEnums.MonsterType _monsterType;

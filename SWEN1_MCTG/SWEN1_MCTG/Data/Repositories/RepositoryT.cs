@@ -3,7 +3,7 @@ using Npgsql;
 
 namespace SWEN1_MCTG.Data.Repositories
 {
-    public abstract class Repository<T> : IRepository<T> where T : class, new()
+    public abstract class Repository<T> : IRepository<T> where T : class
     {
         protected readonly string _connectionString;
         protected readonly string _tableName;
@@ -13,6 +13,8 @@ namespace SWEN1_MCTG.Data.Repositories
             _connectionString = connectionString;
             _tableName = tableName;
         }
+
+        protected abstract T CreateEntity();
 
         public void Add(T entity)
         {
@@ -89,25 +91,8 @@ namespace SWEN1_MCTG.Data.Repositories
             command.ExecuteNonQuery();
         }
 
-        protected string GenerateInsertQuery(T entity)
-        {
-            var properties = entity.GetType().GetProperties();
-            var columns = properties
-                .Where(p => p.Name == "Username" || p.Name == "Password" || p.Name == "Elo")
-                .Select(p => p.Name);
-            var values = properties
-                .Where(p => p.Name == "Username" || p.Name == "Password" || p.Name == "Elo")
-                .Select(p => $"@{p.Name}");
-
-            if (!columns.Any() || !values.Any())
-            {
-                throw new InvalidOperationException("No valid properties found to insert.");
-            }
-
-            return $"INSERT INTO {_tableName} ({string.Join(", ", columns)}) VALUES ({string.Join(", ", values)})";
-        }
-
-
+        // Abstract for now, will be implemented as general method later
+        protected abstract string GenerateInsertQuery(T entity);
         protected string GenerateUpdateQuery(T entity)
         {
             var properties = entity.GetType().GetProperties().Where(p => p.Name != "Id");
@@ -116,7 +101,7 @@ namespace SWEN1_MCTG.Data.Repositories
             return $"UPDATE {_tableName} SET {string.Join(", ", setStatements)} WHERE Id = @Id";
         }
 
-        private void AddParameters(NpgsqlCommand command, T entity)
+        protected virtual void AddParameters(NpgsqlCommand command, T entity)
         {
             var properties = entity.GetType().GetProperties();
             foreach (var property in properties)
@@ -146,22 +131,6 @@ namespace SWEN1_MCTG.Data.Repositories
             return entities;
         }
 
-        protected virtual T MapReaderToEntity(NpgsqlDataReader reader)
-        {
-            var entity = new T();
-            foreach (var property in typeof(T).GetProperties())
-            {
-                // Skip complex types
-                if (property.PropertyType.IsClass && property.PropertyType != typeof(string))
-                {
-                    continue;
-                }
-
-                var value = reader[property.Name];
-                property.SetValue(entity, value == DBNull.Value ? null : value);
-            }
-
-            return entity;
-        }
+        protected abstract T MapReaderToEntity(NpgsqlDataReader reader);
     }
 }
