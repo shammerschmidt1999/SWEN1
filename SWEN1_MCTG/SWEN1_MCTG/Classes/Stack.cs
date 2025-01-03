@@ -10,14 +10,25 @@ namespace SWEN1_MCTG.Classes
     // Stack class for user to store cards
     public class Stack : IStack
     {
+        public Stack()
+        {
+        }
+
         // Fields
         private List<Card> _cards = new List<Card>();
+        private int _userId;
 
         // Properties
         public List<Card> Cards
         {
             get => _cards;
-            private set => _cards = value;
+            set => _cards = value;
+        }
+
+        public int UserId
+        {
+            get => _userId;
+            set => _userId = value;
         }
 
         // Methods

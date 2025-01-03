@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SWEN1_MCTG.Interfaces;
 
 namespace SWEN1_MCTG.Classes
@@ -16,6 +12,7 @@ namespace SWEN1_MCTG.Classes
             _name = name;
             _damage = damage;
             _elementType = elementType;
+            _inDeck = false;
         }
 
         protected Card() { }
@@ -25,9 +22,9 @@ namespace SWEN1_MCTG.Classes
         protected string _name;
         protected double _damage;
         protected GlobalEnums.ElementType _elementType;
+        protected bool _inDeck;
 
         // Properties
-
         public int Id
         {
             get => _id;
@@ -38,15 +35,23 @@ namespace SWEN1_MCTG.Classes
             get => _name;
             private set => _name = value;
         }
+
         public double Damage
         {
             get => _damage;
             private set => _damage = value;
         }
+
         public GlobalEnums.ElementType ElementType
         {
             get => _elementType;
             private set => _elementType = value;
+        }
+
+        public bool InDeck
+        {
+            get => _inDeck;
+            set => _inDeck = value;
         }
 
         // Methods

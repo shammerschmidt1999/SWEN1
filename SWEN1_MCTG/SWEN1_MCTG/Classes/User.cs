@@ -26,21 +26,17 @@ namespace SWEN1_MCTG.Classes
             _password = password;
             _userCards = new Stack();
             _userDeck = new Stack();
-            _userHand = new Stack();
-            _userDiscard = new Stack();
             _userCoinPurse = new CoinPurse();
-            _elo = 1000;
+            _elo = 100;
         }
 
         // Fields
         private int _id;
-        private string _username = string.Empty;
-        private string _password = string.Empty;
-        private int _elo = 1000;
+        private string _username;
+        private string _password;
+        private int _elo;
         private Stack _userCards = new Stack(); // All current cards
         private Stack _userDeck = new Stack(); // Cards in played deck
-        private Stack _userHand = new Stack(); // Cards in hand
-        private Stack _userDiscard = new Stack(); // Discarded cards
         private CoinPurse _userCoinPurse = new CoinPurse();
 
         // Properties
@@ -67,12 +63,6 @@ namespace SWEN1_MCTG.Classes
             set => _userCards = value;
         }
 
-        public Stack UserDiscard
-        {
-            get => _userDiscard;
-            private set => _userDiscard = value;
-        }
-
         public CoinPurse UserCoinPurse
         {
             get => _userCoinPurse;
@@ -89,12 +79,6 @@ namespace SWEN1_MCTG.Classes
         {
             get => _userDeck;
             private set => _userDeck = value;
-        }
-
-        public Stack UserHand
-        {
-            get => _userHand;
-            private set => _userHand = value;
         }
 
         // Methods
@@ -126,8 +110,6 @@ namespace SWEN1_MCTG.Classes
                 user._password = password;
                 user._userCards = new Stack();
                 user._userDeck = new Stack();
-                user._userHand = new Stack();
-                user._userDiscard = new Stack();
                 user._userCoinPurse = new CoinPurse();
                 user._elo = 1000;
             }

@@ -43,8 +43,6 @@ public class UserTests
 
         Assert.AreEqual(expectedEmpty, createdUser.UserCards.Cards.Any());
         Assert.AreEqual(expectedEmpty, createdUser.UserDeck.Cards.Any());
-        Assert.AreEqual(expectedEmpty, createdUser.UserHand.Cards.Any());
-        Assert.AreEqual(expectedEmpty, createdUser.UserDiscard.Cards.Any());
     }
 
     [TestMethod]
