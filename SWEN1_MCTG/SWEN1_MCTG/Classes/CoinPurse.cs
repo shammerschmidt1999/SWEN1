@@ -65,14 +65,14 @@ namespace SWEN1_MCTG.Classes
         /// <returns>True if successful; otherwise, false.</returns>
         public bool RemoveCoins(GlobalEnums.CoinType coinType, int count)
         {
-            var coinsToRemove = _coins.Where(c => c.CoinType == coinType).Take(count).ToList();
+            List<Coin> coinsToRemove = _coins.Where(c => c.CoinType == coinType).Take(count).ToList();
 
             if (coinsToRemove.Count < count)
             {
                 return false; // Not enough coins of the specified type
             }
 
-            foreach (var coin in coinsToRemove)
+            foreach (Coin coin in coinsToRemove)
             {
                 _coins.Remove(coin);
             }

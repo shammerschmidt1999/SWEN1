@@ -62,11 +62,11 @@ namespace SWEN1_MCTG.Tests
         {
             // Arrange
             ICardRepository cardRepository = new CardRepository(ConnectionString);
-            var card = new MonsterCard($"TestMonsterCard_{Guid.NewGuid()}", GlobalEnums.MonsterType.Knight, 75, GlobalEnums.ElementType.Normal);
+            Card card = new MonsterCard($"TestMonsterCard_{Guid.NewGuid()}", GlobalEnums.MonsterType.Knight, 75, GlobalEnums.ElementType.Normal);
             cardRepository.Add(card);
 
             // Act
-            var fetchedCard = cardRepository.GetById(card.Id);
+            Card fetchedCard = cardRepository.GetById(card.Id);
 
             // Assert
             Assert.IsNotNull(fetchedCard);
@@ -78,11 +78,11 @@ namespace SWEN1_MCTG.Tests
         {
             // Arrange
             ICardRepository cardRepository = new CardRepository(ConnectionString);
-            var card = new MonsterCard($"TestMonsterCard_{Guid.NewGuid()}", GlobalEnums.MonsterType.Goblin, 50, GlobalEnums.ElementType.Normal);
+            Card card = new MonsterCard($"TestMonsterCard_{Guid.NewGuid()}", GlobalEnums.MonsterType.Goblin, 50, GlobalEnums.ElementType.Normal);
             cardRepository.Add(card); // Create the card first
 
             // Act
-            var cardToDelete = cardRepository.GetByName(card.Name);
+            Card cardToDelete = cardRepository.GetByName(card.Name);
             cardRepository.Delete(cardToDelete.Id);
 
             // Assert

@@ -23,7 +23,7 @@ namespace SWEN1_MCTG.Tests
         public void TestAddCoinsToPurse()
         {
             // Arrange
-            int userId = 1; // Example user ID
+            int userId = 1;
             List<Coin> newCoins = new List<Coin>
             {
                 new Coin(CoinType.Bronze),
@@ -46,8 +46,8 @@ namespace SWEN1_MCTG.Tests
         public void TestRemoveCoinsFromPurse()
         {
             // Arrange
-            int userId = 2; // Example user ID
-            var initialCoins = new List<Coin>
+            int userId = 2;
+            List<Coin> initialCoins = new List<Coin>
             {
                 new Coin(CoinType.Bronze),
                 new Coin(CoinType.Silver),
@@ -68,8 +68,8 @@ namespace SWEN1_MCTG.Tests
         public void TestRemoveCoinsFromPurse_InsufficientCoins()
         {
             // Arrange
-            int userId = 3; // Example user ID
-            var initialCoins = new List<Coin>
+            int userId = 3;
+            List<Coin> initialCoins = new List<Coin>
             {
                 new Coin(CoinType.Bronze),
                 new Coin(CoinType.Silver)
@@ -87,8 +87,8 @@ namespace SWEN1_MCTG.Tests
         public void TestConvertCoins()
         {
             // Arrange
-            int userId = 4; // Example user ID
-            var initialCoins = new List<Coin>
+            int userId = 4;
+            List<Coin> initialCoins = new List<Coin>
             {
                 new Coin(CoinType.Bronze),
                 new Coin(CoinType.Bronze),
@@ -114,7 +114,7 @@ namespace SWEN1_MCTG.Tests
         {
             // Arrange
             int userId = 5; // Example user ID
-            var initialCoins = new List<Coin>
+            List<Coin> initialCoins = new List<Coin>
             {
                 new Coin(CoinType.Bronze),
                 new Coin(CoinType.Gold)
@@ -147,8 +147,8 @@ namespace SWEN1_MCTG.Tests
         public void TestUpdateCoinPurse()
         {
             // Arrange
-            int userId = 6; // Example user ID
-            var initialCoins = new List<Coin>
+            int userId = 6;
+            List<Coin> initialCoins = new List<Coin>
             {
                 new Coin(CoinType.Diamond),
                 new Coin(CoinType.Platinum)
@@ -156,7 +156,7 @@ namespace SWEN1_MCTG.Tests
             _coinPurseRepository.AddCoinsToPurse(userId, initialCoins);
 
             // Add more coins
-            var moreCoins = new List<Coin>
+            List<Coin> moreCoins = new List<Coin>
             {
                 new Coin(CoinType.Gold),
                 new Coin(CoinType.Gold)
@@ -176,8 +176,8 @@ namespace SWEN1_MCTG.Tests
         public void TestDeleteCoinPurseByUserId()
         {
             // Arrange
-            int userId = 7; // Example user ID
-            var initialCoins = new List<Coin>
+            int userId = 7;
+            List<Coin> initialCoins = new List<Coin>
             {
                 new Coin(CoinType.Platinum)
             };

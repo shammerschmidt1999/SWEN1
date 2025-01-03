@@ -9,6 +9,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
         private readonly CardRepository _cardRepository;
         private readonly string _nToMUserQueryString;
         private readonly string _nToMCardQueryString;
+        private readonly string _nToMInsertQueryString;
 
         public StackRepository(string connectionString)
             : base(connectionString, "user_cards")
@@ -23,6 +24,9 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
                 SELECT uc.user_id, uc.card_id, uc.in_deck, uc.card_type
                 FROM {_tableName} uc
                 WHERE uc.card_id = @CardId";
+
+            _nToMInsertQueryString = $"INSERT INTO {_tableName} (user_id, card_id, in_deck, card_type, instance_id) " +
+                                     $"VALUES (@UserId, @CardId, @InDeck, @CardType, @InstanceId)";
         }
 
         protected override Stack CreateEntity()
@@ -32,7 +36,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
 
         protected override string GenerateInsertQuery(Stack entity)
         {
-            return $"INSERT INTO {_tableName} (user_id, card_id, in_deck, card_type, instance_id) VALUES (@UserId, @CardId, @InDeck, @CardType, @InstanceId)";
+            return _nToMInsertQueryString;
         }
 
         protected override void AddParameters(NpgsqlCommand command, Stack entity)
@@ -86,13 +90,13 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
 
         public Stack GetByUserId(int userId)
         {
-            using var connection = new NpgsqlConnection(_connectionString);
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            using var command = new NpgsqlCommand(_nToMUserQueryString, connection);
+            NpgsqlCommand command = new NpgsqlCommand(_nToMUserQueryString, connection);
             command.Parameters.AddWithValue("@UserId", userId);
 
-            using var reader = command.ExecuteReader();
+            NpgsqlDataReader reader = command.ExecuteReader();
             if (reader.Read())
             {
                 return MapReaderToEntity(reader);
@@ -103,13 +107,13 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
 
         public Stack GetByCardId(int cardId)
         {
-            using var connection = new NpgsqlConnection(_connectionString);
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            using var command = new NpgsqlCommand(_nToMCardQueryString, connection);
+            NpgsqlCommand command = new NpgsqlCommand(_nToMCardQueryString, connection);
             command.Parameters.AddWithValue("@CardId", cardId);
 
-            using var reader = command.ExecuteReader();
+            NpgsqlDataReader reader = command.ExecuteReader();
             if (reader.Read())
             {
                 return MapReaderToEntity(reader);
@@ -120,7 +124,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
 
         public void SetCardInDeck(bool inDeck, int cardId, int userId)
         {
-            using var connection = new NpgsqlConnection(_connectionString);
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
             // Fetch the specific card instance from the database
@@ -130,12 +134,12 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             WHERE card_id = @CardId AND user_id = @UserId
             LIMIT 1";
 
-            using var selectCommand = new NpgsqlCommand(selectQuery, connection);
+            NpgsqlCommand selectCommand = new NpgsqlCommand(selectQuery, connection);
             selectCommand.Parameters.AddWithValue("@CardId", cardId);
             selectCommand.Parameters.AddWithValue("@UserId", userId);
 
             Guid instanceId;
-            using (var reader = selectCommand.ExecuteReader())
+            using (NpgsqlDataReader reader = selectCommand.ExecuteReader())
             {
                 if (reader.Read())
                 {
@@ -153,7 +157,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             SET in_deck = @InDeck
             WHERE card_id = @CardId AND user_id = @UserId AND instance_id = @InstanceId";
 
-            using var updateCommand = new NpgsqlCommand(updateQuery, connection);
+            NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
             updateCommand.Parameters.AddWithValue("@InDeck", inDeck);
             updateCommand.Parameters.AddWithValue("@CardId", cardId);
             updateCommand.Parameters.AddWithValue("@UserId", userId);

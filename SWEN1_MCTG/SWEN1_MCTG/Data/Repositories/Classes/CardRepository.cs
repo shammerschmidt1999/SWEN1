@@ -28,12 +28,12 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
 
         public new void Add(Card entity)
         {
-            using var connection = new NpgsqlConnection(_connectionString);
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
             string insertQuery = GenerateInsertQuery(entity);
 
-            using var command = new NpgsqlCommand(insertQuery, connection);
+            NpgsqlCommand command = new NpgsqlCommand(insertQuery, connection);
 
             // Add the parameters for the entity
             AddParameters(command, entity);
@@ -54,7 +54,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             string cardType = entity is MonsterCard ? "MonsterCard" : "SpellCard";
             command.Parameters.AddWithValue("@card_type", NpgsqlTypes.NpgsqlDbType.Unknown, cardType);
 
-            foreach (var property in properties)
+            foreach (PropertyInfo property in properties)
             {
                 if (property.Name == "InDeck" || property.Name == "InstanceId") continue; // Skip the InDeck and InstanceID property
 
@@ -137,13 +137,13 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
 
         public Card GetByName(string name)
         {
-            using var connection = new NpgsqlConnection(_connectionString);
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            using var command = new NpgsqlCommand(_getByNameQuery, connection);
+            NpgsqlCommand command = new NpgsqlCommand(_getByNameQuery, connection);
             command.Parameters.AddWithValue("@name", name);
 
-            using var reader = command.ExecuteReader();
+            NpgsqlDataReader reader = command.ExecuteReader();
             if (reader.Read())
             {
                 return MapReaderToEntity(reader);

@@ -12,8 +12,11 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
     {
         private readonly string _getCoinPurseByIdQuery = @"SELECT * FROM coin_purses WHERE user_id = @UserId";
         private readonly string _deleteCoinPurseQuery = @"DELETE FROM coin_purses WHERE user_id = @UserId";
-        private readonly string _updateCoinPurseQuery = @"UPDATE coin_purses SET Bronze = @Bronze, Silver = @Silver, Gold = @Gold, Platinum = @Platinum, Diamond = @Diamond WHERE user_id = @UserId";
-        private readonly string _insertCoinPurseQuery = @"INSERT INTO coin_purses (user_id, Bronze, Silver, Gold, Platinum, Diamond) VALUES (@UserId, @Bronze, @Silver, @Gold, @Platinum, @Diamond)";
+        private readonly string _updateCoinPurseQuery = @"UPDATE coin_purses SET Bronze = 
+            @Bronze, Silver = @Silver, Gold = @Gold, Platinum = @Platinum, Diamond = @Diamond WHERE user_id = @UserId";
+        private readonly string _insertCoinPurseQuery = @"INSERT INTO coin_purses (user_id, bronze, silver, gold, platinum, diamond) 
+            VALUES (@UserId, @Bronze, @Silver, @Gold, @Platinum, @Diamond) 
+            ON CONFLICT (user_id) DO UPDATE SET bronze = @Bronze, silver = @Silver, gold = @Gold, platinum = @Platinum, diamond = @Diamond";
 
         public CoinPurseRepository(string connectionString)
             : base(connectionString, "coin_purses")
@@ -62,10 +65,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
         // Override to generate the insert query for the CoinPurse
         protected override string GenerateInsertQuery(CoinPurse coinPurse)
         {
-            return @"INSERT INTO coin_purses (user_id, bronze, silver, gold, platinum, diamond)
-                    VALUES (@UserId, @Bronze, @Silver, @Gold, @Platinum, @Diamond)
-                    ON CONFLICT (user_id) DO UPDATE 
-                    SET bronze = @Bronze, silver = @Silver, gold = @Gold, platinum = @Platinum, diamond = @Diamond";
+            return _insertCoinPurseQuery;
         }
 
         // Override to add parameters to the insert query
@@ -82,58 +82,53 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
         // Method to get CoinPurse by UserId
         public CoinPurse GetByUserId(int userId)
         {
-            using (NpgsqlConnection connection = new NpgsqlConnection(_connectionString))
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            NpgsqlCommand command = new NpgsqlCommand(_getCoinPurseByIdQuery, connection);
+            command.Parameters.AddWithValue("@UserId", userId);
+
+            NpgsqlDataReader reader = command.ExecuteReader();
+
+            if (reader.Read())
             {
-                connection.Open();
-                NpgsqlCommand command = new NpgsqlCommand(_getCoinPurseByIdQuery, connection);
-                command.Parameters.AddWithValue("@UserId", userId);
-
-                NpgsqlDataReader reader = command.ExecuteReader();
-                if (reader.Read())
-                {
-                    return MapReaderToEntity(reader);
-                }
-
-                return null; // Return null if the CoinPurse is not found for the user
+                return MapReaderToEntity(reader);
             }
+
+            return null; // Return null if the CoinPurse is not found for the user
         }
 
         // Method to delete CoinPurse by UserId
         public void DeleteByUserId(int userId)
         {
-            using (NpgsqlConnection connection = new NpgsqlConnection(_connectionString))
-            {
-                connection.Open();
-                NpgsqlCommand command = new NpgsqlCommand(_deleteCoinPurseQuery, connection);
-                command.Parameters.AddWithValue("@UserId", userId);
-                command.ExecuteNonQuery();
-            }
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            NpgsqlCommand command = new NpgsqlCommand(_deleteCoinPurseQuery, connection);
+            command.Parameters.AddWithValue("@UserId", userId);
+            command.ExecuteNonQuery();
         }
 
         // Additional method to update a user's coin purse
         public void UpdateCoinPurse(CoinPurse coinPurse)
         {
-            using (NpgsqlConnection connection = new NpgsqlConnection(_connectionString))
-            {
-                connection.Open();
-                NpgsqlCommand command = new NpgsqlCommand(_updateCoinPurseQuery, connection);
-                AddParameters(command, coinPurse);
-                command.ExecuteNonQuery();
-            }
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            NpgsqlCommand command = new NpgsqlCommand(_updateCoinPurseQuery, connection);
+            AddParameters(command, coinPurse);
+            command.ExecuteNonQuery();
         }
 
         // Method to add a new CoinPurse
         public void AddCoinPurse(CoinPurse coinPurse)
         {
-            using (var connection = new NpgsqlConnection(_connectionString))
-            {
-                connection.Open();
-                using (var command = new NpgsqlCommand(_insertCoinPurseQuery, connection))
-                {
-                    AddParameters(command, coinPurse);
-                    command.ExecuteNonQuery();
-                }
-            }
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            NpgsqlCommand command = new NpgsqlCommand(_insertCoinPurseQuery, connection);
+            AddParameters(command, coinPurse);
+            command.ExecuteNonQuery();
         }
 
         // Method to add coins to the CoinPurse (handles adding multiple coins)

@@ -49,7 +49,7 @@ namespace SWEN1_MCTG.Classes
         /// <exception cref="ArgumentException"></exception>
         public Card GetCardFromStack(string cardName)
         {
-            var card = _cards.Find(x => x.Name == cardName);
+            Card card = _cards.Find(x => x.Name == cardName);
             if (card == null)
             {
                 throw new ArgumentException($"Card with name {cardName} not found in stack.");

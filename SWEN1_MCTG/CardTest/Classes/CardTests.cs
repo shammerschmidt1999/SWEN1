@@ -18,7 +18,7 @@ public class CardTests
         double damage = 10;
         GlobalEnums.ElementType elementType = GlobalEnums.ElementType.Fire;
 
-        var TestSpellCard = new SpellCard(name, damage, elementType);
+        Card TestSpellCard = new SpellCard(name, damage, elementType);
         
         Assert.AreEqual(name, TestSpellCard.Name);
         Assert.AreEqual(damage, TestSpellCard.Damage);
@@ -33,7 +33,7 @@ public class CardTests
         GlobalEnums.ElementType elementType = GlobalEnums.ElementType.Fire;
         GlobalEnums.MonsterType monsterType = GlobalEnums.MonsterType.Ork;
 
-        var TestMonsterCard = new MonsterCard(name, monsterType, damage, elementType);
+        MonsterCard TestMonsterCard = new MonsterCard(name, monsterType, damage, elementType);
 
         Assert.AreEqual(name, TestMonsterCard.Name);
         Assert.AreEqual(damage, TestMonsterCard.Damage);
