@@ -5,9 +5,10 @@ using System.Linq;
 using System.Reflection;
 using Npgsql;
 using SWEN1_MCTG.Classes;
+using SWEN1_MCTG.Data.Repositories.Interfaces;
 using SWEN1_MCTG.Interfaces;
 
-namespace SWEN1_MCTG.Data.Repositories
+namespace SWEN1_MCTG.Data.Repositories.Classes
 {
     public class CardRepository : Repository<Card>, ICardRepository
     {
@@ -55,7 +56,7 @@ namespace SWEN1_MCTG.Data.Repositories
 
             foreach (var property in properties)
             {
-                if (property.Name == "InDeck") continue; // Skip the InDeck property
+                if (property.Name == "InDeck" || property.Name == "InstanceId") continue; // Skip the InDeck and InstanceID property
 
                 object? value = property.GetValue(entity);
                 if (value is Enum)
@@ -80,7 +81,7 @@ namespace SWEN1_MCTG.Data.Repositories
 
         protected override string GenerateInsertQuery(Card entity)
         {
-            IEnumerable<PropertyInfo> properties = typeof(Card).GetProperties().Where(p => p.Name != "Id" && p.Name != "InDeck");
+            IEnumerable<PropertyInfo> properties = typeof(Card).GetProperties().Where(p => p.Name != "Id" && p.Name != "InDeck" && p.Name != "InstanceId");
             string columnNames = string.Join(", ", properties.Select(p => p.Name));
             string parameterNames = string.Join(", ", properties.Select(p => $"@{p.Name}"));
 

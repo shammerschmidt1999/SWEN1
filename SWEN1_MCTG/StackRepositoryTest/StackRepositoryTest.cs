@@ -4,6 +4,8 @@ using Npgsql;
 using SWEN1_MCTG;
 using SWEN1_MCTG.Classes;
 using SWEN1_MCTG.Data.Repositories;
+using SWEN1_MCTG.Data.Repositories.Classes;
+using SWEN1_MCTG.Data.Repositories.Interfaces;
 using SWEN1_MCTG.Interfaces;
 
 namespace CardRepositoryTest.Classes
@@ -66,6 +68,64 @@ namespace CardRepositoryTest.Classes
             Assert.IsNotNull(card);
             Assert.IsInstanceOfType(card, typeof(MonsterCard));
         }
+
+        [TestMethod]
+        public void GetByUserId_ReturnsCorrectStack()
+        {
+            // Arrange
+            IStackRepository stackRepository = new StackRepository(connectionString);
+            int testUserId = 1;
+
+            // Act
+            Stack stack = stackRepository.GetByUserId(testUserId);
+
+            // Assert
+            Assert.IsNotNull(stack);
+            Assert.AreEqual(testUserId, stack.UserId);
+        }
+
+        [TestMethod]
+        public void GetByCardId_ReturnsCorrectStack()
+        {
+            // Arrange
+            IStackRepository stackRepository = new StackRepository(connectionString);
+            int testCardId = 1;
+
+            // Act
+            Stack stack = stackRepository.GetByCardId(testCardId);
+
+            // Assert
+            Assert.IsNotNull(stack);
+            Assert.IsTrue(stack.Cards.Any(c => c.Id == testCardId));
+        }
+
+        [TestMethod]
+        public void SetCardInDeck_SetsCardInDeck()
+        {
+            // Arrange
+            IStackRepository stackRepository = new StackRepository(connectionString);
+            ICardRepository cardRepository = new CardRepository(connectionString);
+            int testUserId = 1;
+
+            // Create or retrieve a card instance
+            Card testCard = cardRepository.GetByName("TestMonsterCard");
+
+            // Add the card to the user's stack
+            Stack stack = new Stack()
+            {
+                UserId = testUserId,
+                Cards = new List<Card> { testCard }
+            };
+            stackRepository.Add(stack);
+
+            // Act
+            stackRepository.SetCardInDeck(true, testCard.Id, testUserId);
+
+            // Assert
+            Stack retrievedStack = stackRepository.GetByUserId(testUserId);
+            Assert.IsTrue(retrievedStack.Cards.Any(c => c.Id == testCard.Id && c.InDeck));
+        }
+
 
     }
 }

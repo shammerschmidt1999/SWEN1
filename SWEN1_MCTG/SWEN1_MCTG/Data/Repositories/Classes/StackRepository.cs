@@ -1,16 +1,28 @@
 ﻿using Npgsql;
 using SWEN1_MCTG.Classes;
+using SWEN1_MCTG.Data.Repositories.Interfaces;
 
-namespace SWEN1_MCTG.Data.Repositories
+namespace SWEN1_MCTG.Data.Repositories.Classes
 {
     public class StackRepository : Repository<Stack>, IStackRepository
     {
         private readonly CardRepository _cardRepository;
+        private readonly string _nToMUserQueryString;
+        private readonly string _nToMCardQueryString;
 
         public StackRepository(string connectionString)
             : base(connectionString, "user_cards")
         {
             _cardRepository = new CardRepository(connectionString);
+            _nToMUserQueryString = $@"
+                SELECT uc.user_id, uc.card_id, uc.in_deck, uc.card_type
+                FROM {_tableName} uc
+                WHERE uc.user_id = @UserId";
+
+            _nToMCardQueryString = $@"
+                SELECT uc.user_id, uc.card_id, uc.in_deck, uc.card_type
+                FROM {_tableName} uc
+                WHERE uc.card_id = @CardId";
         }
 
         protected override Stack CreateEntity()
@@ -67,7 +79,7 @@ namespace SWEN1_MCTG.Data.Repositories
 
             // Fetch card details using CardRepository
             Card card = _cardRepository.GetById(cardId);
-            card.InDeck = inDeck;
+            card.SetInDeck(inDeck);
 
             return card;
         }
@@ -77,12 +89,7 @@ namespace SWEN1_MCTG.Data.Repositories
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            string query = $@"
-                SELECT uc.user_id, uc.card_id, uc.in_deck, uc.card_type
-                FROM {_tableName} uc
-                WHERE uc.user_id = @UserId";
-
-            using var command = new NpgsqlCommand(query, connection);
+            using var command = new NpgsqlCommand(_nToMUserQueryString, connection);
             command.Parameters.AddWithValue("@UserId", userId);
 
             using var reader = command.ExecuteReader();
@@ -99,12 +106,7 @@ namespace SWEN1_MCTG.Data.Repositories
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
-            string query = $@"
-                SELECT uc.user_id, uc.card_id, uc.in_deck, uc.card_type
-                FROM {_tableName} uc
-                WHERE uc.card_id = @CardId";
-
-            using var command = new NpgsqlCommand(query, connection);
+            using var command = new NpgsqlCommand(_nToMCardQueryString, connection);
             command.Parameters.AddWithValue("@CardId", cardId);
 
             using var reader = command.ExecuteReader();
@@ -115,5 +117,55 @@ namespace SWEN1_MCTG.Data.Repositories
 
             throw new InvalidOperationException($"Stack for card with Id {cardId} not found.");
         }
+
+        public void SetCardInDeck(bool inDeck, int cardId, int userId)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            // Fetch the specific card instance from the database
+            string selectQuery = $@"
+            SELECT instance_id
+            FROM {_tableName}
+            WHERE card_id = @CardId AND user_id = @UserId
+            LIMIT 1";
+
+            using var selectCommand = new NpgsqlCommand(selectQuery, connection);
+            selectCommand.Parameters.AddWithValue("@CardId", cardId);
+            selectCommand.Parameters.AddWithValue("@UserId", userId);
+
+            Guid instanceId;
+            using (var reader = selectCommand.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    instanceId = reader.GetGuid(reader.GetOrdinal("instance_id"));
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Card with Id {cardId} not found for user with Id {userId}");
+                }
+            }
+
+            // Update the in_deck status for the specific card instance
+            string updateQuery = $@"
+            UPDATE {_tableName}
+            SET in_deck = @InDeck
+            WHERE card_id = @CardId AND user_id = @UserId AND instance_id = @InstanceId";
+
+            using var updateCommand = new NpgsqlCommand(updateQuery, connection);
+            updateCommand.Parameters.AddWithValue("@InDeck", inDeck);
+            updateCommand.Parameters.AddWithValue("@CardId", cardId);
+            updateCommand.Parameters.AddWithValue("@UserId", userId);
+            updateCommand.Parameters.AddWithValue("@InstanceId", instanceId);
+
+            int rowsAffected = updateCommand.ExecuteNonQuery();
+            if (rowsAffected == 0)
+            {
+                throw new InvalidOperationException($"Card instance with Id {cardId} and InstanceId {instanceId} not found for user with Id {userId}");
+            }
+        }
+
+
     }
 }

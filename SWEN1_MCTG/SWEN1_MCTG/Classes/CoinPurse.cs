@@ -13,19 +13,29 @@ namespace SWEN1_MCTG.Classes
     {
         public CoinPurse()
         {
-            // Add 5 coins to the purse
-            Coin newCoin = new Coin(GlobalEnums.CoinType.Diamond);
-            AddCoin(newCoin);
+        }
+
+        public CoinPurse(GlobalEnums.CoinType coinType)
+        {
+            Coin firstCoin = new Coin(coinType);
+            _coins.Add(firstCoin);
         }
 
         // Fields
         private List<Coin> _coins = new List<Coin>();
+        private int _userId;
 
         // Properties
         public List<Coin> Coins
         {
             get => _coins;
             private set => _coins = value;
+        }
+
+        public int UserId
+        {
+            get => _userId;
+            set => _userId = value;
         }
 
         // Methods

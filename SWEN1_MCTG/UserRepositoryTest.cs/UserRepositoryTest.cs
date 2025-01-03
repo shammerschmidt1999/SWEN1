@@ -1,5 +1,7 @@
 using SWEN1_MCTG.Classes;
 using SWEN1_MCTG.Data.Repositories;
+using SWEN1_MCTG.Data.Repositories.Classes;
+using SWEN1_MCTG.Data.Repositories.Interfaces;
 
 namespace SWEN1_MCTG.Tests
 {

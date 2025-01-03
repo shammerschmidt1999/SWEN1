@@ -1,8 +1,9 @@
 ﻿using System.Reflection;
 using Newtonsoft.Json;
 using Npgsql;
+using SWEN1_MCTG.Data.Repositories.Interfaces;
 
-namespace SWEN1_MCTG.Data.Repositories
+namespace SWEN1_MCTG.Data.Repositories.Classes
 {
     /// <summary>
     /// Repository for a specific entity type.

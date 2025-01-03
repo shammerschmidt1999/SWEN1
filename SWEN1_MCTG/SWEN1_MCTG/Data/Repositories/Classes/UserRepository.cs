@@ -1,8 +1,9 @@
 ﻿using System.Reflection;
 using Npgsql;
 using SWEN1_MCTG.Classes;
+using SWEN1_MCTG.Data.Repositories.Interfaces;
 
-namespace SWEN1_MCTG.Data.Repositories
+namespace SWEN1_MCTG.Data.Repositories.Classes
 {
     public class UserRepository : Repository<User>, IUserRepository
     {

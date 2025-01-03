@@ -23,6 +23,7 @@ namespace SWEN1_MCTG.Classes
         protected double _damage;
         protected GlobalEnums.ElementType _elementType;
         protected bool _inDeck;
+        protected Guid _instanceId;
 
         // Properties
         public int Id
@@ -51,10 +52,20 @@ namespace SWEN1_MCTG.Classes
         public bool InDeck
         {
             get => _inDeck;
-            set => _inDeck = value;
+            private set => _inDeck = value;
+        }
+
+        public Guid InstanceId
+        {
+            get => _instanceId;
+            set => _instanceId = value;
         }
 
         // Methods
+        public void SetInDeck(bool inDeck)
+        {
+            _inDeck = inDeck;
+        }
         public abstract void PrintInformation();
     }
 }
