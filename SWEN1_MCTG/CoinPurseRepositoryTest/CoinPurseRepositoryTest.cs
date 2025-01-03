@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using static SWEN1_MCTG.GlobalEnums;
 
-namespace SWEN1_MCTG.Tests
+namespace CoinPurseRepositoryTest
 {
     [TestClass]
     public class CoinPurseRepositoryTests

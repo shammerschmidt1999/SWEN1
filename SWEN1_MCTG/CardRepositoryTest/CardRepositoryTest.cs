@@ -8,8 +8,9 @@ using SWEN1_MCTG.Interfaces;
 using SWEN1_MCTG.Data.Repositories;
 using SWEN1_MCTG.Data.Repositories.Classes;
 using SWEN1_MCTG.Data.Repositories.Interfaces;
+using SWEN1_MCTG;
 
-namespace SWEN1_MCTG.Tests
+namespace CardRepositoryTest
 {
     [TestClass]
     public class CardRepositoryTests

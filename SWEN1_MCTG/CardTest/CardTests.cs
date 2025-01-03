@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using SWEN1_MCTG;
 using SWEN1_MCTG.Classes;
 
-namespace CardTest.Classes;
+namespace CardTest;
 
 [TestClass]
 public class CardTests
@@ -19,7 +19,7 @@ public class CardTests
         GlobalEnums.ElementType elementType = GlobalEnums.ElementType.Fire;
 
         Card TestSpellCard = new SpellCard(name, damage, elementType);
-        
+
         Assert.AreEqual(name, TestSpellCard.Name);
         Assert.AreEqual(damage, TestSpellCard.Damage);
         Assert.AreEqual(elementType, TestSpellCard.ElementType);

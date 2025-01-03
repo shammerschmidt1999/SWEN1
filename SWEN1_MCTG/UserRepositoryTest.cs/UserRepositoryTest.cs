@@ -3,7 +3,7 @@ using SWEN1_MCTG.Data.Repositories;
 using SWEN1_MCTG.Data.Repositories.Classes;
 using SWEN1_MCTG.Data.Repositories.Interfaces;
 
-namespace SWEN1_MCTG.Tests
+namespace UserRepositoryTest
 {
     [TestClass]
     public class UserRepositoryTests

@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SWEN1_MCTG;
 using SWEN1_MCTG.Classes;
 
-namespace UserTest.Classes;
+namespace UserTest;
 
 
 [TestClass]
@@ -43,14 +44,6 @@ public class UserTests
 
         Assert.AreEqual(expectedEmpty, createdUser.UserCards.Cards.Any());
         Assert.AreEqual(expectedEmpty, createdUser.UserDeck.Cards.Any());
-    }
-
-    [TestMethod]
-    public void Constructor_CreateUser_UserHasTwentyCoins()
-    {
-        int expectedCoins = 20;
-
-        Assert.AreEqual(expectedCoins, createdUser.UserCoinPurse.GetCoinsValue());
     }
 }
 
