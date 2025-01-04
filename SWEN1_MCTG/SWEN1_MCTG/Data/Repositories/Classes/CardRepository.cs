@@ -14,6 +14,10 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
     {
         private readonly string _getByNameQuery;
 
+        public CardRepository() : base(null, null)
+        {
+        }
+
         public CardRepository(string connectionString)
             : base(connectionString, "cards")
         {
@@ -150,6 +154,24 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             }
 
             throw new InvalidOperationException($"Card with Name {name} not found.");
+        }
+
+        public List<Card> GetRandomCards(int count)
+        {
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            string query = $"SELECT * FROM cards ORDER BY RANDOM() LIMIT {count}";
+            NpgsqlCommand command = new NpgsqlCommand(query, connection);
+
+            List<Card> cards = new List<Card>();
+            NpgsqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                cards.Add(MapReaderToEntity(reader));
+            }
+
+            return cards;
         }
     }
 }

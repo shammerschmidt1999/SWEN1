@@ -21,9 +21,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CardRepositoryTest", "CardR
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserRepositoryTest", "UserRepositoryTest.cs\UserRepositoryTest.csproj", "{FAF27B48-F0B9-448F-8EE3-1B29C069A976}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackRepositoryTest", "StackRepositoryTest\StackRepositoryTest.csproj", "{DB174343-3AFC-4652-A531-B8EB1B218C5A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StackRepositoryTest", "StackRepositoryTest\StackRepositoryTest.csproj", "{DB174343-3AFC-4652-A531-B8EB1B218C5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoinPurseRepositoryTest", "CoinPurseRepositoryTest\CoinPurseRepositoryTest.csproj", "{2E0D616B-F8F1-49A7-B6A6-EFBF1EFC4695}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoinPurseRepositoryTest", "CoinPurseRepositoryTest\CoinPurseRepositoryTest.csproj", "{2E0D616B-F8F1-49A7-B6A6-EFBF1EFC4695}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PackageServiceTest", "PackageServiceTest\PackageServiceTest.csproj", "{0B2B8A81-9ECF-4559-B075-5BF014823BC5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{2E0D616B-F8F1-49A7-B6A6-EFBF1EFC4695}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E0D616B-F8F1-49A7-B6A6-EFBF1EFC4695}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E0D616B-F8F1-49A7-B6A6-EFBF1EFC4695}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B2B8A81-9ECF-4559-B075-5BF014823BC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B2B8A81-9ECF-4559-B075-5BF014823BC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B2B8A81-9ECF-4559-B075-5BF014823BC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B2B8A81-9ECF-4559-B075-5BF014823BC5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -77,6 +83,7 @@ Global
 		{FAF27B48-F0B9-448F-8EE3-1B29C069A976} = {B559E207-E8EE-4EAE-81C6-F6FFA2D82989}
 		{DB174343-3AFC-4652-A531-B8EB1B218C5A} = {B559E207-E8EE-4EAE-81C6-F6FFA2D82989}
 		{2E0D616B-F8F1-49A7-B6A6-EFBF1EFC4695} = {B559E207-E8EE-4EAE-81C6-F6FFA2D82989}
+		{0B2B8A81-9ECF-4559-B075-5BF014823BC5} = {6A658A28-1385-4633-AE98-2330E6A9788A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {03A6ABD7-FB71-4AF3-B4C3-D5FD9B94256A}

@@ -8,7 +8,7 @@ namespace UserRepositoryTest
     [TestClass]
     public class UserRepositoryTests
     {
-        private readonly string ConnectionString = AppSettings.GetConnectionString("DefaultConnection");
+        private readonly string ConnectionString = AppSettings.GetConnectionString("TestConnection");
 
         [TestMethod]
         public void TestAddUser()

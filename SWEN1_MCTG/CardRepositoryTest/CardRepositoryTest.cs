@@ -15,7 +15,7 @@ namespace CardRepositoryTest
     [TestClass]
     public class CardRepositoryTests
     {
-        private readonly string ConnectionString = AppSettings.GetConnectionString("DefaultConnection");
+        private readonly string ConnectionString = AppSettings.GetConnectionString("TestConnection");
 
         [TestMethod]
         public void TestAddCardMonsterCard()

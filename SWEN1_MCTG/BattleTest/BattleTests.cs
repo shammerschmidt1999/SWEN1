@@ -180,7 +180,7 @@ public class BattleTests
     }
 
     [TestMethod]
-    public void CalculateDamage_MonsterlVsMonsterDamage_GoblinAttackAgainstDragonNullifiesDamage()
+    public void CalculateDamage_MonsterVsMonsterDamage_GoblinAttackAgainstDragonNullifiesDamage()
     {
         string player1CardName = "Player1SpellCard";
         string player2CardName = "Player2MonsterCard";
@@ -203,7 +203,7 @@ public class BattleTests
     }
 
     [TestMethod]
-    public void CalculateDamage_MonsterlVsMonsterDamage_OrkAttackAgainstWizardNullifiesDamage()
+    public void CalculateDamage_MonsterVsMonsterDamage_OrkAttackAgainstWizardNullifiesDamage()
     {
         string player1CardName = "Player1SpellCard";
         string player2CardName = "Player2MonsterCard";
@@ -226,7 +226,7 @@ public class BattleTests
     }
 
     [TestMethod]
-    public void CalculateDamage_MonsterlVsMonsterDamage_DragonAttackAgainstFireElvesNullifiesDamage()
+    public void CalculateDamage_MonsterVsMonsterDamage_DragonAttackAgainstFireElvesNullifiesDamage()
     {
         string player1CardName = "Player1SpellCard";
         string player2CardName = "Player2MonsterCard";
@@ -249,7 +249,7 @@ public class BattleTests
     }
 
     [TestMethod]
-    public void CalculateDamage_MonsterlVsMonsterDamage_AttackWithoutSynergyDamageDoesNotChange()
+    public void CalculateDamage_MonsterVsMonsterDamage_AttackWithoutSynergyDamageDoesNotChange()
     {
 
         string player1CardName = "Player1SpellCard";

@@ -13,7 +13,7 @@ namespace StackRepositoryTest
     [TestClass]
     public class StackRepositoryTests
     {
-        private readonly string connectionString = AppSettings.GetConnectionString("DefaultConnection");
+        private readonly string connectionString = AppSettings.GetConnectionString("TestConnection");
 
         [TestMethod]
         public void AddStack_AddsStackToDatabase()

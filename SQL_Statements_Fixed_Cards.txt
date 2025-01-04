@@ -1,0 +1,70 @@
+--- SQL STATEMENTS FOR ACTUAL CARDS ---
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (10, 'Fireball', 50, 'Fire', null, 'SpellCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (11, 'Tsunami', 75, 'Water', null, 'SpellCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (12, 'Brimstone', 100, 'Normal', null, 'SpellCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (13, 'Hellfire', 100, 'Fire', null, 'SpellCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (14, 'Blizzard', 100, 'Water', null, 'SpellCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (15, 'Gunshot', 40, 'Normal', null, 'SpellCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (16, 'Deathwing', 500, 'Fire', 'Dragon', 'MonsterCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (17, 'Gallywix', 99, 'Normal', 'Goblin', 'MonsterCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (18, 'Elminster', 999, 'Normal', 'Wizard', 'MonsterCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (19, 'Tide Knight', 70, 'Water', 'Knight', 'MonsterCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (20, 'Hellscream', 70, 'Fire', 'Ork', 'MonsterCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (21, 'Cth-Un', 1000, 'Water', 'Kraken', 'MonsterCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (22, 'Meteor', 400, 'Fire', null, 'SpellCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (23, 'Glacial Spike', 400, 'Water', null, 'SpellCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (24, 'Earthquake', 400, 'Normal', null, 'SpellCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (25, 'Lancelot', 500, 'Normal', 'Knight', 'MonsterCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (26, 'Burned One', 500, 'Fire', 'FireElve', 'MonsterCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (27, 'Elve Commander', 66, 'Fire', 'FireElve', 'MonsterCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (28, 'Foot Soldier', 15, 'Normal', 'Knight', 'MonsterCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (29, 'Frozen Terror', 250, 'Water', 'Dragon', 'MonsterCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (30, 'Hellbender', 150, 'Fire', 'Ork', 'MonsterCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (31, 'Shipeater', 150, 'Water', 'Kraken', 'MonsterCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (32, 'Tinkerer', 20, 'Fire', 'Goblin', 'MonsterCard');

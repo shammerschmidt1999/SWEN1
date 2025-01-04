@@ -39,4 +39,12 @@ public static class GlobalEnums
         Draw,
         Victory
     }
+
+    // Package types
+    public enum PackageType
+    {
+        Basic = 5,
+        Premium = 10,
+        Legendary = 20
+    }
 }

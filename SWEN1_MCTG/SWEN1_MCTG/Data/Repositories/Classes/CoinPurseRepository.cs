@@ -18,6 +18,9 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             VALUES (@UserId, @Bronze, @Silver, @Gold, @Platinum, @Diamond) 
             ON CONFLICT (user_id) DO UPDATE SET bronze = @Bronze, silver = @Silver, gold = @Gold, platinum = @Platinum, diamond = @Diamond";
 
+        public CoinPurseRepository() : base(null, null)
+        {
+        }
         public CoinPurseRepository(string connectionString)
             : base(connectionString, "coin_purses")
         {

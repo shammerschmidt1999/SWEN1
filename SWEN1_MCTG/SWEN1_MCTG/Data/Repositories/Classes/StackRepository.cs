@@ -11,6 +11,11 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
         private readonly string _nToMCardQueryString;
         private readonly string _nToMInsertQueryString;
 
+        // Parameterless constructor for mocking purposes
+        public StackRepository() : base(null, null)
+        {
+        }
+
         public StackRepository(string connectionString)
             : base(connectionString, "user_cards")
         {
@@ -122,6 +127,19 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             throw new InvalidOperationException($"Stack for card with Id {cardId} not found.");
         }
 
+        /*public void UpdateNtoM()
+        {
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            string updateQuery = GenerateUpdateQuery(entity);
+
+            NpgsqlCommand command = new NpgsqlCommand(updateQuery, connection);
+            AddParameters(command, entity);
+
+            command.ExecuteNonQuery();
+        }*/
+
         public void SetCardInDeck(bool inDeck, int cardId, int userId)
         {
             NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
@@ -167,6 +185,47 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             if (rowsAffected == 0)
             {
                 throw new InvalidOperationException($"Card instance with Id {cardId} and InstanceId {instanceId} not found for user with Id {userId}");
+            }
+        }
+
+        public void AddCardsToUser(int userId, List<Card> cards)
+        {
+            using (NpgsqlConnection connection = new NpgsqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        foreach (var card in cards)
+                        {
+                            string insertQuery = $@"
+                    INSERT INTO {_tableName} (user_id, card_id, in_deck, card_type, instance_id)
+                    VALUES (@UserId, @CardId, @InDeck, @CardType, @InstanceId)";
+
+                            using (NpgsqlCommand command = new NpgsqlCommand(insertQuery, connection))
+                            {
+                                command.Parameters.AddWithValue("@UserId", userId);
+                                command.Parameters.AddWithValue("@CardId", card.Id);
+                                command.Parameters.AddWithValue("@InDeck", card.InDeck);
+
+                                string cardType = card is MonsterCard ? "MonsterCard" : "SpellCard";
+                                command.Parameters.AddWithValue("@CardType", NpgsqlTypes.NpgsqlDbType.Unknown, cardType);
+                                command.Parameters.AddWithValue("@InstanceId", Guid.NewGuid());
+
+                                command.ExecuteNonQuery();
+                            }
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
             }
         }
 

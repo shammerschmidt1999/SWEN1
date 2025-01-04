@@ -1,0 +1,121 @@
+﻿using SWEN1_MCTG.Classes;
+using SWEN1_MCTG.Data.Repositories.Classes;
+
+namespace SWEN1_MCTG.Data;
+
+public class PackageService : IPackageService
+{
+    private readonly StackRepository _stackRepository;
+    private readonly CardRepository _cardRepository;
+    private readonly CoinPurseRepository _coinPurseRepository;
+    private readonly Func<List<Card>, int, List<Card>> _cardSelectionStrategy; // Used for testing
+
+    public PackageService(StackRepository stackRepository, CardRepository cardRepository, CoinPurseRepository coinPurseRepository, Func<List<Card>, int, List<Card>> cardSelectionStrategy)
+    {
+
+        _stackRepository = stackRepository;
+        _cardRepository = cardRepository;
+        _coinPurseRepository = coinPurseRepository;
+        _cardSelectionStrategy = cardSelectionStrategy ?? DefaultCardSelection; // Used for testing
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="packageType"></param>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public void PurchasePackage(int userId, GlobalEnums.PackageType packageType)
+    {
+        // Get corresponding CoinPurse
+        CoinPurse coinPurse = _coinPurseRepository.GetByUserId(userId);
+
+        // Get the price of the package
+        int packagePrice = (int)packageType;
+
+        // Check if user has enough coins to purchase package
+        if (coinPurse.GetCoinsValue() < packagePrice)
+        {
+            throw new InvalidOperationException("Not enough coins to purchase package");
+        }
+
+        // Extract the exact coins needed for the package
+        Dictionary<GlobalEnums.CoinType, int> coinsUsed = coinPurse.ExtractCoins(packagePrice);
+        if (coinsUsed == null)
+        {
+            throw new InvalidOperationException("Failed to extract the required coins for the package");
+        }
+
+        // Determine the amount of cards to be drawn from the database
+        int amountOfCards = GetAmountOfCards(packageType);
+
+        // Determine the amount of decisions the user can make
+        int possibleDecisions = packageType == GlobalEnums.PackageType.Legendary ? 2 : 1;
+
+        // Get random cards from the database
+        List<Card> randomCards = _cardRepository.GetRandomCards(amountOfCards);
+
+        // Let the user choose the cards
+        List<Card> userCardSelection = _cardSelectionStrategy(randomCards, possibleDecisions);
+
+        // Add the cards to the users stack
+        _stackRepository.AddCardsToUser(userId, userCardSelection);
+
+        // Update the user's coin purse in the repository
+        _coinPurseRepository.UpdateCoinPurse(coinPurse);
+
+        Console.WriteLine("Package purchased successfully!");
+        Console.WriteLine("Cards added to your personal cards!");
+    }
+
+    public int GetAmountOfCards(GlobalEnums.PackageType packageType)
+    {
+        return packageType switch
+        {
+            GlobalEnums.PackageType.Basic => 5,
+            GlobalEnums.PackageType.Premium => 10,
+            GlobalEnums.PackageType.Legendary => 12,
+            _ => throw new ArgumentOutOfRangeException(nameof(packageType), "Package type not found")
+        };
+    }
+
+    public List<Card> GetUserCardSelection(List<Card> randomCards, int cardsToChoose)
+    {
+        Console.WriteLine("Select cards:");
+        for (int i = 0; i < randomCards.Count; i++)
+        {
+            Console.WriteLine($"{i + 1}: {randomCards[i].Name}");
+        }
+
+        List<Card> selectedCards = new List<Card>();
+        for (int i = 0; i < cardsToChoose; i++)
+        {
+            Console.WriteLine($"Choose card {i + 1}:");
+            int choice = int.Parse(Console.ReadLine());
+            selectedCards.Add(randomCards[choice - 1]);
+        }
+
+        return selectedCards;
+    }
+
+    // Used for testing purposes
+    private List<Card> DefaultCardSelection(List<Card> randomCards, int cardsToChoose)
+    {
+        Console.WriteLine("Select cards:");
+        for (int i = 0; i < randomCards.Count; i++)
+        {
+            Console.WriteLine($"{i + 1}: {randomCards[i].Name}");
+        }
+
+        List<Card> selectedCards = new List<Card>();
+        for (int i = 0; i < cardsToChoose; i++)
+        {
+            Console.WriteLine($"Choose card {i + 1}:");
+            int choice = int.Parse(Console.ReadLine());
+            selectedCards.Add(randomCards[choice - 1]);
+        }
+
+        return selectedCards;
+    }
+}

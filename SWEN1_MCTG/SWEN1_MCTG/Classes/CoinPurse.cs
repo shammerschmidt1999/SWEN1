@@ -173,5 +173,67 @@ namespace SWEN1_MCTG.Classes
             Console.WriteLine($"{ diamondValue / ((int)GlobalEnums.CoinType.Diamond) }x Diamond: { diamondValue }");
             Console.WriteLine($"Total: { GetCoinsValue() }");
         }
+
+        // <summary>
+        /// Calculates and removes the exact coins needed to reach a specified value.
+        /// </summary>
+        /// <param name="targetValue">The total value to extract.</param>
+        /// <returns>A dictionary of CoinType and the count of coins used, or null if the operation fails.</returns>
+        public Dictionary<GlobalEnums.CoinType, int> ExtractCoins(int targetValue)
+        {
+            if (targetValue > GetCoinsValue())
+            {
+                // Not enough total value in the CoinPurse
+                return null;
+            }
+
+            // Result dictionary to track the coins used
+            var coinsUsed = new Dictionary<GlobalEnums.CoinType, int>();
+
+            // Sort the coin types by their value in descending order
+            IOrderedEnumerable<CoinType> sortedCoinTypes = Enum.GetValues(typeof(GlobalEnums.CoinType))
+                .Cast<GlobalEnums.CoinType>()
+                .OrderByDescending(ct => (int)ct);
+
+            foreach (var coinType in sortedCoinTypes)
+            {
+                int coinValue = (int)coinType;
+                int coinCount = _coins.Count(c => c.CoinType == coinType);
+
+                if (coinCount > 0 && targetValue >= coinValue)
+                {
+                    // Determine the maximum number of coins we can use
+                    int coinsToUse = Math.Min(targetValue / coinValue, coinCount);
+                    if (coinsToUse > 0)
+                    {
+                        // Update target value and track coins used
+                        targetValue -= coinsToUse * coinValue;
+                        coinsUsed[coinType] = coinsToUse;
+
+                        // Remove the coins from the purse
+                        RemoveCoins(coinType, coinsToUse);
+                    }
+                }
+
+                // Exit early if the target value is met
+                if (targetValue == 0)
+                {
+                    break;
+                }
+            }
+
+            // If the target value is not met, rollback changes and return null
+            if (targetValue > 0)
+            {
+                // Add the removed coins back to the purse
+                foreach (KeyValuePair<CoinType,int> entry in coinsUsed)
+                {
+                    AddCoins(Enumerable.Repeat(new Coin(entry.Key), entry.Value));
+                }
+                return null;
+            }
+
+            return coinsUsed;
+        }
     }
 }

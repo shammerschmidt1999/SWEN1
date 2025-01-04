@@ -6,7 +6,9 @@ namespace SWEN1_MCTG.Classes
     public class Package : IPackage
     {
         // Fields
-        private int _price = 5;
+        private int _price;
+        private GlobalEnums.PackageType _packageType;
+        private int _amountOfCards;
         private List<Card> _cards = new List<Card>();
 
         // Properties
@@ -20,6 +22,18 @@ namespace SWEN1_MCTG.Classes
         {
             get => _cards;
             set => _cards = value;
+        }
+
+        public GlobalEnums.PackageType PackageType
+        {
+            get => _packageType;
+            set => _packageType = value;
+        }
+
+        public int AmountOfCards
+        {
+            get => _amountOfCards;
+            set => _amountOfCards = value;
         }
 
         // Methods

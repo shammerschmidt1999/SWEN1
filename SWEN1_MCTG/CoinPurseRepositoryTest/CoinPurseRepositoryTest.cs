@@ -10,7 +10,7 @@ namespace CoinPurseRepositoryTest
     [TestClass]
     public class CoinPurseRepositoryTests
     {
-        private readonly string _connectionString = AppSettings.GetConnectionString("DefaultConnection");
+        private readonly string _connectionString = AppSettings.GetConnectionString("TestConnection");
         private CoinPurseRepository _coinPurseRepository;
 
         [TestInitialize]
