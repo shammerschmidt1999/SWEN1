@@ -10,6 +10,7 @@ public interface ICoinPurseRepository : IRepository<CoinPurse>
     void DeleteByUserId(int userId);
     void AddCoinPurse(CoinPurse coinPurse);
     void UpdateCoinPurse(CoinPurse coinPurse);
-    public void AddCoinsToPurse(int userId, IEnumerable<Coin> coins);
+    void AddCoinsToPurse(int userId, IEnumerable<Coin> coins);
     bool RemoveCoinsFromPurse(int userId, CoinType coinType, int count);
+    void RemoveAllCoinsFromPurse(int userId);
 }

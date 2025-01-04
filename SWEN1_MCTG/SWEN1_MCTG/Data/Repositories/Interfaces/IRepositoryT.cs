@@ -11,7 +11,6 @@ namespace SWEN1_MCTG.Data.Repositories.Interfaces
         void Add(T entity);
         IEnumerable<T> GetAll();
         T GetById(int id);
-        void Update(T entity);
         void Delete(int id);
     }
 }

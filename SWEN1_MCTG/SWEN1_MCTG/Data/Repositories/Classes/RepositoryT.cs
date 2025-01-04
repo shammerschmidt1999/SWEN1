@@ -55,7 +55,10 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             }
         }
 
-        // Method to get all entities from the database
+        /// <summary>
+        /// Method to get all entities from the database.
+        /// </summary>
+        /// <returns> A List T of entities </returns>
         public IEnumerable<T> GetAll()
         {
             NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
@@ -67,7 +70,12 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             return MapReaderToEntities(reader);
         }
 
-        // Method to get an entity by its Id
+        /// <summary>
+        /// Method to get an entity by its Id from the database
+        /// </summary>
+        /// <param name="id"> The id of the entity </param>
+        /// <returns> The entity with the corresponding id </returns>
+        /// <exception cref="InvalidOperationException"> If no entity with the given id is found </exception>
         public T GetById(int id)
         {
             NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
@@ -85,21 +93,10 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             throw new InvalidOperationException($"{typeof(T).Name} with Id {id} not found.");
         }
 
-        // Method to update an entity in the database
-        public void Update(T entity)
-        {
-            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
-
-            string updateQuery = GenerateUpdateQuery(entity);
-
-            NpgsqlCommand command = new NpgsqlCommand(updateQuery, connection);
-            AddParameters(command, entity);
-
-            command.ExecuteNonQuery();
-        }
-
-        // Method to delete an entity from the database
+        /// <summary>
+        /// Method to delete an entity from the database by its Id
+        /// </summary>
+        /// <param name="id"> The id of the entity </param>
         public void Delete(int id)
         {
             NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
@@ -111,39 +108,11 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             command.ExecuteNonQuery();
         }
 
-        // Abstract for now, will be implemented as general method later
-        protected abstract string GenerateInsertQuery(T entity);
-
-        // Method to generate the update query for an entity
-        protected string GenerateUpdateQuery(T entity)
-        {
-            IEnumerable<PropertyInfo> properties = entity.GetType().GetProperties().Where(p => p.Name != "Id");
-            IEnumerable<string> setStatements = properties.Select(p => $"{p.Name} = @{p.Name}");
-
-            return $"UPDATE {_tableName} SET {string.Join(", ", setStatements)} WHERE Id = @Id";
-        }
-
-        // Method to add parameters to a command
-        protected virtual void AddParameters(NpgsqlCommand command, T entity)
-        {
-            PropertyInfo[] properties = entity.GetType().GetProperties();
-            foreach (PropertyInfo property in properties)
-            {
-                object? value = property.GetValue(entity);
-
-                // Only consider specific properties
-                if (property.Name != "Username" && property.Name != "Password" && property.Name != "Elo")
-                {
-                    continue;
-                }
-
-                // Handle basic types
-                NpgsqlParameter parameter = new NpgsqlParameter(property.Name, value ?? DBNull.Value);
-                command.Parameters.Add(parameter);
-            }
-        }
-
-        // Method to map a reader to entities
+        /// <summary>
+        /// Method to map a reader to a list of entities
+        /// </summary>
+        /// <param name="reader"> Reader </param>
+        /// <returns> IEnumerable of entities mapped to reader </returns>
         protected IEnumerable<T> MapReaderToEntities(NpgsqlDataReader reader)
         {
             List<T> entities = new List<T>();
@@ -155,7 +124,25 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             return entities;
         }
 
-        // Abstract method to map a reader to an entity
+        /// <summary>
+        /// Method to map a reader to an entity
+        /// </summary>
+        /// <param name="reader"> Reader </param>
+        /// <returns> An entity mapped to the reader </returns>
         protected abstract T MapReaderToEntity(NpgsqlDataReader reader);
+
+        /// <summary>
+        /// Method to generate the INSERT Query for an entity
+        /// </summary>
+        /// <param name="entity"> The entity </param>
+        /// <returns> INSERT Query string </returns>
+        protected abstract string GenerateInsertQuery(T entity);
+
+        /// <summary>
+        /// Method to add parameters to a command
+        /// </summary>
+        /// <param name="command"> The command </param>
+        /// <param name="entity"> The entity affected </param>
+        protected abstract void AddParameters(NpgsqlCommand command, T entity);
     }
 }

@@ -69,7 +69,13 @@ public class PackageService : IPackageService
         Console.WriteLine("Cards added to your personal cards!");
     }
 
-    public int GetAmountOfCards(GlobalEnums.PackageType packageType)
+    /// <summary>
+    /// Get the amount of cards that should be drawn from the database
+    /// </summary>
+    /// <param name="packageType"> The type of Package the user wants to purchase </param>
+    /// <returns> An integer that represents the size of the package according to the packageType </returns>
+    /// <exception cref="ArgumentOutOfRangeException"> In case a non-existing packageType is entered </exception>
+    private int GetAmountOfCards(GlobalEnums.PackageType packageType)
     {
         return packageType switch
         {
@@ -80,7 +86,13 @@ public class PackageService : IPackageService
         };
     }
 
-    public List<Card> GetUserCardSelection(List<Card> randomCards, int cardsToChoose)
+    /// <summary>
+    /// Reads the user's input to select cards
+    /// </summary>
+    /// <param name="randomCards"> A List of cards that are randomly drawn from the database </param>
+    /// <param name="cardsToChoose"> The amount of cards a user can select </param>
+    /// <returns> A list of cards with the selected cards </returns>
+    private List<Card> GetUserCardSelection(List<Card> randomCards, int cardsToChoose)
     {
         Console.WriteLine("Select cards:");
         for (int i = 0; i < randomCards.Count; i++)

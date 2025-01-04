@@ -60,9 +60,9 @@ namespace SWEN1_MCTG.Classes
         /// <summary>
         /// Removes coins of a specific type.
         /// </summary>
-        /// <param name="coinType">The type of coin to remove.</param>
-        /// <param name="count">Number of coins to remove.</param>
-        /// <returns>True if successful; otherwise, false.</returns>
+        /// <param name="coinType"> The type of coin to remove </param>
+        /// <param name="count"> Number of coins to remove </param>
+        /// <returns> True if successful; otherwise, false </returns>
         public bool RemoveCoins(GlobalEnums.CoinType coinType, int count)
         {
             List<Coin> coinsToRemove = _coins.Where(c => c.CoinType == coinType).Take(count).ToList();
@@ -174,11 +174,11 @@ namespace SWEN1_MCTG.Classes
             Console.WriteLine($"Total: { GetCoinsValue() }");
         }
 
-        // <summary>
+        /// <summary>
         /// Calculates and removes the exact coins needed to reach a specified value.
         /// </summary>
-        /// <param name="targetValue">The total value to extract.</param>
-        /// <returns>A dictionary of CoinType and the count of coins used, or null if the operation fails.</returns>
+        /// <param name="targetValue"> The total value to extract </param>
+        /// <returns> A dictionary of CoinType and the count of coins used, or null if the operation fails </returns>
         public Dictionary<GlobalEnums.CoinType, int> ExtractCoins(int targetValue)
         {
             if (targetValue > GetCoinsValue())

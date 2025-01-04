@@ -37,7 +37,7 @@ namespace SWEN1_MCTG.Classes
         /// <param name="token"> Token string </param>
         /// <returns> Returns a tuple of success flag and user object.
         ///          If successful, the success flag is TRUE and the user represents the authenticated user,
-        ///          otherwise success flag if FALSE and user object is NULL </returns>
+        ///          otherwise success flag if FALSE and user object is NULL</returns>
         public static (bool Success, User? User) Authenticate(string token)
         {
             if (Program.ALLOW_DEBUG_TOKEN && token.EndsWith("-debug"))

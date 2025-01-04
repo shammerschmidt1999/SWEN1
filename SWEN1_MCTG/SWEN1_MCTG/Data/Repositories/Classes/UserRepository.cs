@@ -42,6 +42,25 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             return entity;
         }
 
+        protected override void AddParameters(NpgsqlCommand command, User user)
+        {
+            PropertyInfo[] properties = user.GetType().GetProperties();
+            foreach (PropertyInfo property in properties)
+            {
+                object? value = property.GetValue(user);
+
+                // Only consider specific properties
+                if (property.Name != "Username" && property.Name != "Password" && property.Name != "Elo")
+                {
+                    continue;
+                }
+
+                // Handle basic types
+                NpgsqlParameter parameter = new NpgsqlParameter(property.Name, value ?? DBNull.Value);
+                command.Parameters.Add(parameter);
+            }
+        }
+
         protected override string GenerateInsertQuery(User entity)
         {
             PropertyInfo[] properties = entity.GetType().GetProperties();

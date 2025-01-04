@@ -165,5 +165,18 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
 
             return result;
         }
+
+        // Method to remove all coins from the CoinPurse
+        public void RemoveAllCoinsFromPurse(int userId)
+        {
+            CoinPurse coinPurse = GetByUserId(userId);
+            if (coinPurse == null)
+            {
+                return; // CoinPurse not found
+            }
+
+            coinPurse.Coins.Clear();
+            UpdateCoinPurse(coinPurse);
+        }
     }
 }

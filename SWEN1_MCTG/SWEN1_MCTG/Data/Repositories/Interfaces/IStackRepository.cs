@@ -8,5 +8,6 @@ public interface IStackRepository : IRepository<Stack>
     Card CreateCard(NpgsqlDataReader reader);
     Stack GetByUserId(int id);
     Stack GetByCardId(int id);
-    public void SetCardInDeck(bool inDeck, int cardId, int userId);
+    void SetCardInDeck(bool inDeck, int cardId, int userId);
+    void AddCardsToUser(int userId, List<Card> cards);
 }
