@@ -79,6 +79,12 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             return $"INSERT INTO {_tableName} ({string.Join(", ", columns)}) VALUES ({string.Join(", ", values)}) RETURNING Id";
         }
 
+        /// <summary>
+        /// Gets a user entity by fetching the users data by searching for the username
+        /// </summary>
+        /// <param name="username"> Provided username </param>
+        /// <returns> Corresponding user entity </returns>
+        /// <exception cref="InvalidOperationException"> If user is not found in db </exception>
         public User GetByUsername(string username)
         {
             NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
@@ -94,6 +100,23 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             }
 
             throw new InvalidOperationException($"User with Username {username} not found.");
+        }
+
+        /// <summary>
+        /// Checks if a username exists in the db
+        /// </summary>
+        /// <param name="username"> Provided username </param>
+        /// <returns> True if user exits in db; Else false </returns>
+        public bool Exists(string username)
+        {
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            NpgsqlCommand command = new NpgsqlCommand(_getByUsernameQuery, connection);
+            command.Parameters.AddWithValue("@Username", username);
+
+            NpgsqlDataReader reader = command.ExecuteReader();
+            return reader.Read();
         }
     }
 }

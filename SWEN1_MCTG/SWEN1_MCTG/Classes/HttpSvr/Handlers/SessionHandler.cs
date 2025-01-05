@@ -1,10 +1,6 @@
 ﻿using SWEN1_MCTG.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Nodes;
-using System.Threading.Tasks;
 
 namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
 {
@@ -18,7 +14,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
         public override bool Handle(HttpSvrEventArgs e)
         {
             if ((e.Path.TrimEnd('/', ' ', '\t') == "/sessions") && (e.Method == "POST"))
-            {                                                                
+            {
                 return _CreateSession(e);
             }
 
@@ -33,17 +29,17 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
         public static bool _CreateSession(HttpSvrEventArgs e)
         {
             JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
-            int status = HttpStatusCode.BAD_REQUEST;                            
+            int status = HttpStatusCode.BAD_REQUEST;
 
             try
             {
-                JsonNode? json = JsonNode.Parse(e.Payload);                     
+                JsonNode? json = JsonNode.Parse(e.Payload);
                 if (json != null)
-                {                                                               
+                {
                     (bool Success, string Token) result = User.Logon((string)json["Username"]!, (string)json["Password"]!);
 
                     if (result.Success)
-                    {                                                           
+                    {
                         status = HttpStatusCode.OK;
                         reply = new JsonObject()
                         {
@@ -53,7 +49,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                         };
                     }
                     else
-                    {                                                           
+                    {
                         status = HttpStatusCode.UNAUTHORIZED;
                         reply = new JsonObject()
                         {
@@ -64,11 +60,11 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                 }
             }
             catch (Exception)
-            {                                                                   
+            {
                 reply = new JsonObject() { ["success"] = false, ["message"] = "Unexpected error." };
             }
 
-            e.Reply(status, reply?.ToJsonString());                             
+            e.Reply(status, reply?.ToJsonString());
             return true;
         }
     }

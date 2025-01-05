@@ -1,22 +1,23 @@
-﻿using SWEN1_MCTG.Classes.HttpSvr;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SWEN1_MCTG.Classes.HttpSvr;
 
 namespace SWEN1_MCTG.Classes
 {
     public static class Token
     {
-        // Alphabet string
         private const string _ALPHABET = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        private static ITokenRepository _tokenRepository;
 
-        // Token dictionary
-        internal static Dictionary<string, User> _Tokens = new();
+        public static void Initialize(ITokenRepository tokenRepository)
+        {
+            _tokenRepository = tokenRepository;
+        }
 
-        /// <summary> Creates a new token for a user </summary>
-        /// <param name="user"> User that the token gets assigned to </param>
+        /// <summary>
+        /// Create a token for a user
+        /// </summary>
+        /// <param name="user"> User entity </param>
         /// <returns> Token string </returns>
         internal static string _CreateTokenFor(User user)
         {
@@ -28,40 +29,21 @@ namespace SWEN1_MCTG.Classes
                 rval += _ALPHABET[rnd.Next(0, 62)];
             }
 
-            _Tokens.Add(rval, user);
+            _tokenRepository.CreateToken(rval, user.Id);
 
             return rval;
         }
 
-        /// <summary> Authenticates a user by token </summary>
-        /// <param name="token"> Token string </param>
-        /// <returns> Returns a tuple of success flag and user object.
-        ///          If successful, the success flag is TRUE and the user represents the authenticated user,
-        ///          otherwise success flag if FALSE and user object is NULL</returns>
         public static (bool Success, User? User) Authenticate(string token)
         {
-            if (Program.ALLOW_DEBUG_TOKEN && token.EndsWith("-debug"))
-            {
-                token = token[..^6];
-                User? user = User.Get(token);
-
-                return ((user != null), user);
-            }
-
-            if (_Tokens.ContainsKey(token))
-            { 
-                return (true, _Tokens[token]);
-            }
-
-            return (false, null);
+            return _tokenRepository.Authenticate(token);
         }
 
-
-        /// <summary> Authenticates a user by token </summary>
-        /// <param name="e"> Event arguments </param>
-        /// <returns> Returns a tuple of success flag and user object
-        ///          If successful, the success flag is TRUE and the user represents the authenticated user,
-        ///          otherwise success flag if FALSE and user object is NULL </returns>
+        /// <summary>
+        /// Authenticate a user based on the Authorization header
+        /// </summary>
+        /// <param name="e"> HTTP Server Args </param>
+        /// <returns> TRUE and a User entity if successfully authenticated; FALSE and null else</returns>
         public static (bool Success, User? User) Authenticate(HttpSvrEventArgs e)
         {
             foreach (HttpHeader i in e.Headers)

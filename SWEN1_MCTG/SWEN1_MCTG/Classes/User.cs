@@ -6,15 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 using SWEN1_MCTG.Interfaces;
 using SWEN1_MCTG.Classes.Exceptions;
+using Npgsql;
 
 namespace SWEN1_MCTG.Classes
 {
     // Represents a user in game
     public sealed class User : IUser
     {
-        // Used temporarily to store users in memory
-        private static Dictionary<string, User> _Users = new Dictionary<string, User>();
-
         // Constructor
         public User()
         {
@@ -102,36 +100,6 @@ namespace SWEN1_MCTG.Classes
             stack.PrintStack();
         }
 
-        public static void Create(string username, string password)
-        {
-            User user = new();
-            {
-                user._username = username;
-                user._password = password;
-                user._userCards = new Stack();
-                user._userDeck = new Stack();
-                user._userCoinPurse = new CoinPurse();
-                user._elo = 1000;
-            }
-            _Users.Add(user.Username, user);
-        }
-
-        /// <summary>
-        /// Compares the given username and password with the stored ones, creates Token on success
-        /// </summary>
-        /// <param name="username"> Provided username </param>
-        /// <param name="password"> Provided password </param>
-        /// <returns> Success status and created token </returns>
-        public static (bool Success, string Token) Logon(string username, string password)
-        {
-            if (_Users.ContainsKey(username) && _Users[username].Password == password)
-            {
-                return (true, Token._CreateTokenFor(_Users[username]));
-            }
-
-            return (false, string.Empty);
-        }
-
         /// <summary>
         /// Changes user data if the token is valid
         /// </summary>
@@ -155,66 +123,53 @@ namespace SWEN1_MCTG.Classes
         }
 
         /// <summary>
-        /// Gets a user object by username
+        /// Compares the given username and password with the stored ones, creates Token on success
         /// </summary>
-        /// <param name="userName"> Username to search for </param>
-        /// <returns> User object with provided username </returns>
-        public static User? Get(string userName)
+        /// <param name="username"> Provided username </param>
+        /// <param name="password"> Provided password </param>
+        /// <returns> Success status and created token </returns>
+        public static (bool Success, string Token) Logon(string username, string password)
         {
-            _Users.TryGetValue(userName, out User? user);
-            return user;
+            User? user = ValidateCredentials(username, password);
+            if (user != null)
+            {
+                string token = Token._CreateTokenFor(user);
+                return (true, token);
+            }
+            return (false, string.Empty);
         }
 
         /// <summary>
-        /// Checks if user exists in User list
+        /// Validates the given credentials
         /// </summary>
-        /// <param name="userName"> Username to search for </param>
-        /// <returns> True if user exists, else false </returns>
-        public static bool Exists(string userName)
+        /// <param name="username"> Given username </param>
+        /// <param name="password"> Given password </param>
+        /// <returns> User entity with provided credentials </returns>
+        private static User? ValidateCredentials(string username, string password)
         {
-            return _Users.ContainsKey(userName);
-        }
+            string connectionString = AppSettings.GetConnectionString("TestConnection");
 
-        // Wrapper method to add a coin to the user's CoinPurse
-        public void AddCoin(Coin newCoin)
-        {
-            _userCoinPurse.AddCoin(newCoin);
-        }
+            NpgsqlConnection connection = new NpgsqlConnection(connectionString);
+            connection.Open();
 
-        // Wrapper method to remove a coin from the user's CoinPurse
-        public void RemoveCoin(Coin coinToRemove)
-        {
-            _userCoinPurse.RemoveCoin(coinToRemove);
-        }
+            NpgsqlCommand command = new NpgsqlCommand("SELECT id, username, password FROM users WHERE username = @username AND password = @password", connection);
+            string hashedPassword = PasswordHelper.HashPassword(password);
 
-        // Wrapper method to get the total value of coins
-        public int GetTotalCoinValue()
-        {
-            return _userCoinPurse.GetCoinsValue();
-        }
+            command.Parameters.AddWithValue("username", username);
+            command.Parameters.AddWithValue("password", hashedPassword);
 
-        // Wrapper method to print the coins
-        public void PrintCoins()
-        {
-            _userCoinPurse.PrintCoins();
-        }
+            using NpgsqlDataReader reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                return new User
+                {
+                    Id = reader.GetInt32(0),
+                    Username = reader.GetString(1),
+                    Password = reader.GetString(2)
+                };
+            }
 
-        // Wrapper method to add a card to the user's stack
-        public void AddCard(Card newCard, Stack stack)
-        {
-            stack.AddCardToStack(newCard);
-        }
-
-        // Wrapper method to remove a card from the user's stack
-        public void RemoveCard(string cardName, Stack stack)
-        {
-            stack.RemoveCardFromStack(cardName);
-        }
-
-        // Wrapper method to get a card from the user's stack
-        public Card GetCard(string cardName, Stack stack)
-        {
-            return stack.GetCardFromStack(cardName);
+            return null;
         }
 
     }

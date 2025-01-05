@@ -8,11 +8,28 @@ using System.Threading.Tasks;
 using SWEN1_MCTG.Interfaces;
 using SWEN1_MCTG.Classes.Exceptions;
 using System.Text.Json.Nodes;
+using SWEN1_MCTG.Data.Repositories.Classes;
+using SWEN1_MCTG.Data.Repositories.Interfaces;
 
 namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
 {
     public class UserHandler : Handler, IHandler
     {
+        private readonly string _connectionString;
+        private readonly IUserRepository _userRepository;
+
+        public UserHandler()
+        {
+            _connectionString = AppSettings.GetConnectionString("TestConnection");
+            _userRepository = new UserRepository(_connectionString);
+        }
+
+        public UserHandler(string connectionString, IUserRepository userRepository)
+        {
+            _connectionString = connectionString;
+            _userRepository = userRepository;
+        }
+
         /// <summary>
         /// Handles user creation and login
         /// </summary>
@@ -21,10 +38,10 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
         public override bool Handle(HttpSvrEventArgs e)
         {
             if ((e.Path.TrimEnd('/', ' ', '\t') == "/users") && (e.Method == "POST"))
-            {                                                                   
+            {
                 return _CreateUser(e);
             }
-            else if (e.Path.StartsWith("/users/") && (e.Method == "GET"))        
+            else if (e.Path.StartsWith("/users/") && (e.Method == "GET"))
             {
                 return _QueryUser(e);
             }
@@ -37,7 +54,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
         /// </summary>
         /// <param name="e"> Server Event Arguments </param>
         /// <returns> True on successful user creation, false on unsuccessful user creation </returns>
-        private static bool _CreateUser(HttpSvrEventArgs e)
+        private bool _CreateUser(HttpSvrEventArgs e)
         {
             JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
             int status = HttpStatusCode.BAD_REQUEST;
@@ -51,7 +68,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                     string password = (string)json["Password"]!;
 
                     // Check if the user already exists
-                    if (User.Exists(username))
+                    if (_userRepository.Exists(username))
                     {
                         status = HttpStatusCode.BAD_REQUEST;
                         reply = new JsonObject()
@@ -63,7 +80,9 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                     else
                     {
                         // Create the new user
-                        User.Create(username, password);
+                        User newUser = new User(username, password);
+                        _userRepository.Add(newUser);
+
                         status = HttpStatusCode.OK;
                         reply = new JsonObject()
                         {
@@ -86,27 +105,26 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
             return true;
         }
 
-
         /// <summary>
         /// Gets user information
         /// </summary>
         /// <param name="e"> Server Event Arguments </param>
         /// <returns> True on successful query, false on unsuccessful query </returns>
-        private static bool _QueryUser(HttpSvrEventArgs e)
+        private bool _QueryUser(HttpSvrEventArgs e)
         {
             JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
-            int status = HttpStatusCode.BAD_REQUEST;                         
+            int status = HttpStatusCode.BAD_REQUEST;
 
             try
             {
-                (bool Success, User? User) ses = Token.Authenticate(e);        
+                (bool Success, User? User) ses = Token.Authenticate(e);
 
                 if (ses.Success)
-                {                                                              
-                    User? user = User.Get(e.Path[7..]);                      
+                {
+                    User? user = _userRepository.GetByUsername(e.Path[7..]);
 
                     if (user == null)
-                    {                                                          
+                    {
                         status = HttpStatusCode.NOT_FOUND;
                         reply = new JsonObject() { ["success"] = false, ["message"] = "User not found." };
                     }
@@ -115,7 +133,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                         status = HttpStatusCode.OK;
                         reply = new JsonObject()
                         {
-                            ["success"] = true,          
+                            ["success"] = true,
                             ["username"] = user!.Username,
                         };
                     }
@@ -127,13 +145,12 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                 }
             }
             catch (Exception)
-            {                                                                  
+            {
                 reply = new JsonObject() { ["success"] = false, ["message"] = "Unexpected error." };
             }
 
             e.Reply(status, reply?.ToJsonString());
             return true;
         }
-    
     }
 }

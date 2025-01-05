@@ -10,6 +10,8 @@ using SWEN1_MCTG.Classes.HttpSvr;
 using System.Text.Json;
 using SWEN1_MCTG.Classes.HttpSvr.Handlers;
 using SWEN1_MCTG.Data.Repositories;
+using SWEN1_MCTG.Data.Repositories.Classes;
+using SWEN1_MCTG.Data.Repositories.Interfaces;
 
 namespace SWEN1_MCTG
 {
@@ -19,6 +21,15 @@ namespace SWEN1_MCTG
 
         static void Main(string[] args)
         {
+            string connectionString = AppSettings.GetConnectionString("TestConnection");
+
+            // Initialize repositories
+            IUserRepository userRepository = new UserRepository(connectionString);
+            ITokenRepository tokenRepository = new TokenRepository(connectionString);
+
+            // Initialize Token class with the repository
+            Token.Initialize(tokenRepository);
+
             HttpSvr svr = new();
             svr.Incoming += Svr_Incoming;
 
@@ -36,7 +47,6 @@ namespace SWEN1_MCTG
             }
 
             Handler.HandleEvent(e);
-
         }
     }
 }
