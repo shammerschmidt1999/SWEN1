@@ -79,7 +79,6 @@ namespace SWEN1_MCTG.Classes
                 card.PrintInformation();
             }
         }
-
         /// <summary>
         /// Shuffles the Stack randomly
         /// </summary>

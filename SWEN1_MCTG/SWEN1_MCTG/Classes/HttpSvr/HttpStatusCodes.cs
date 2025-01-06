@@ -14,5 +14,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr
         public const int UNAUTHORIZED = 401;
 
         public const int NOT_FOUND = 404;
+
+        public const int NO_CONTENT = 204;
     }
 }
