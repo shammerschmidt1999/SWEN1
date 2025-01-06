@@ -26,6 +26,9 @@ namespace SWEN1_MCTG.Classes
             _userDeck = new Stack();
             _userCoinPurse = new CoinPurse();
             _elo = 100;
+            _wins = 0;
+            _defeats = 0;
+            _draws = 0;
         }
 
         // Fields
@@ -36,6 +39,9 @@ namespace SWEN1_MCTG.Classes
         private Stack _userCards = new Stack(); // All current cards
         private Stack _userDeck = new Stack(); // Cards in played deck
         private CoinPurse _userCoinPurse = new CoinPurse();
+        private int _wins;
+        private int _defeats;
+        private int _draws;
 
         // Properties
         public int Id
@@ -77,6 +83,24 @@ namespace SWEN1_MCTG.Classes
         {
             get => _userDeck;
             private set => _userDeck = value;
+        }
+
+        public int Wins
+        {
+            get => _wins;
+            set => _wins = value;
+        }
+
+        public int Defeats
+        {
+            get => _defeats;
+            set => _defeats = value;
+        }
+
+        public int Draws
+        {
+            get => _draws;
+            set => _draws = value;
         }
 
         // Methods

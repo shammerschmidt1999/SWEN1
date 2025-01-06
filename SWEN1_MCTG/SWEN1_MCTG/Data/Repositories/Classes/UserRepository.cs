@@ -50,7 +50,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
                 object? value = property.GetValue(user);
 
                 // Only consider specific properties
-                if (property.Name != "Username" && property.Name != "Password" && property.Name != "Elo")
+                if (property.Name == "UserCards" || property.Name == "UserDeck" || property.Name == "UserCoinPurse")
                 {
                     continue;
                 }
@@ -117,6 +117,22 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
 
             NpgsqlDataReader reader = command.ExecuteReader();
             return reader.Read();
+        }
+
+        public void Update(User entity)
+        {
+            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            string updateQuery = $"UPDATE {_tableName} SET Username = @Username, Password = @Password, Elo = @Elo WHERE Id = @Id";
+
+            NpgsqlCommand command = new NpgsqlCommand(updateQuery, connection);
+            command.Parameters.AddWithValue("@Username", entity.Username);
+            command.Parameters.AddWithValue("@Password", entity.Password);
+            command.Parameters.AddWithValue("@Elo", entity.Elo);
+            command.Parameters.AddWithValue("@Id", entity.Id);
+
+            command.ExecuteNonQuery();
         }
     }
 }

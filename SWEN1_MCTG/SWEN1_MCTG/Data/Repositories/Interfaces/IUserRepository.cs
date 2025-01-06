@@ -6,4 +6,5 @@ public interface IUserRepository : IRepository<User>
 {
     User GetByUsername(string username);
     bool Exists(string username);
+    void Update(User user);
 }
