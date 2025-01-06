@@ -56,7 +56,7 @@ namespace CoinPurseRepositoryTest
             _coinPurseRepository.AddCoinsToPurse(userId, initialCoins);
 
             // Act
-            bool result = _coinPurseRepository.RemoveCoinsFromPurse(userId, CoinType.Silver, 1);
+            bool result = _coinPurseRepository.RemoveCoinsFromPurse(userId);
             CoinPurse coinPurse = _coinPurseRepository.GetByUserId(userId);
 
             // Assert

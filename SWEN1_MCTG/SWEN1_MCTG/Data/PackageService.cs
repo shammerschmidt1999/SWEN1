@@ -8,6 +8,7 @@ public class PackageService : IPackageService
     private readonly StackRepository _stackRepository;
     private readonly CardRepository _cardRepository;
     private readonly CoinPurseRepository _coinPurseRepository;
+    private readonly string _connectionString;
     private readonly Func<List<Card>, int, List<Card>> _cardSelectionStrategy; // Used for testing
 
     public PackageService(StackRepository stackRepository, CardRepository cardRepository, CoinPurseRepository coinPurseRepository, Func<List<Card>, int, List<Card>> cardSelectionStrategy)
@@ -17,6 +18,14 @@ public class PackageService : IPackageService
         _cardRepository = cardRepository;
         _coinPurseRepository = coinPurseRepository;
         _cardSelectionStrategy = cardSelectionStrategy ?? DefaultCardSelection; // Used for testing
+    }
+
+    public PackageService()
+    {
+        _connectionString = AppSettings.GetConnectionString("TestConnection");
+        _stackRepository = new StackRepository(_connectionString);
+        _cardRepository = new CardRepository(_connectionString);
+        _coinPurseRepository = new CoinPurseRepository(_connectionString);
     }
 
     /// <summary>
@@ -51,13 +60,18 @@ public class PackageService : IPackageService
         int amountOfCards = GetAmountOfCards(packageType);
 
         // Determine the amount of decisions the user can make
-        int possibleDecisions = packageType == GlobalEnums.PackageType.Legendary ? 2 : 1;
+        int possibleDecisions = packageType == GlobalEnums.PackageType.Legendary ? 6 : 4;
 
         // Get random cards from the database
         List<Card> randomCards = _cardRepository.GetRandomCards(amountOfCards);
 
         // Let the user choose the cards
+        List<Card> userCardSelection = GetUserCardSelection(randomCards, possibleDecisions);
+
+        /* For testing purposes, the user's card selection is determined by the DefaultCardSelection method.
+         * This method reads the user's input to select cards.
         List<Card> userCardSelection = _cardSelectionStrategy(randomCards, possibleDecisions);
+        */
 
         // Add the cards to the users stack
         _stackRepository.AddCardsToUser(userId, userCardSelection);
@@ -101,15 +115,29 @@ public class PackageService : IPackageService
         }
 
         List<Card> selectedCards = new List<Card>();
+        HashSet<int> chosenIndices = new HashSet<int>();
+
         for (int i = 0; i < cardsToChoose; i++)
         {
-            Console.WriteLine($"Choose card {i + 1}:");
-            int choice = int.Parse(Console.ReadLine());
-            selectedCards.Add(randomCards[choice - 1]);
+            int choice;
+            do
+            {
+                Console.WriteLine($"Choose card {i + 1}:");
+                choice = int.Parse(Console.ReadLine()) - 1;
+
+                if (chosenIndices.Contains(choice))
+                {
+                    Console.WriteLine("You have already chosen this card. Please select a different card.");
+                }
+            } while (chosenIndices.Contains(choice) || choice < 0 || choice >= randomCards.Count);
+
+            chosenIndices.Add(choice);
+            selectedCards.Add(randomCards[choice]);
         }
 
         return selectedCards;
     }
+
 
     // Used for testing purposes
     private List<Card> DefaultCardSelection(List<Card> randomCards, int cardsToChoose)

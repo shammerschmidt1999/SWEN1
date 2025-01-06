@@ -149,22 +149,55 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
         }
 
         // Method to remove coins from the CoinPurse (handles removing coins by type)
-        public bool RemoveCoinsFromPurse(int userId, CoinType coinType, int count)
+        public bool RemoveCoinsFromPurse(int userId, int amount)
         {
-            CoinPurse coinPurse = GetByUserId(userId);
+            var coinPurse = GetByUserId(userId);
             if (coinPurse == null)
             {
                 return false; // CoinPurse not found
             }
 
-            bool result = coinPurse.RemoveCoins(coinType, count);
-            if (result)
+            var coins = coinPurse.Coins.OrderByDescending(c => c.Value).ToList();
+            int remainingAmount = amount;
+
+            foreach (var coin in coins)
             {
-                UpdateCoinPurse(coinPurse);
+                if (remainingAmount <= 0)
+                    break;
+
+                if (coin.Value <= remainingAmount)
+                {
+                    remainingAmount -= coin.Value;
+                    coinPurse.Coins.Remove(coin);
+                }
+                else
+                {
+                    coinPurse.Coins.Remove(coin);
+                    int remainingValue = coin.Value - remainingAmount;
+                    remainingAmount = 0;
+
+                    // Convert remaining value into smaller denomination coins
+                    foreach (CoinType coinType in Enum.GetValues(typeof(CoinType)).Cast<CoinType>().OrderByDescending(ct => (int)ct))
+                    {
+                        while (remainingValue >= (int)coinType)
+                        {
+                            coinPurse.AddCoin(new Coin(coinType));
+                            remainingValue -= (int)coinType;
+                        }
+                    }
+                }
             }
 
-            return result;
+            if (remainingAmount > 0)
+            {
+                return false; // Not enough coins
+            }
+
+            UpdateCoinPurse(coinPurse);
+            return true;
         }
+
+
 
         // Method to remove all coins from the CoinPurse
         public void RemoveAllCoinsFromPurse(int userId)

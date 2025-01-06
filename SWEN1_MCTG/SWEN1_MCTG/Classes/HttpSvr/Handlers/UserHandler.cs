@@ -17,17 +17,13 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
     {
         private readonly string _connectionString;
         private readonly IUserRepository _userRepository;
+        private readonly ICoinPurseRepository _coinPurseRepository;
 
         public UserHandler()
         {
             _connectionString = AppSettings.GetConnectionString("TestConnection");
             _userRepository = new UserRepository(_connectionString);
-        }
-
-        public UserHandler(string connectionString, IUserRepository userRepository)
-        {
-            _connectionString = connectionString;
-            _userRepository = userRepository;
+            _coinPurseRepository = new CoinPurseRepository(_connectionString);
         }
 
         /// <summary>
@@ -82,6 +78,13 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                         // Create the new user
                         User newUser = new User(username, password);
                         _userRepository.Add(newUser);
+                        User addedUser = _userRepository.GetByUsername(username);
+
+                        CoinPurse coinPurse = new CoinPurse();
+                        Coin startingCoin = new Coin(GlobalEnums.CoinType.Diamond);
+                        coinPurse.AddCoin(startingCoin);
+                        coinPurse.UserId = addedUser.Id;
+                        _coinPurseRepository.AddCoinPurse(coinPurse);
 
                         status = HttpStatusCode.OK;
                         reply = new JsonObject()

@@ -11,6 +11,6 @@ public interface ICoinPurseRepository : IRepository<CoinPurse>
     void AddCoinPurse(CoinPurse coinPurse);
     void UpdateCoinPurse(CoinPurse coinPurse);
     void AddCoinsToPurse(int userId, IEnumerable<Coin> coins);
-    bool RemoveCoinsFromPurse(int userId, CoinType coinType, int count);
+    public bool RemoveCoinsFromPurse(int userId, int amount);
     void RemoveAllCoinsFromPurse(int userId);
 }

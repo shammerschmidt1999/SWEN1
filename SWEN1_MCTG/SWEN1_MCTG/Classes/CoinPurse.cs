@@ -200,7 +200,7 @@ namespace SWEN1_MCTG.Classes
                 int coinValue = (int)coinType;
                 int coinCount = _coins.Count(c => c.CoinType == coinType);
 
-                if (coinCount > 0 && targetValue >= coinValue)
+                if (coinCount > 0 && targetValue > 0)
                 {
                     // Determine the maximum number of coins we can use
                     int coinsToUse = Math.Min(targetValue / coinValue, coinCount);
@@ -212,6 +212,26 @@ namespace SWEN1_MCTG.Classes
 
                         // Remove the coins from the purse
                         RemoveCoins(coinType, coinsToUse);
+                    }
+
+                    // Handle partial coin usage if target value is still greater than 0
+                    if (targetValue > 0 && coinValue > targetValue)
+                    {
+                        coinsUsed[coinType] = coinsUsed.ContainsKey(coinType) ? coinsUsed[coinType] + 1 : 1;
+                        int remainingValue = coinValue - targetValue;
+                        targetValue = 0;
+                        RemoveCoins(coinType, 1);
+
+                        // Add the remaining value back as smaller denomination coins
+                        foreach (CoinType smallerCoinType in sortedCoinTypes.Reverse())
+                        {
+                            int smallerCoinValue = (int)smallerCoinType;
+                            while (remainingValue >= smallerCoinValue)
+                            {
+                                AddCoin(new Coin(smallerCoinType));
+                                remainingValue -= smallerCoinValue;
+                            }
+                        }
                     }
                 }
 
@@ -226,7 +246,7 @@ namespace SWEN1_MCTG.Classes
             if (targetValue > 0)
             {
                 // Add the removed coins back to the purse
-                foreach (KeyValuePair<CoinType,int> entry in coinsUsed)
+                foreach (KeyValuePair<CoinType, int> entry in coinsUsed)
                 {
                     AddCoins(Enumerable.Repeat(new Coin(entry.Key), entry.Value));
                 }
