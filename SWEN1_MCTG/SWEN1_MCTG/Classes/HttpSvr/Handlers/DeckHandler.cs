@@ -33,6 +33,10 @@ public class DeckHandler : Handler, IHandler
         {
             return _DisplayDeck(e);
         }
+        else if ((e.Path.TrimEnd('/', ' ', '\t') == "/deck") && (e.Method == "PUT"))
+        {
+            return _EditDeck(e);
+        }
         return false;
     }
 
@@ -117,5 +121,60 @@ public class DeckHandler : Handler, IHandler
 
         return cardsArray;
     }
+
+    public bool _EditDeck(HttpSvrEventArgs e)
+    {
+        JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
+        int status = HttpStatusCode.BAD_REQUEST;
+
+        try
+        {
+            (bool Success, User? User) ses = Token.Authenticate(e);
+
+            if (ses.Success)
+            {
+                User user = _userRepository.GetByUsername(ses.User!.Username);
+                Stack userCards = _stackRepository.GetByUserId(ses.User!.Id);
+
+                // Parse the JSON payload
+                JsonArray cardNames = JsonNode.Parse(e.Payload)?.AsArray() ?? new JsonArray();
+
+                foreach (var cardNameNode in cardNames)
+                {
+                    string cardName = cardNameNode.ToString();
+                    var cards = userCards.Cards.Where(c => c.Name == cardName).ToList();
+
+                    foreach (var card in cards)
+                    {
+                        if (card.InDeck)
+                        {
+                            card.SetInDeck(false);
+                        }
+                        else
+                        {
+                            card.SetInDeck(true);
+                        }
+                        _stackRepository.SetCardInDeck(card.InDeck, card.Id, user.Id);
+                    }
+                }
+
+                status = HttpStatusCode.OK;
+                reply = new JsonObject() { ["success"] = true, ["message"] = "Deck updated successfully." };
+            }
+            else
+            {
+                status = HttpStatusCode.UNAUTHORIZED;
+                reply = new JsonObject() { ["success"] = false, ["message"] = "Unauthorized." };
+            }
+        }
+        catch (Exception)
+        {
+            reply = new JsonObject() { ["success"] = false, ["message"] = "Unexpected error." };
+        }
+
+        e.Reply(status, reply?.ToJsonString());
+        return true;
+    }
+
 
 }
