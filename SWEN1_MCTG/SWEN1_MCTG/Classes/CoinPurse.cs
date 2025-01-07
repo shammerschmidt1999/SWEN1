@@ -135,46 +135,6 @@ namespace SWEN1_MCTG.Classes
         }
 
         /// <summary>
-        /// Displays amount of coins and sum of coin value for each coin type
-        /// </summary>
-        public void PrintCoins()
-        {
-            int bronzeValue = 0;
-            int silverValue = 0;
-            int goldValue = 0;
-            int platinumValue = 0;
-            int diamondValue = 0;
-
-            foreach (Coin coin in _coins)
-            {
-                switch(coin.CoinType)
-                {
-                    case GlobalEnums.CoinType.Bronze:
-                        bronzeValue += coin.Value;
-                        break;
-                    case GlobalEnums.CoinType.Silver:
-                        silverValue += coin.Value;
-                        break;
-                    case GlobalEnums.CoinType.Gold:
-                        goldValue += coin.Value;
-                        break;
-                    case GlobalEnums.CoinType.Platinum:
-                        platinumValue += coin.Value;
-                        break;
-                    case GlobalEnums.CoinType.Diamond:
-                        diamondValue += coin.Value;
-                        break;
-                }
-            }
-            Console.WriteLine($"{ bronzeValue / ((int)GlobalEnums.CoinType.Bronze) }x Bronze: { bronzeValue }");
-            Console.WriteLine($"{ silverValue / ((int)GlobalEnums.CoinType.Silver) }x Silver: { silverValue }");
-            Console.WriteLine($"{ goldValue / ((int)GlobalEnums.CoinType.Gold) }x Gold: { goldValue }");
-            Console.WriteLine($"{ platinumValue / ((int)GlobalEnums.CoinType.Platinum) }x Platinum: { platinumValue }");
-            Console.WriteLine($"{ diamondValue / ((int)GlobalEnums.CoinType.Diamond) }x Diamond: { diamondValue }");
-            Console.WriteLine($"Total: { GetCoinsValue() }");
-        }
-
-        /// <summary>
         /// Calculates and removes the exact coins needed to reach a specified value.
         /// </summary>
         /// <param name="targetValue"> The total value to extract </param>
@@ -188,14 +148,14 @@ namespace SWEN1_MCTG.Classes
             }
 
             // Result dictionary to track the coins used
-            var coinsUsed = new Dictionary<GlobalEnums.CoinType, int>();
+            Dictionary<GlobalEnums.CoinType, int> coinsUsed = new Dictionary<GlobalEnums.CoinType, int>();
 
             // Sort the coin types by their value in descending order
             IOrderedEnumerable<CoinType> sortedCoinTypes = Enum.GetValues(typeof(GlobalEnums.CoinType))
                 .Cast<GlobalEnums.CoinType>()
                 .OrderByDescending(ct => (int)ct);
 
-            foreach (var coinType in sortedCoinTypes)
+            foreach (CoinType coinType in sortedCoinTypes)
             {
                 int coinValue = (int)coinType;
                 int coinCount = _coins.Count(c => c.CoinType == coinType);

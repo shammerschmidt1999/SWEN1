@@ -75,6 +75,11 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             return stack;
         }
 
+        /// <summary>
+        /// Creates a card from a database entry
+        /// </summary>
+        /// <param name="reader"> The NpgsqlDataReader </param>
+        /// <returns> Card entity created from the DB </returns>
         public Card CreateCard(NpgsqlDataReader reader)
         {
             int cardId = reader.GetInt32(reader.GetOrdinal("card_id"));
@@ -88,6 +93,12 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             return card;
         }
 
+        /// <summary>
+        /// Gets a users Cards by the users Id
+        /// </summary>
+        /// <param name="userId"> The users Id </param>
+        /// <returns> A stack that holds the cards of the user </returns>
+        /// <exception cref="InvalidOperationException"> If the user is not found in the DB </exception>
         public Stack GetByUserId(int userId)
         {
             NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
@@ -105,6 +116,12 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             throw new InvalidOperationException($"Stack for user with Id {userId} not found.");
         }
 
+        /// <summary>
+        /// Gets 
+        /// </summary>
+        /// <param name="cardId"> Gets a stack that has this card </param>
+        /// <returns> A stack entity </returns>
+        /// <exception cref="InvalidOperationException"> If there is no card with cardId found in the DB </exception>
         public Stack GetByCardId(int cardId)
         {
             NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
@@ -122,6 +139,14 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             throw new InvalidOperationException($"Stack for card with Id {cardId} not found.");
         }
 
+        // TODO: User must not have more than 4 cards in his deck!
+        /// <summary>
+        /// Sets the inDeck bool of a card belonging to a user
+        /// </summary>
+        /// <param name="inDeck"> True (is in Deck); false (is not in Deck) </param>
+        /// <param name="cardId"> The cards Id </param>
+        /// <param name="userId"> The users Id </param>
+        /// <exception cref="InvalidOperationException"> If the relationship between the card and the user is not found </exception>
         public void SetCardInDeck(bool inDeck, int cardId, int userId)
         {
             NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
@@ -181,7 +206,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             {
                 connection.Open();
 
-                using (var transaction = connection.BeginTransaction())
+                using (NpgsqlTransaction transaction = connection.BeginTransaction())
                 {
                     try
                     {

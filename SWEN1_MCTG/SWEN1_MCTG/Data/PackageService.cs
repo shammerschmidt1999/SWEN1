@@ -140,6 +140,7 @@ public class PackageService : IPackageService
 
 
     // Used for testing purposes
+    // Chooses random cards from the drawn cards to simulate user decision
     private List<Card> DefaultCardSelection(List<Card> randomCards, int cardsToChoose)
     {
         Console.WriteLine("Select cards:");

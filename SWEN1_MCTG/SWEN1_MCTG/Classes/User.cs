@@ -103,27 +103,6 @@ namespace SWEN1_MCTG.Classes
             set => _draws = value;
         }
 
-        // Methods
-        /// <summary>
-        /// Prints User Information
-        /// </summary>
-        public void PrintUser()
-        {
-            Console.WriteLine("Username: " + _username);
-            Console.WriteLine("Password: " + _password);
-            Console.WriteLine("Coins: " + _userCoinPurse.GetCoinsValue());
-            PrintStack(_userCards);
-        }
-
-        /// <summary>
-        /// Prints information of chosen User stack (e.g. Cards, Hand,...)
-        /// </summary>
-        /// <param name="stack"> The Stack of Cards that should be printed </param>
-        public void PrintStack(Stack stack)
-        {
-            stack.PrintStack();
-        }
-
         /// <summary>
         /// Changes user data if the token is valid
         /// </summary>
@@ -163,6 +142,7 @@ namespace SWEN1_MCTG.Classes
             return (false, string.Empty);
         }
 
+        // TODO: Move this to UserRepository?
         /// <summary>
         /// Validates the given credentials
         /// </summary>

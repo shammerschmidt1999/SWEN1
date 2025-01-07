@@ -66,6 +66,5 @@ namespace SWEN1_MCTG.Classes
         {
             _inDeck = inDeck;
         }
-        public abstract void PrintInformation();
     }
 }

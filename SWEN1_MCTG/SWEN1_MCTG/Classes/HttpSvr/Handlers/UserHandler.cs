@@ -47,7 +47,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
             else if (e.Path.StartsWith("/users/") && (e.Method == "PUT"))
             {
                 // Match the path pattern for user data
-                var match = Regex.Match(e.Path.TrimEnd('/', ' ', '\t'), @"^/users/(?<username>[^/]+)$");
+                Match match = Regex.Match(e.Path.TrimEnd('/', ' ', '\t'), @"^/users/(?<username>[^/]+)$");
                 if (match.Success)
                 {
                     string username = match.Groups["username"].Value;

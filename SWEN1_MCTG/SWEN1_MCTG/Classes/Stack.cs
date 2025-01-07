@@ -42,61 +42,6 @@ namespace SWEN1_MCTG.Classes
         }
 
         /// <summary>
-        /// Get a card object by name
-        /// </summary>
-        /// <param name="cardName"> The name of the card object you want to find </param>
-        /// <returns> The card with the same name as the parameter in the List </returns>
-        /// <exception cref="ArgumentException"></exception>
-        public Card GetCardFromStack(string cardName)
-        {
-            Card card = _cards.Find(x => x.Name == cardName);
-            if (card == null)
-            {
-                throw new ArgumentException($"Card with name {cardName} not found in stack.");
-            }
-            return card;
-        }
-
-        /// <summary>
-        /// Removes a card from the List of Cards
-        /// </summary>
-        /// <param name="cardName"> The name of the Card you want to remove </param>
-        public void RemoveCardFromStack(string cardName)
-        {
-            Card? cardToRemove = _cards.Find(x => x.Name == cardName);
-            if (cardToRemove != null)
-            {
-                _cards.Remove(cardToRemove);
-            }
-        }
-        /// <summary>
-        /// Prints Information of each Card in the Stack
-        /// </summary>
-        public void PrintStack()
-        {
-            foreach (Card card in _cards)
-            {
-                card.PrintInformation();
-            }
-        }
-        /// <summary>
-        /// Shuffles the Stack randomly
-        /// </summary>
-        public void ShuffleStack()
-        {
-            Random rng = new Random();
-            int n = _cards.Count;
-            while (n > 1)
-            {
-                n--;
-                int k = rng.Next(n + 1);
-                Card value = _cards[k];
-                _cards[k] = _cards[n];
-                _cards[n] = value;
-            }
-        }
-
-        /// <summary>
         /// Gets one random card from the Stack
         /// </summary>
         /// <returns> One card at a random index between 0 and cards.Count </returns>

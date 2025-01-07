@@ -17,16 +17,5 @@ namespace SWEN1_MCTG.Classes
         }
 
         public SpellCard() { }
-
-        // Methods
-        /// <summary>
-        /// Displays Information of SpellCard
-        /// </summary>
-        public override void PrintInformation()
-        {
-            Console.WriteLine("SpellCard Name: " + _name);
-            Console.WriteLine("SpellCard Element: " + _elementType);
-            Console.WriteLine("SpellCard Damage: " + _damage);
-        }
     }
 }

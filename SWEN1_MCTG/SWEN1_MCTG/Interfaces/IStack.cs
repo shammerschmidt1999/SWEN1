@@ -10,10 +10,6 @@ namespace SWEN1_MCTG.Interfaces
     public interface IStack
     {
         void AddCardToStack(Card newCard);
-        Card? GetCardFromStack(string cardName);
-        void RemoveCardFromStack(string cardName);
-        void PrintStack();
-        void ShuffleStack();
         Card? GetRandomCardFromStack();
     }
 }

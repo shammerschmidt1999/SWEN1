@@ -9,18 +9,15 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers;
     public class CardsHandler : Handler, IHandler
     {
         private readonly string _connectionString;
-        private readonly ICardRepository _cardRepository;
         private readonly IUserRepository _userRepository;
         private readonly IStackRepository _stackRepository;
 
         public CardsHandler()
         {
             _connectionString = AppSettings.GetConnectionString("TestConnection");
-            _cardRepository = new CardRepository(_connectionString);
             _userRepository = new UserRepository(_connectionString);
             _stackRepository = new StackRepository(_connectionString);
-    }
-
+        }
 
         /// <summary>
         /// Handles package purchase
@@ -36,6 +33,11 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers;
             return false;
         }
 
+        /// <summary>
+        /// Displays information on all the users cards
+        /// </summary>
+        /// <param name="e"> HTTPEventArgs </param>
+        /// <returns> TRUE if operation was successful; FALSE if it was unsuccessful </returns>
     public bool _DisplayCards(HttpSvrEventArgs e)
     {
         JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
@@ -87,12 +89,17 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers;
         return true;
     }
 
+        /// <summary>
+        /// Generates an Array with the information of the users cards
+        /// </summary>
+        /// <param name="userCards"> The users cards </param>
+        /// <returns> A JsonArray with the user cards data </returns>
     private JsonArray _generateCardArray(Stack userCards)
     {
 
         JsonArray cardsArray = new JsonArray();
 
-        foreach (var card in userCards.Cards)
+        foreach (Card card in userCards.Cards)
         {
             JsonObject cardObject = new JsonObject()
             {

@@ -119,6 +119,10 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             return reader.Read();
         }
 
+        /// <summary>
+        /// Updates a user in the db
+        /// </summary>
+        /// <param name="entity"> The user entity and the data that should be stored in the DB </param>
         public void Update(User entity)
         {
             NpgsqlConnection connection = new NpgsqlConnection(_connectionString);

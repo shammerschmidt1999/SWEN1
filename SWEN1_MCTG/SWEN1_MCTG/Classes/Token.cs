@@ -34,6 +34,11 @@ namespace SWEN1_MCTG.Classes
             return rval;
         }
 
+        /// <summary>
+        /// Authenticates the user by looking for user token relationship in DB
+        /// </summary>
+        /// <param name="token"> Token string </param>
+        /// <returns> TRUE and the user entity if successful; FALSE and null if not </returns>
         public static (bool Success, User? User) Authenticate(string token)
         {
             return _tokenRepository.Authenticate(token);

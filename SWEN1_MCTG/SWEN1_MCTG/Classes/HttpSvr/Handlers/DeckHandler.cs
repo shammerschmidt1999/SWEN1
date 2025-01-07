@@ -9,14 +9,12 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers;
 public class DeckHandler : Handler, IHandler
 {
     private readonly string _connectionString;
-    private readonly ICardRepository _cardRepository;
     private readonly IUserRepository _userRepository;
     private readonly IStackRepository _stackRepository;
 
     public DeckHandler()
     {
         _connectionString = AppSettings.GetConnectionString("TestConnection");
-        _cardRepository = new CardRepository(_connectionString);
         _userRepository = new UserRepository(_connectionString);
         _stackRepository = new StackRepository(_connectionString);
     }
@@ -40,6 +38,11 @@ public class DeckHandler : Handler, IHandler
         return false;
     }
 
+    /// <summary>
+    /// Method to display the cards that the user currently has in deck
+    /// </summary>
+    /// <param name="e"> HttpSvrEventArgs </param>
+    /// <returns>TRUE if operation was successful; FALSE if not </returns>
     public bool _DisplayDeck(HttpSvrEventArgs e)
     {
         JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
@@ -91,12 +94,16 @@ public class DeckHandler : Handler, IHandler
         return true;
     }
 
+    /// <summary>
+    /// Generates a JSON Array of cards to print
+    /// </summary>
+    /// <param name="userCards"> The cards of the user </param>
+    /// <returns> JSON Array with information of each card </returns>
     private JsonArray _generateDeckArray(Stack userCards)
     {
-
         JsonArray cardsArray = new JsonArray();
 
-        foreach (var card in userCards.Cards)
+        foreach (Card card in userCards.Cards)
         {
             if (!card.InDeck)
             {
@@ -122,6 +129,11 @@ public class DeckHandler : Handler, IHandler
         return cardsArray;
     }
 
+    /// <summary>
+    /// Sets cards to be inDeck or not
+    /// </summary>
+    /// <param name="e"> HttpSvrEventArgs </param>
+    /// <returns> TRUE if operation was successful; FALSE if not </returns>
     public bool _EditDeck(HttpSvrEventArgs e)
     {
         JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
@@ -139,12 +151,12 @@ public class DeckHandler : Handler, IHandler
                 // Parse the JSON payload
                 JsonArray cardNames = JsonNode.Parse(e.Payload)?.AsArray() ?? new JsonArray();
 
-                foreach (var cardNameNode in cardNames)
+                foreach (JsonNode cardNameNode in cardNames)
                 {
                     string cardName = cardNameNode.ToString();
-                    var cards = userCards.Cards.Where(c => c.Name == cardName).ToList();
+                    List<Card> cards = userCards.Cards.Where(c => c.Name == cardName).ToList();
 
-                    foreach (var card in cards)
+                    foreach (Card card in cards)
                     {
                         if (card.InDeck)
                         {
@@ -175,6 +187,4 @@ public class DeckHandler : Handler, IHandler
         e.Reply(status, reply?.ToJsonString());
         return true;
     }
-
-
 }

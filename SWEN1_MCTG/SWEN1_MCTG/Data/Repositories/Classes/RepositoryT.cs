@@ -27,9 +27,6 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             _deleteQuery = $"DELETE FROM {_tableName} WHERE Id = @Id";
         }
 
-        // Abstract method to create an entity of the specific type
-        protected abstract T CreateEntity();
-
         /// <summary>
         /// Method to add an entity to the database.
         /// </summary>
@@ -144,5 +141,11 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
         /// <param name="command"> The command </param>
         /// <param name="entity"> The entity affected </param>
         protected abstract void AddParameters(NpgsqlCommand command, T entity);
+
+        /// <summary>
+        /// Creates the entity that uses the Repository
+        /// </summary>
+        /// <returns> The created entity </returns>
+        protected abstract T CreateEntity();
     }
 }

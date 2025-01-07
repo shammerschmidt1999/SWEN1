@@ -82,7 +82,11 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             command.Parameters.AddWithValue("@Diamond", coinPurse.Coins.Count(c => c.CoinType == CoinType.Diamond));
         }
 
-        // Method to get CoinPurse by UserId
+        /// <summary>
+        /// Gets the users coinpurse
+        /// </summary>
+        /// <param name="userId"> The Id of the user </param>
+        /// <returns> A coinPurse entity that matches the users coinpurse </returns>
         public CoinPurse GetByUserId(int userId)
         {
             NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
@@ -101,7 +105,10 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             return null; // Return null if the CoinPurse is not found for the user
         }
 
-        // Method to delete CoinPurse by UserId
+        /// <summary>
+        /// Deletes a users CoinPurse
+        /// </summary>
+        /// <param name="userId"> The users Id </param>
         public void DeleteByUserId(int userId)
         {
             NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
@@ -112,7 +119,10 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             command.ExecuteNonQuery();
         }
 
-        // Additional method to update a user's coin purse
+        /// <summary>
+        /// Updates a users CoinPurse
+        /// </summary>
+        /// <param name="coinPurse"> The CoinPurse entity of the user </param>
         public void UpdateCoinPurse(CoinPurse coinPurse)
         {
             NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
@@ -123,7 +133,10 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             command.ExecuteNonQuery();
         }
 
-        // Method to add a new CoinPurse
+        /// <summary>
+        /// Adds a new CoinPurse to the Database
+        /// </summary>
+        /// <param name="coinPurse"> The coinPurse entity to be added to the DB </param>
         public void AddCoinPurse(CoinPurse coinPurse)
         {
             NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
@@ -134,7 +147,11 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             command.ExecuteNonQuery();
         }
 
-        // Method to add coins to the CoinPurse (handles adding multiple coins)
+        /// <summary>
+        /// Method to add Coins to a users coinPurse
+        /// </summary>
+        /// <param name="userId"> The users Id </param>
+        /// <param name="coins"> The amount and kind of coins to be added </param>
         public void AddCoinsToPurse(int userId, IEnumerable<Coin> coins)
         {
             CoinPurse coinPurse = GetByUserId(userId);
@@ -148,19 +165,24 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             UpdateCoinPurse(coinPurse);
         }
 
-        // Method to remove coins from the CoinPurse (handles removing coins by type)
+        /// <summary>
+        /// Removes Coins from the users coinPurse by determining the value of the users combined coins
+        /// </summary>
+        /// <param name="userId"> The users Id </param>
+        /// <param name="amount"> The cost and value that should be removed from the coinpurse </param>
+        /// <returns> TRUE if operation successful; FALSE if unsuccessful </returns>
         public bool RemoveCoinsFromPurse(int userId, int amount)
         {
-            var coinPurse = GetByUserId(userId);
+            CoinPurse coinPurse = GetByUserId(userId);
             if (coinPurse == null)
             {
                 return false; // CoinPurse not found
             }
 
-            var coins = coinPurse.Coins.OrderByDescending(c => c.Value).ToList();
+            List<Coin> coins = coinPurse.Coins.OrderByDescending(c => c.Value).ToList();
             int remainingAmount = amount;
 
-            foreach (var coin in coins)
+            foreach (Coin coin in coins)
             {
                 if (remainingAmount <= 0)
                     break;
@@ -197,9 +219,10 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             return true;
         }
 
-
-
-        // Method to remove all coins from the CoinPurse
+        /// <summary>
+        /// Removes all coins from a users coinpurse
+        /// </summary>
+        /// <param name="userId"> The users Id </param>
         public void RemoveAllCoinsFromPurse(int userId)
         {
             CoinPurse coinPurse = GetByUserId(userId);

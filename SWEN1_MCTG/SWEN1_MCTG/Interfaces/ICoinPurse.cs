@@ -12,7 +12,5 @@ namespace SWEN1_MCTG.Interfaces
         void AddCoin(Coin newCoin);
         void RemoveCoin(Coin coinToRemove);
         int GetCoinsValue();
-        void PrintCoins();
     }
-
 }

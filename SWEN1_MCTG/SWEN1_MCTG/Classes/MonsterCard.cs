@@ -28,17 +28,5 @@ namespace SWEN1_MCTG.Classes
             get => _monsterType;
             private set => _monsterType = value;
         }
-
-        // Methods
-        /// <summary>
-        /// Displays Information of the card
-        /// </summary>
-        public override void PrintInformation()
-        {
-            Console.WriteLine("MonsterCard Name: " + _name);
-            Console.WriteLine("MonsterCard Type: " + _monsterType);
-            Console.WriteLine("MonsterCard Element: " + _elementType);
-            Console.WriteLine("MonsterCard Damage: " + _damage);
-        }
     }
 }
