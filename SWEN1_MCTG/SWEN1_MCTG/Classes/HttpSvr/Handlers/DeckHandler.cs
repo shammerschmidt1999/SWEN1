@@ -164,6 +164,14 @@ public class DeckHandler : Handler, IHandler
                         }
                         else
                         {
+                            // Check if the user has 4 cards in the deck
+                            if (UserHasFourCardsInDeck(userCards))
+                            {
+                                status = HttpStatusCode.BAD_REQUEST;
+                                reply = new JsonObject() { ["success"] = false, ["message"] = "Deck is full." };
+                                e.Reply(status, reply?.ToJsonString());
+                                return true;
+                            }
                             card.SetInDeck(true);
                         }
                         _stackRepository.SetCardInDeck(card.InDeck, card.Id, user.Id);
@@ -186,5 +194,10 @@ public class DeckHandler : Handler, IHandler
 
         e.Reply(status, reply?.ToJsonString());
         return true;
+    }
+
+    private bool UserHasFourCardsInDeck(Stack userCards)
+    {
+        return userCards.Cards.Count(c => c.InDeck) >= 4;
     }
 }

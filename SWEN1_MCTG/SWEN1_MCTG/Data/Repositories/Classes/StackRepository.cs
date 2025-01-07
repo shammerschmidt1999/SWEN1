@@ -139,7 +139,6 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             throw new InvalidOperationException($"Stack for card with Id {cardId} not found.");
         }
 
-        // TODO: User must not have more than 4 cards in his deck!
         /// <summary>
         /// Sets the inDeck bool of a card belonging to a user
         /// </summary>
