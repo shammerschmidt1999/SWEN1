@@ -29,12 +29,11 @@ public class BattleTests
         player2Password = "Player2Password";
 
         // Create the users
-        User.Create(player1Username, player1Password);
-        User.Create(player2Username, player2Password);
+        User userPlayer1 = new User(player1Username, player1Password);
+        User userPlayer2 = new User(player2Username, player2Password);
 
-        // Retrieve the users
-        player1 = User.Get(player1Username);
-        player2 = User.Get(player2Username);
+        player1 = userPlayer1;
+        player2 = userPlayer2;
     }
 
     [TestMethod]

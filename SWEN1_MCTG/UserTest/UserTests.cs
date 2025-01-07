@@ -24,10 +24,9 @@ public class UserTests
         playerPassword = "createdUserPassword";
 
         // Create the user
-        User.Create(playerUsername, playerPassword);
+        User newUser = new User(playerUsername, playerPassword);
 
-        // Retrieve the user
-        createdUser = User.Get(playerUsername);
+        createdUser = newUser;
     }
 
     [TestMethod]
