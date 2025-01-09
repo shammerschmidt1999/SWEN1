@@ -13,6 +13,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
         private readonly string _nToMUserQueryString;
         private readonly string _nToMCardQueryString;
         private readonly string _nToMInsertQueryString;
+        private readonly string _getInDeckQueryString;
 
         public StackRepository(string connectionString)
             : base(connectionString, "user_cards")
@@ -22,6 +23,10 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
                 SELECT uc.user_id, uc.card_id, uc.in_deck, uc.card_type
                 FROM {TableName} uc
                 WHERE uc.user_id = @UserId";
+
+            _getInDeckQueryString =
+                $@"SELECT uc.card_id FROM {TableName} uc WHERE 
+                uc.user_id = @UserId AND uc.in_deck = TRUE";
 
             _nToMCardQueryString = $@"
                 SELECT uc.user_id, uc.card_id, uc.in_deck, uc.card_type
@@ -76,6 +81,30 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             } while (reader.Read());
 
             return stack;
+        }
+
+        public async Task<List<Card>> GetUserDeckAsync(User user)
+        {
+            if (user == null)
+            {
+                return null;
+            }
+
+            await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
+            await using NpgsqlCommand command = new NpgsqlCommand(_getInDeckQueryString, connection);
+            command.Parameters.AddWithValue("@UserId", user.Id);
+
+            await using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
+            List<Card> deck = new List<Card>();
+            while (reader.Read()) {
+                int cardId = reader.GetInt32(reader.GetOrdinal("card_id"));
+                Card card = await _cardRepository.GetByIdAsync(cardId);
+                deck.Add(card);
+            }
+
+            return deck;
         }
 
         public async Task<Card> CreateCardAsync(NpgsqlDataReader reader)

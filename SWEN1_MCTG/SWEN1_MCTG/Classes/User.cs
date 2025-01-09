@@ -37,9 +37,9 @@ namespace SWEN1_MCTG.Classes
         private string _username;
         private string _password;
         private int _elo;
-        private Stack _userCards = new Stack(); // All current cards
-        private Stack _userDeck = new Stack(); // Cards in played deck
-        private CoinPurse _userCoinPurse = new CoinPurse();
+        private Stack _userCards; // All current cards
+        private Stack _userDeck; // Cards in played deck
+        private CoinPurse _userCoinPurse;
         private int _wins;
         private int _defeats;
         private int _draws;
@@ -83,7 +83,7 @@ namespace SWEN1_MCTG.Classes
         public Stack UserDeck
         {
             get => _userDeck;
-            private set => _userDeck = value;
+            set => _userDeck = value;
         }
 
         public int Wins

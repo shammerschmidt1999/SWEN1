@@ -12,12 +12,12 @@ public class TokenRepository : ITokenRepository
             INSERT INTO tokens (token, user_id, created_at) 
             VALUES (@token, @userId, @createdAt)";
     private readonly string _selectQuery = @"
-            SELECT u.id, u.username, u.password 
-            FROM tokens t 
-            JOIN users u ON t.user_id = u.id 
-            WHERE t.token = @token 
-            ORDER BY t.created_at DESC 
-            LIMIT 1";
+        SELECT u.id, u.username, u.password, u.defeats, u.draws, u.elo, u.wins
+        FROM tokens t
+        JOIN users u ON t.user_id = u.id
+        WHERE t.token = @token
+        ORDER BY t.created_at DESC
+        LIMIT 1";
 
     public TokenRepository(string connectionString)
     {
@@ -64,7 +64,12 @@ public class TokenRepository : ITokenRepository
             {
                 Id = reader.GetInt32(0),
                 Username = reader.GetString(1),
-                Password = reader.GetString(2)
+                Password = reader.GetString(2),
+                Defeats = reader.GetInt32(3),
+                Draws = reader.GetInt32(4),
+                Elo = reader.GetInt32(5),
+                Wins = reader.GetInt32(6)
+
             };
             return (true, user);
         }

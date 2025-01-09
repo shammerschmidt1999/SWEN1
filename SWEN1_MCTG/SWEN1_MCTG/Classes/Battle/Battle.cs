@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using SWEN1_MCTG.Interfaces;
 
-namespace SWEN1_MCTG.Classes
+namespace SWEN1_MCTG.Classes.Battle
 {
     public class Battle : IBattle
     {
         // Constructor
-        public Battle(User player1, User player2) 
-        { 
+        public Battle(User player1, User player2)
+        {
             _player1 = player1;
             _player2 = player2;
             _battleLog = new List<string>();
@@ -34,7 +34,7 @@ namespace SWEN1_MCTG.Classes
         }
 
         public User Player2
-        { 
+        {
             get => _player2;
             set => _player2 = value;
         }
@@ -56,20 +56,47 @@ namespace SWEN1_MCTG.Classes
         }
 
         // Methods
-        public void BattleRound(User player1, User player2, Stack player1Hand, Stack player2Hand)
+        public async Task<GlobalEnums.RoundResults> StartBattleAsync()
+        {
+            while (_roundCount < _maxRounds && _player1.UserDeck.Cards.Count > 0 && _player2.UserDeck.Cards.Count > 0)
+            {
+                _roundCount++;
+                BattleRound();
+            }
+
+            return DetermineWinner();
+        }
+
+        private void BattleRound()
         {
 
-            double card1Damage;
-            double card2Damage;
+            StartingMessage();
 
-            Card? card1 = player1Hand.GetRandomCardFromStack();
-            Card? card2 = player2Hand.GetRandomCardFromStack();
+            Card card1 = _player1.UserDeck.GetRandomCardFromStack();
+            Card card2 = _player2.UserDeck.GetRandomCardFromStack();
+            string winnerName = "Draw";
 
-            card1Damage = CalculateDamage(card1, card2, card1.Damage);
-            card2Damage = CalculateDamage(card2, card1, card2.Damage);
+            double damage1 = CalculateDamage(card1, card2, card1.Damage);
+            double damage2 = CalculateDamage(card2, card1, card2.Damage);
 
-            CompareDamage(card1Damage, card2Damage);
+            GlobalEnums.RoundResults result = CompareDamage(damage1, damage2);
 
+            if (result == GlobalEnums.RoundResults.Victory)
+            {
+                _player1.UserDeck.AddCardToStack(card2);
+                _player2.UserDeck.Cards.Remove(card2);
+            }
+            else if (result == GlobalEnums.RoundResults.Defeat)
+            {
+                _player2.UserDeck.AddCardToStack(card1);
+                _player1.UserDeck.Cards.Remove(card1);
+            }
+
+            // Add formatted log
+            _battleLog.Add($"--- Round {_roundCount} ---");
+            _battleLog.Add($"{_player1.Username} ({card1.Name}) [{damage1}] vs {_player2.Username} ({card2.Name}) [{damage2}]");
+            _battleLog.Add($"Round Winner: {winnerName}");
+            _battleLog.Add("");
         }
 
         /// <summary>
@@ -178,8 +205,44 @@ namespace SWEN1_MCTG.Classes
                 return 0;
 
             return card1Damage;
-
         }
 
+        private GlobalEnums.RoundResults DetermineWinner()
+        {
+            GlobalEnums.RoundResults result;
+
+            if (_player1.UserDeck.Cards.Count > _player2.UserDeck.Cards.Count)
+            {
+                result = GlobalEnums.RoundResults.Victory;
+            }
+            else if (_player1.UserDeck.Cards.Count < _player2.UserDeck.Cards.Count)
+            {
+                result = GlobalEnums.RoundResults.Defeat;
+            }
+            else
+            {
+                result = GlobalEnums.RoundResults.Draw;
+            }
+
+            return result;
+        }
+
+        private void StartingMessage()
+        {
+            _battleLog.Add($"Battle between {_player1.Username} and {_player2.Username} starts now...");
+            _battleLog.Add($"{_player1.Username}'s deck: ");
+
+            foreach (Card card in _player1.UserDeck.Cards)
+            {
+                _battleLog.Add($"{card.Name}");
+            }
+
+            _battleLog.Add($"{_player2.Username}'s deck: ");
+
+            foreach (Card card in _player2.UserDeck.Cards)
+            {
+                _battleLog.Add($"{card.Name}");
+            }
+        }
     }
 }

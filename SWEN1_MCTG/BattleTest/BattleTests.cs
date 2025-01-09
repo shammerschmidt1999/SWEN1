@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SWEN1_MCTG;
 using SWEN1_MCTG.Classes;
+using SWEN1_MCTG.Classes.Battle;
 
 namespace BattleTest;
 

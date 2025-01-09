@@ -9,11 +9,13 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
     public class UserRepository : Repository<User>, IUserRepository
     {
         private readonly string _getByUsernameQuery;
+        private readonly string _updateQuery;
 
         public UserRepository(string connectionString)
             : base(connectionString, "users")
         {
             _getByUsernameQuery = $"SELECT * FROM {TableName} WHERE Username = @Username";
+            _updateQuery = $"UPDATE {TableName} SET Username = @Username, Password = @Password, Elo = @Elo, Wins = @Wins, Defeats = @Defeats, Draws = @Draws WHERE Id = @Id";
         }
 
         protected override User CreateEntity() { return new User(); }
@@ -129,13 +131,14 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
             await connection.OpenAsync();
 
-            string updateQuery = $"UPDATE {TableName} SET Username = @Username, Password = @Password, Elo = @Elo WHERE Id = @Id";
-
-            await using NpgsqlCommand command = new NpgsqlCommand(updateQuery, connection);
+            await using NpgsqlCommand command = new NpgsqlCommand(_updateQuery, connection);
             command.Parameters.AddWithValue("@Username", entity.Username);
             command.Parameters.AddWithValue("@Password", entity.Password);
             command.Parameters.AddWithValue("@Elo", entity.Elo);
             command.Parameters.AddWithValue("@Id", entity.Id);
+            command.Parameters.AddWithValue("@Wins", entity.Wins);
+            command.Parameters.AddWithValue("@Defeats", entity.Defeats);
+            command.Parameters.AddWithValue("@Draws", entity.Draws);
 
             await command.ExecuteNonQueryAsync();
         }
