@@ -21,24 +21,24 @@ if %pauseFlag%==1 pause
 REM --------------------------------------------------
 echo 1) Create Users (Registration)
 REM Create User
-curl -i -X POST http://localhost:10001/users --header "Content-Type: application/json" -d "{\"Username\":\"kienboec\", \"Password\":\"daniel\"}"
+curl -i -X POST http://localhost:10001/users --header "Content-Type: application/json" -d "{\"Username\":\"Florian\", \"Password\":\"floriansPW\"}"
 echo "Should return HTTP 201"
 echo.
-curl -i -X POST http://localhost:10001/users --header "Content-Type: application/json" -d "{\"Username\":\"altenhof\", \"Password\":\"markus\"}"
+curl -i -X POST http://localhost:10001/users --header "Content-Type: application/json" -d "{\"Username\":\"Marius\", \"Password\":\"myPassword123\"}"
 echo "Should return HTTP 201"
 echo.
-curl -i -X POST http://localhost:10001/users --header "Content-Type: application/json" -d "{\"Username\":\"admin\",    \"Password\":\"istrator\"}"
+curl -i -X POST http://localhost:10001/users --header "Content-Type: application/json" -d "{\"Username\":\"admin\",    \"Password\":\"istratorPW\"}"
 echo "Should return HTTP 201"
 echo.
-curl -i -X POST http://localhost:10001/users --header "Content-Type: application/json" -d "{\"Username\":\"PackageUser\",    \"Password\":\"WillBuyPackage\"}"
+curl -i -X POST http://localhost:10001/users --header "Content-Type: application/json" -d "{\"Username\":\"PackageBuyer\",    \"Password\":\"WillBuyAPackage\"}"
 echo "Should return HTTP 201"
 echo.
 
 echo should fail:
-curl -i -X POST http://localhost:10001/users --header "Content-Type: application/json" -d "{\"Username\":\"kienboec\", \"Password\":\"daniel\"}"
+curl -i -X POST http://localhost:10001/users --header "Content-Type: application/json" -d "{\"Username\":\"Florian\", \"Password\":\"hammerschmidt\"}"
 echo "Should return HTTP 4xx - User already exists"
 echo.
-curl -i -X POST http://localhost:10001/users --header "Content-Type: application/json" -d "{\"Username\":\"kienboec\", \"Password\":\"different\"}"
+curl -i -X POST http://localhost:10001/users --header "Content-Type: application/json" -d "{\"Username\":\"Marius\", \"Password\":\"different\"}"
 echo "Should return HTTP 4xx - User already exists"
 echo. 
 echo.

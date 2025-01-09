@@ -18,7 +18,7 @@ for %%a in (%*) do (
 
 REM --------------------------------------------------
 echo 4) acquire packages kienboec
-curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer packageUser-mtcgToken" -d "{\"packageType\": \"Basic\"}"
+curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer kienboec-mtcgToken" -d "{\"packageType\": \"Basic\"}"
 echo "Should return HTTP 201"
 echo.
 curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer packageUser-mtcgToken" -d "{\"packageType\": \"Basic\"}"

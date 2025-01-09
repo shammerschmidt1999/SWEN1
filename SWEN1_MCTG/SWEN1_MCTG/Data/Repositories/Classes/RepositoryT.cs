@@ -45,11 +45,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             AddParameters(command, entity); // Add the parameters to the command
 
             // Execute the command
-            PropertyInfo idProperty = entity.GetType().GetProperty("Id");
-            if (idProperty != null)
-            {
-                idProperty.SetValue(entity, Convert.ToInt32(await command.ExecuteScalarAsync()));
-            }
+            await command.ExecuteScalarAsync();
         }
 
         /// <summary>

@@ -33,15 +33,15 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
         /// </summary>
         /// <param name="e"> Console arguments </param>
         /// <returns> bool if request was successful or not </returns>
-        public override Task<bool> HandleAsync(HttpSvrEventArgs e)
+        public override async Task<bool> HandleAsync(HttpSvrEventArgs e)
         {
             if ((e.Path.TrimEnd('/', ' ', '\t') == "/users") && (e.Method == "POST"))
             {
-                return _CreateUserAsync(e);
+                return await _CreateUserAsync(e);
             }
             else if (e.Path.StartsWith("/users/") && (e.Method == "GET"))
             {
-                return _QueryUserAsync(e);
+                return await _QueryUserAsync(e);
             }
             else if (e.Path.StartsWith("/users/") && (e.Method == "PUT"))
             {
@@ -50,11 +50,11 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                 if (match.Success)
                 {
                     string username = match.Groups["username"].Value;
-                    return _UpdateUserAsync(e, username);
+                    return await _UpdateUserAsync(e, username);
                 }
             }
 
-            return Task.FromResult(false);
+            return false;
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                         Coin startingCoin = new Coin(GlobalEnums.CoinType.Diamond);
                         coinPurse.AddCoin(startingCoin);
                         coinPurse.UserId = addedUser.Id;
-                        await _coinPurseRepository.AddCoinPurseAsync(coinPurse);
+                        await _coinPurseRepository.AddAsync(coinPurse);
 
                         status = HttpStatusCode.OK;
                         reply = new JsonObject()

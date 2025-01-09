@@ -12,11 +12,8 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
     {
         private readonly string _getCoinPurseByIdQuery = @"SELECT * FROM coin_purses WHERE user_id = @UserId";
         private readonly string _deleteCoinPurseQuery = @"DELETE FROM coin_purses WHERE user_id = @UserId";
-        private readonly string _updateCoinPurseQuery = @"UPDATE coin_purses SET Bronze = 
-            @Bronze, Silver = @Silver, Gold = @Gold, Platinum = @Platinum, Diamond = @Diamond WHERE user_id = @UserId";
-        private readonly string _insertCoinPurseQuery = @"INSERT INTO coin_purses (user_id, bronze, silver, gold, platinum, diamond) 
-            VALUES (@UserId, @Bronze, @Silver, @Gold, @Platinum, @Diamond) 
-            ON CONFLICT (user_id) DO UPDATE SET bronze = @Bronze, silver = @Silver, gold = @Gold, platinum = @Platinum, diamond = @Diamond";
+        private readonly string _updateCoinPurseQuery = @"UPDATE coin_purses SET Bronze = @Bronze, Silver = @Silver, Gold = @Gold, Platinum = @Platinum, Diamond = @Diamond WHERE user_id = @UserId";
+        private readonly string _insertCoinPurseQuery = @"INSERT INTO coin_purses (user_id, bronze, silver, gold, platinum, diamond) VALUES (@UserId, @Bronze, @Silver, @Gold, @Platinum, @Diamond) ON CONFLICT (user_id) DO UPDATE SET bronze = @Bronze, silver = @Silver, gold = @Gold, platinum = @Platinum, diamond = @Diamond";
 
         public CoinPurseRepository(string connectionString)
             : base(connectionString, "coin_purses")
@@ -63,11 +60,6 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             await command.ExecuteNonQueryAsync();
         }
 
-        public async Task AddCoinPurseAsync(CoinPurse coinPurse)
-        {
-            await AddAsync(coinPurse);
-        }
-
         public async Task UpdateCoinPurseAsync(CoinPurse coinPurse)
         {
             await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
@@ -111,15 +103,19 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             return new CoinPurse();
         }
 
-        protected override void AddParameters(NpgsqlCommand command, CoinPurse entity)
+        protected override void AddParameters(NpgsqlCommand command, CoinPurse coinPurse)
         {
-            command.Parameters.AddWithValue("@user_id", entity.UserId);
-            command.Parameters.AddWithValue("@coins", entity.Coins);
+            command.Parameters.AddWithValue("@UserId", coinPurse.UserId);
+            command.Parameters.AddWithValue("@Bronze", coinPurse.Coins.Count(c => c.CoinType == CoinType.Bronze));
+            command.Parameters.AddWithValue("@Silver", coinPurse.Coins.Count(c => c.CoinType == CoinType.Silver));
+            command.Parameters.AddWithValue("@Gold", coinPurse.Coins.Count(c => c.CoinType == CoinType.Gold));
+            command.Parameters.AddWithValue("@Platinum", coinPurse.Coins.Count(c => c.CoinType == CoinType.Platinum));
+            command.Parameters.AddWithValue("@Diamond", coinPurse.Coins.Count(c => c.CoinType == CoinType.Diamond));
         }
 
         protected override string GenerateInsertQuery(CoinPurse entity)
         {
-            return $"INSERT INTO {TableName} (user_id, coins) VALUES (@user_id, @coins) RETURNING id";
+            return _insertCoinPurseQuery;
         }
 
         protected override CoinPurse MapReaderToEntity(NpgsqlDataReader reader)
@@ -145,7 +141,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
 
         private string GenerateUpdateQuery(CoinPurse entity)
         {
-            return $"UPDATE {TableName} SET coins = @coins WHERE user_id = @user_id";
+            return _updateCoinPurseQuery;
         }
     }
 }

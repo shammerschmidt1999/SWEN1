@@ -8,6 +8,17 @@ public class TokenRepository : ITokenRepository
 {
     private readonly string _connectionString;
 
+    private readonly string _insertQuery = @"
+            INSERT INTO tokens (token, user_id, created_at) 
+            VALUES (@token, @userId, @createdAt)";
+    private readonly string _selectQuery = @"
+            SELECT u.id, u.username, u.password 
+            FROM tokens t 
+            JOIN users u ON t.user_id = u.id 
+            WHERE t.token = @token 
+            ORDER BY t.created_at DESC 
+            LIMIT 1";
+
     public TokenRepository(string connectionString)
     {
         _connectionString = connectionString;
@@ -24,11 +35,7 @@ public class TokenRepository : ITokenRepository
         await using NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
         await connection.OpenAsync();
 
-        string query = @"
-            INSERT INTO tokens (token, user_id, created_at) 
-            VALUES (@token, @userId, @createdAt)";
-
-        await using NpgsqlCommand command = new NpgsqlCommand(query, connection);
+        await using NpgsqlCommand command = new NpgsqlCommand(_insertQuery, connection);
         command.Parameters.AddWithValue("token", token);
         command.Parameters.AddWithValue("userId", userId);
         command.Parameters.AddWithValue("createdAt", DateTime.UtcNow);
@@ -46,15 +53,7 @@ public class TokenRepository : ITokenRepository
         await using NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
         await connection.OpenAsync();
 
-        string query = @"
-            SELECT u.id, u.username, u.password 
-            FROM tokens t 
-            JOIN users u ON t.user_id = u.id 
-            WHERE t.token = @token 
-            ORDER BY t.created_at DESC 
-            LIMIT 1";
-
-        await using NpgsqlCommand command = new NpgsqlCommand(query, connection);
+        await using NpgsqlCommand command = new NpgsqlCommand(_selectQuery, connection);
         command.Parameters.AddWithValue("token", token);
 
         await using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
