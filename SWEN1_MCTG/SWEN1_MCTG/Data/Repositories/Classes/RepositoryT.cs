@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Npgsql;
 using SWEN1_MCTG.Data.Repositories.Interfaces;
+using System.Threading.Tasks;
 
 namespace SWEN1_MCTG.Data.Repositories.Classes
 {
@@ -11,44 +12,43 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
     /// <typeparam name="T"> The class of the entity </typeparam>
     public abstract class Repository<T> : IRepository<T> where T : class
     {
-        protected readonly string _connectionString; // Connection string to the database
-        protected readonly string _tableName; // Name of the table in the database
-        protected readonly string _getAllQuery;
-        protected readonly string _getByIdQuery;
-        protected readonly string _deleteQuery;
+        protected readonly string ConnectionString; // Connection string to the database
+        protected readonly string TableName; // Name of the table in the database
+        protected readonly string GetAllQuery;
+        protected readonly string GetByIdQuery;
+        protected readonly string DeleteQuery;
 
         // Constructor to set the connection string, table name and queries
         protected Repository(string connectionString, string tableName)
         {
-            _connectionString = connectionString;
-            _tableName = tableName;
-            _getAllQuery = $"SELECT * FROM {_tableName}";
-            _getByIdQuery = $"SELECT * FROM {_tableName} WHERE Id = @Id";
-            _deleteQuery = $"DELETE FROM {_tableName} WHERE Id = @Id";
+            ConnectionString = connectionString;
+            TableName = tableName;
+            GetAllQuery = $"SELECT * FROM {TableName}";
+            GetByIdQuery = $"SELECT * FROM {TableName} WHERE Id = @Id";
+            DeleteQuery = $"DELETE FROM {TableName} WHERE Id = @Id";
         }
 
         /// <summary>
         /// Method to add an entity to the database.
         /// </summary>
         /// <param name="entity"> The entity which has the data to be stored in the DB</param>
-        public void Add(T entity)
+        public async Task AddAsync(T entity)
         {
-            // Open a connection to the database
-            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
+            await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+            await connection.OpenAsync();
 
             // Generate the insert query
             string insertQuery = GenerateInsertQuery(entity);
 
             // Create a command with the insert query and the connection
-            NpgsqlCommand command = new NpgsqlCommand(insertQuery, connection);
+            await using NpgsqlCommand command = new NpgsqlCommand(insertQuery, connection);
             AddParameters(command, entity); // Add the parameters to the command
 
             // Execute the command
             PropertyInfo idProperty = entity.GetType().GetProperty("Id");
             if (idProperty != null)
             {
-                idProperty.SetValue(entity, Convert.ToInt32(command.ExecuteScalar()));
+                idProperty.SetValue(entity, Convert.ToInt32(await command.ExecuteScalarAsync()));
             }
         }
 
@@ -56,13 +56,13 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
         /// Method to get all entities from the database.
         /// </summary>
         /// <returns> A List T of entities </returns>
-        public IEnumerable<T> GetAll()
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
-            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
+            await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+            await connection.OpenAsync();
 
-            NpgsqlCommand command = new NpgsqlCommand(_getAllQuery, connection);
-            NpgsqlDataReader reader = command.ExecuteReader();
+            await using NpgsqlCommand command = new NpgsqlCommand(GetAllQuery, connection);
+            await using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
 
             return MapReaderToEntities(reader);
         }
@@ -73,16 +73,16 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
         /// <param name="id"> The id of the entity </param>
         /// <returns> The entity with the corresponding id </returns>
         /// <exception cref="InvalidOperationException"> If no entity with the given id is found </exception>
-        public T GetById(int id)
+        public async Task<T> GetByIdAsync(int id)
         {
-            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
+            await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+            await connection.OpenAsync();
 
-            NpgsqlCommand command = new NpgsqlCommand(_getByIdQuery, connection);
+            await using NpgsqlCommand command = new NpgsqlCommand(GetByIdQuery, connection);
             command.Parameters.AddWithValue("@Id", id);
 
-            NpgsqlDataReader reader = command.ExecuteReader();
-            if (reader.Read())
+            await using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
             {
                 return MapReaderToEntity(reader);
             }
@@ -94,15 +94,15 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
         /// Method to delete an entity from the database by its Id
         /// </summary>
         /// <param name="id"> The id of the entity </param>
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
-            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
+            await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+            await connection.OpenAsync();
 
-            NpgsqlCommand command = new NpgsqlCommand(_deleteQuery, connection);
+            await using NpgsqlCommand command = new NpgsqlCommand(DeleteQuery, connection);
             command.Parameters.AddWithValue("@Id", id);
 
-            command.ExecuteNonQuery();
+            await command.ExecuteNonQueryAsync();
         }
 
         /// <summary>

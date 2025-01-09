@@ -44,16 +44,16 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
         /// If a handler successfully handles the event, the method returns immediately.
         /// If no handler can handle the event, it replies with a BAD_REQUEST status.
         /// </remarks>
-        public static void HandleEvent(HttpSvrEventArgs e)
+        public static async Task HandleEventAsync(HttpSvrEventArgs e)
         {
             _Handlers ??= _GetHandlers();
 
             foreach (IHandler i in _Handlers)
             {
-                if (i.Handle(e)) return;
+                if (await i.HandleAsync(e)) return;
             }
             e.Reply(HttpStatusCode.BAD_REQUEST);
         }
-        public abstract bool Handle(HttpSvrEventArgs e);
+        public abstract Task<bool> HandleAsync(HttpSvrEventArgs e);
     }
 }

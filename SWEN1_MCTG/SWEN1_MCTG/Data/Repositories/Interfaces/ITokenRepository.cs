@@ -3,6 +3,6 @@ using SWEN1_MCTG.Data.Repositories.Interfaces;
 
 public interface ITokenRepository
 {
-    void CreateToken(string token, int userId);
-    (bool Success, User? User) Authenticate(string token);
+    Task CreateTokenAsync(string token, int userId);
+    Task<(bool Success, User? User)> AuthenticateAsync(string token);
 }

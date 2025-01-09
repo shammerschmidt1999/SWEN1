@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Npgsql;
 using SWEN1_MCTG.Classes;
 using SWEN1_MCTG.Data.Repositories.Interfaces;
@@ -12,7 +13,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
 {
     public class CardRepository : Repository<Card>, ICardRepository
     {
-        private readonly string _getByNameQuery;
+        private readonly string GetByNameQuery;
 
         public CardRepository() : base(null, null)
         {
@@ -21,7 +22,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
         public CardRepository(string connectionString)
             : base(connectionString, "cards")
         {
-            _getByNameQuery = $"SELECT * FROM {_tableName} WHERE name = @name";
+            GetByNameQuery = $"SELECT * FROM {TableName} WHERE name = @name";
         }
 
         protected override Card CreateEntity()
@@ -30,14 +31,14 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             throw new NotImplementedException();
         }
 
-        public new void Add(Card entity)
+        public new async Task AddAsync(Card entity)
         {
-            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
+            await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+            await connection.OpenAsync();
 
             string insertQuery = GenerateInsertQuery(entity);
 
-            NpgsqlCommand command = new NpgsqlCommand(insertQuery, connection);
+            await using NpgsqlCommand command = new NpgsqlCommand(insertQuery, connection);
 
             // Add the parameters for the entity
             AddParameters(command, entity);
@@ -47,7 +48,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             command.Parameters.AddWithValue("@card_type", cardType);
 
             // Execute the command and get the generated Id
-            entity.Id = Convert.ToInt32(command.ExecuteScalar());
+            entity.Id = Convert.ToInt32(await command.ExecuteScalarAsync());
         }
 
         protected override void AddParameters(NpgsqlCommand command, Card entity)
@@ -100,7 +101,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
                 parameterNames += ", @card_type";
             }
 
-            return $"INSERT INTO {_tableName} ({columnNames}) VALUES ({parameterNames}) RETURNING Id";
+            return $"INSERT INTO {TableName} ({columnNames}) VALUES ({parameterNames}) RETURNING Id";
         }
 
         protected override Card MapReaderToEntity(NpgsqlDataReader reader)
@@ -139,16 +140,16 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             return card;
         }
 
-        public Card GetByName(string name)
+        public async Task<Card> GetByNameAsync(string name)
         {
-            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
+            await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+            await connection.OpenAsync();
 
-            NpgsqlCommand command = new NpgsqlCommand(_getByNameQuery, connection);
+            await using NpgsqlCommand command = new NpgsqlCommand(GetByNameQuery, connection);
             command.Parameters.AddWithValue("@name", name);
 
-            NpgsqlDataReader reader = command.ExecuteReader();
-            if (reader.Read())
+            await using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
             {
                 return MapReaderToEntity(reader);
             }
@@ -156,17 +157,17 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             throw new InvalidOperationException($"Card with Name {name} not found.");
         }
 
-        public List<Card> GetRandomCards(int count)
+        public async Task<List<Card>> GetRandomCardsAsync(int count)
         {
-            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
+            await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+            await connection.OpenAsync();
 
             string query = $"SELECT * FROM cards ORDER BY RANDOM() LIMIT {count}";
-            NpgsqlCommand command = new NpgsqlCommand(query, connection);
+            await using NpgsqlCommand command = new NpgsqlCommand(query, connection);
 
             List<Card> cards = new List<Card>();
-            NpgsqlDataReader reader = command.ExecuteReader();
-            while (reader.Read())
+            await using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
             {
                 cards.Add(MapReaderToEntity(reader));
             }

@@ -9,6 +9,5 @@ namespace SWEN1_MCTG.Interfaces
 {
     public interface IUser
     {
-        void Save(string token);
     }
 }

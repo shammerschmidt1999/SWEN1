@@ -11,11 +11,11 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
         /// </summary>
         /// <param name="e"> Server Event Arguments </param>
         /// <returns> True (via _CreateSession) on successful session create, false on unsuccessful session create </returns>
-        public override bool Handle(HttpSvrEventArgs e)
+        public override async Task<bool> HandleAsync(HttpSvrEventArgs e)
         {
             if ((e.Path.TrimEnd('/', ' ', '\t') == "/sessions") && (e.Method == "POST"))
             {
-                return _CreateSession(e);
+                return await _CreateSessionAsync(e);
             }
 
             return false;
@@ -26,7 +26,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
         /// </summary>
         /// <param name="e"> Server Event Arguments </param>
         /// <returns> True on successful session creation, false on unsuccessful session creation </returns>
-        public static bool _CreateSession(HttpSvrEventArgs e)
+        public static async Task<bool> _CreateSessionAsync(HttpSvrEventArgs e)
         {
             JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
             int status = HttpStatusCode.BAD_REQUEST;
@@ -36,7 +36,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                 JsonNode? json = JsonNode.Parse(e.Payload);
                 if (json != null)
                 {
-                    (bool Success, string Token) result = User.Logon((string)json["Username"]!, (string)json["Password"]!);
+                    (bool Success, string Token) result = await User.LogonAsync((string)json["Username"]!, (string)json["Password"]!);
 
                     if (result.Success)
                     {

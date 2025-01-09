@@ -1,6 +1,12 @@
 --- SQL STATEMENTS FOR ACTUAL CARDS ---
 
 INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (1, 'TestMonsterCard', 100, 'Fire', Dragon, 'MonsterCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
+VALUES (2, 'TestSpellCard', 50, 'Fire', null, 'SpellCard');
+
+INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)
 VALUES (10, 'Fireball', 50, 'Fire', null, 'SpellCard');
 
 INSERT INTO cards (id, name, damage, elementType, monsterType, card_type)

@@ -8,9 +8,9 @@ namespace SWEN1_MCTG.Data.Repositories.Interfaces
 {
     public interface IRepository<T>
     {
-        void Add(T entity);
-        IEnumerable<T> GetAll();
-        T GetById(int id);
-        void Delete(int id);
+        Task AddAsync(T entity);
+        Task<IEnumerable<T>> GetAllAsync();
+        Task<T> GetByIdAsync(int id);
+        Task DeleteAsync(int id);
     }
 }

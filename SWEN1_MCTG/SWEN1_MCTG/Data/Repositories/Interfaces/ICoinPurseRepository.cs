@@ -6,11 +6,11 @@ namespace SWEN1_MCTG.Data.Repositories.Interfaces;
 public interface ICoinPurseRepository : IRepository<CoinPurse>
 {
     List<Coin> GenerateCoins(CoinType coinType, int count);
-    CoinPurse GetByUserId(int userId);
-    void DeleteByUserId(int userId);
-    void AddCoinPurse(CoinPurse coinPurse);
-    void UpdateCoinPurse(CoinPurse coinPurse);
-    void AddCoinsToPurse(int userId, IEnumerable<Coin> coins);
-    public bool RemoveCoinsFromPurse(int userId, int amount);
-    void RemoveAllCoinsFromPurse(int userId);
+    Task<CoinPurse> GetByUserIdAsync(int userId);
+    Task DeleteByUserIdAsync(int userId);
+    Task AddCoinPurseAsync(CoinPurse coinPurse);
+    Task UpdateCoinPurseAsync(CoinPurse coinPurse);
+    Task AddCoinsToPurseAsync(int userId, IEnumerable<Coin> coins);
+    Task<bool> RemoveCoinsFromPurseAsync(int userId, int amount);
+    Task RemoveAllCoinsFromPurseAsync(int userId);
 }

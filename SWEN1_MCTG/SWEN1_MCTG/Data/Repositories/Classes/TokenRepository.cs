@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Threading.Tasks;
 using Npgsql;
 using SWEN1_MCTG.Classes;
 
@@ -12,21 +13,27 @@ public class TokenRepository : ITokenRepository
         _connectionString = connectionString;
     }
 
+    // TODO: Add only one token per user to database
     /// <summary>
     /// Creates a token for the user and stores it in the db
     /// </summary>
     /// <param name="token"> The token string </param>
     /// <param name="userId"> The users Id </param>
-    public void CreateToken(string token, int userId)
+    public async Task CreateTokenAsync(string token, int userId)
     {
-        NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
-        connection.Open();
+        await using NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
+        await connection.OpenAsync();
 
-        NpgsqlCommand command = new NpgsqlCommand("INSERT INTO tokens (token, user_id) VALUES (@token, @userId)", connection);
+        string query = @"
+            INSERT INTO tokens (token, user_id, created_at) 
+            VALUES (@token, @userId, @createdAt)";
+
+        await using NpgsqlCommand command = new NpgsqlCommand(query, connection);
         command.Parameters.AddWithValue("token", token);
         command.Parameters.AddWithValue("userId", userId);
+        command.Parameters.AddWithValue("createdAt", DateTime.UtcNow);
 
-        command.ExecuteNonQuery();
+        await command.ExecuteNonQueryAsync();
     }
 
     /// <summary>
@@ -34,17 +41,25 @@ public class TokenRepository : ITokenRepository
     /// </summary>
     /// <param name="token"> The token string </param>
     /// <returns> TRUE and the user entity if authenticated; FALSE and null if not </returns>
-    public (bool Success, User? User) Authenticate(string token)
+    public async Task<(bool Success, User? User)> AuthenticateAsync(string token)
     {
-        NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
-        connection.Open();
-        
-        NpgsqlCommand command = new NpgsqlCommand("SELECT u.id, u.username, u.password FROM tokens t JOIN users u ON t.user_id = u.id WHERE t.token = @token", connection);
+        await using NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
+        await connection.OpenAsync();
+
+        string query = @"
+            SELECT u.id, u.username, u.password 
+            FROM tokens t 
+            JOIN users u ON t.user_id = u.id 
+            WHERE t.token = @token 
+            ORDER BY t.created_at DESC 
+            LIMIT 1";
+
+        await using NpgsqlCommand command = new NpgsqlCommand(query, connection);
         command.Parameters.AddWithValue("token", token);
 
-        NpgsqlDataReader reader = command.ExecuteReader();
+        await using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
 
-        if (reader.Read())
+        if (await reader.ReadAsync())
         {
             User user = new User
             {

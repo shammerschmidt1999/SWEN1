@@ -24,11 +24,11 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers;
         /// </summary>
         /// <param name="e"> Console arguments </param>
         /// <returns> bool if request was successful or not </returns>
-        public override bool Handle(HttpSvrEventArgs e)
+        public override async Task<bool> HandleAsync(HttpSvrEventArgs e)
         {
             if ((e.Path.TrimEnd('/', ' ', '\t') == "/cards") && (e.Method == "GET"))
             {
-                return _DisplayCards(e);
+                return await _DisplayCardsAsync(e);
             }
             return false;
         }
@@ -38,19 +38,19 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers;
         /// </summary>
         /// <param name="e"> HTTPEventArgs </param>
         /// <returns> TRUE if operation was successful; FALSE if it was unsuccessful </returns>
-    public bool _DisplayCards(HttpSvrEventArgs e)
+    private async Task<bool> _DisplayCardsAsync(HttpSvrEventArgs e)
     {
         JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
         int status = HttpStatusCode.BAD_REQUEST;
 
         try
         {
-            (bool Success, User? User) ses = Token.Authenticate(e);
+            (bool Success, User? User) ses = await Token.AuthenticateBearerAsync(e);
 
             if (ses.Success)
             {
-                User user = _userRepository.GetByUsername(ses.User!.Username);
-                Stack userCards = _stackRepository.GetByUserId(ses.User!.Id);
+                User user = await _userRepository.GetByUsernameAsync(ses.User!.Username);
+                Stack userCards = await _stackRepository.GetByUserIdAsync(ses.User!.Id);
 
                 // Format the message as a JSON array
                 JsonArray cardsArray = _generateCardArray(userCards);

@@ -5,6 +5,6 @@ namespace SWEN1_MCTG.Interfaces
 {
     public interface IHandler
     {
-        public bool Handle(HttpSvrEventArgs e);
+        public Task<bool> HandleAsync(HttpSvrEventArgs e);
     }
 }

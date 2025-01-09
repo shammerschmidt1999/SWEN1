@@ -16,7 +16,7 @@ namespace StackRepositoryTest
         private readonly string connectionString = AppSettings.GetConnectionString("TestConnection");
 
         [TestMethod]
-        public void AddStack_AddsStackToDatabase()
+        public async Task AddStack_AddsStackToDatabase()
         {
             // Arrange
             int testUserId = 1;
@@ -24,10 +24,10 @@ namespace StackRepositoryTest
             IStackRepository stackRepository = new StackRepository(connectionString);
             ICardRepository cardRepository = new CardRepository(connectionString);
 
-            Card testMonsterCard = cardRepository.GetByName("TestMonsterCard");
-            Card testSpellCard = cardRepository.GetByName("TestSpellCard");
+            Card testMonsterCard = await cardRepository.GetByNameAsync("TestMonsterCard");
+            Card testSpellCard = await cardRepository.GetByNameAsync("TestSpellCard");
 
-            Stack retrievedStackBefore = stackRepository.GetByUserId(testUserId);
+            Stack retrievedStackBefore = await stackRepository.GetByUserIdAsync(testUserId);
             int stackSizeBefore = retrievedStackBefore.Cards.Count;
 
             Stack stack = new Stack()
@@ -41,16 +41,16 @@ namespace StackRepositoryTest
             };
 
             // Act
-            stackRepository.Add(stack);
+            await stackRepository.AddAsync(stack);
 
             // Assert
-            Stack retrievedStack = stackRepository.GetByUserId(testUserId);
+            Stack retrievedStack = await stackRepository.GetByUserIdAsync(testUserId);
             Assert.IsNotNull(retrievedStack);
             Assert.AreEqual(stackSizeBefore + 2, retrievedStack.Cards.Count);
         }
 
         [TestMethod]
-        public void CreateCard_CreatesCorrectCardType()
+        public async Task CreateCard_CreatesCorrectCardType()
         {
             // Arrange
             IStackRepository stackRepository = new StackRepository(connectionString);
@@ -62,7 +62,7 @@ namespace StackRepositoryTest
             reader.Read();
 
             // Act
-            Card card = stackRepository.CreateCard(reader);
+            Card card = await stackRepository.CreateCardAsync(reader);
 
             // Assert
             Assert.IsNotNull(card);
@@ -70,14 +70,14 @@ namespace StackRepositoryTest
         }
 
         [TestMethod]
-        public void GetByUserId_ReturnsCorrectStack()
+        public async Task GetByUserId_ReturnsCorrectStack()
         {
             // Arrange
             IStackRepository stackRepository = new StackRepository(connectionString);
             int testUserId = 1;
 
             // Act
-            Stack stack = stackRepository.GetByUserId(testUserId);
+            Stack stack = await stackRepository.GetByUserIdAsync(testUserId);
 
             // Assert
             Assert.IsNotNull(stack);
@@ -85,14 +85,14 @@ namespace StackRepositoryTest
         }
 
         [TestMethod]
-        public void GetByCardId_ReturnsCorrectStack()
+        public async Task GetByCardId_ReturnsCorrectStack()
         {
             // Arrange
             IStackRepository stackRepository = new StackRepository(connectionString);
             int testCardId = 1;
 
             // Act
-            Stack stack = stackRepository.GetByCardId(testCardId);
+            Stack stack = await stackRepository.GetByCardIdAsync(testCardId);
 
             // Assert
             Assert.IsNotNull(stack);
@@ -100,7 +100,7 @@ namespace StackRepositoryTest
         }
 
         [TestMethod]
-        public void SetCardInDeck_SetsCardInDeck()
+        public async Task SetCardInDeck_SetsCardInDeck()
         {
             // Arrange
             IStackRepository stackRepository = new StackRepository(connectionString);
@@ -108,7 +108,7 @@ namespace StackRepositoryTest
             int testUserId = 1;
 
             // Create or retrieve a card instance
-            Card testCard = cardRepository.GetByName("TestMonsterCard");
+            Card testCard = await cardRepository.GetByNameAsync("TestMonsterCard");
 
             // Add the card to the user's stack
             Stack stack = new Stack()
@@ -116,13 +116,13 @@ namespace StackRepositoryTest
                 UserId = testUserId,
                 Cards = new List<Card> { testCard }
             };
-            stackRepository.Add(stack);
+            await stackRepository.AddAsync(stack);
 
             // Act
-            stackRepository.SetCardInDeck(true, testCard.Id, testUserId);
+            await stackRepository.SetCardInDeckAsync(true, testCard.Id, testUserId);
 
             // Assert
-            Stack retrievedStack = stackRepository.GetByUserId(testUserId);
+            Stack retrievedStack = await stackRepository.GetByUserIdAsync(testUserId);
             Assert.IsTrue(retrievedStack.Cards.Any(c => c.Id == testCard.Id && c.InDeck));
         }
 

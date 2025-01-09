@@ -29,28 +29,29 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
         /// </summary>
         /// <param name="e"> Console arguments </param>
         /// <returns> bool if request was successful or not </returns>
-        public override bool Handle(HttpSvrEventArgs e)
+        public override async Task<bool> HandleAsync(HttpSvrEventArgs e)
         {
             if ((e.Path.TrimEnd('/', ' ', '\t') == "/scoreboard") && (e.Method == "GET"))
             {
-                return _DisplayScoreboard(e);
+                return await _DisplayScoreboardAsync(e);
             }
 
             return false;
         }
 
-        private bool _DisplayScoreboard(HttpSvrEventArgs e)
+        private async Task<bool> _DisplayScoreboardAsync(HttpSvrEventArgs e)
         {
             JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
             int status = HttpStatusCode.BAD_REQUEST;
 
             try
             {
-                (bool Success, User? User) ses = Token.Authenticate(e);
+                (bool Success, User? User) ses = await Token.AuthenticateBearerAsync(e);
 
                 if (ses.Success)
                 {
-                    List<User> users = _userRepository.GetAll().ToList();
+                    IEnumerable<User> usersEnumerable = await _userRepository.GetAllAsync();
+                    List<User> users = usersEnumerable.ToList();
 
                     if (users.Count == 0)
                     {

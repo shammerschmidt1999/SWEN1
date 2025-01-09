@@ -1,11 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Data;
-using System.Data.SqlClient;
+using System.Threading.Tasks;
 using SWEN1_MCTG.Classes;
-using SWEN1_MCTG.Data;
-using SWEN1_MCTG.Interfaces;
-using SWEN1_MCTG.Data.Repositories;
 using SWEN1_MCTG.Data.Repositories.Classes;
 using SWEN1_MCTG.Data.Repositories.Interfaces;
 using SWEN1_MCTG;
@@ -18,38 +14,38 @@ namespace CardRepositoryTest
         private readonly string ConnectionString = AppSettings.GetConnectionString("TestConnection");
 
         [TestMethod]
-        public void TestAddCardMonsterCard()
+        public async Task TestAddCardMonsterCard()
         {
             // Arrange
             ICardRepository cardRepository = new CardRepository(ConnectionString);
             Card card = new MonsterCard($"TestMonsterCard_{Guid.NewGuid()}", GlobalEnums.MonsterType.Dragon, 100, GlobalEnums.ElementType.Fire);
 
             // Act
-            cardRepository.Add(card);
+            await cardRepository.AddAsync(card);
 
             // Assert
-            Card fetchedCard = cardRepository.GetByName(card.Name);
+            Card fetchedCard = await cardRepository.GetByNameAsync(card.Name);
             Assert.IsNotNull(fetchedCard);
             Assert.AreEqual(card.Name, fetchedCard.Name);
             Assert.AreEqual(card.Damage, fetchedCard.Damage);
             Assert.AreEqual(card.ElementType, fetchedCard.ElementType);
 
             // Cast to MonsterCard to assert MonsterType
-            MonsterCard fetchedMonsterCard = fetchedCard as MonsterCard;
+            MonsterCard? fetchedMonsterCard = fetchedCard as MonsterCard;
             Assert.IsNotNull(fetchedMonsterCard);
-            Assert.AreEqual(((MonsterCard)card).MonsterType, fetchedMonsterCard.MonsterType);
+            Assert.AreEqual(((MonsterCard)card).MonsterType, fetchedMonsterCard!.MonsterType);
         }
 
         [TestMethod]
-        public void TestAddSpellCard()
+        public async Task TestAddSpellCard()
         {
             // Arrange
             ICardRepository cardRepository = new CardRepository(ConnectionString);
             Card card = new SpellCard($"TestSpellCard{Guid.NewGuid()}", 50, GlobalEnums.ElementType.Fire);
-            cardRepository.Add(card);
 
             // Act
-            Card fetchedCard = cardRepository.GetByName(card.Name);
+            await cardRepository.AddAsync(card);
+            Card fetchedCard = await cardRepository.GetByNameAsync(card.Name);
 
             // Assert
             Assert.IsNotNull(fetchedCard);
@@ -59,15 +55,15 @@ namespace CardRepositoryTest
         }
 
         [TestMethod]
-        public void TestGetCardById()
+        public async Task TestGetCardById()
         {
             // Arrange
             ICardRepository cardRepository = new CardRepository(ConnectionString);
             Card card = new MonsterCard($"TestMonsterCard_{Guid.NewGuid()}", GlobalEnums.MonsterType.Knight, 75, GlobalEnums.ElementType.Normal);
-            cardRepository.Add(card);
+            await cardRepository.AddAsync(card);
 
             // Act
-            Card fetchedCard = cardRepository.GetById(card.Id);
+            Card fetchedCard = await cardRepository.GetByIdAsync(card.Id);
 
             // Assert
             Assert.IsNotNull(fetchedCard);
@@ -75,20 +71,19 @@ namespace CardRepositoryTest
         }
 
         [TestMethod]
-        public void TestDeleteCard()
+        public async Task TestDeleteCard()
         {
             // Arrange
             ICardRepository cardRepository = new CardRepository(ConnectionString);
             Card card = new MonsterCard($"TestMonsterCard_{Guid.NewGuid()}", GlobalEnums.MonsterType.Goblin, 50, GlobalEnums.ElementType.Normal);
-            cardRepository.Add(card); // Create the card first
+            await cardRepository.AddAsync(card); // Create the card first
 
             // Act
-            Card cardToDelete = cardRepository.GetByName(card.Name);
-            cardRepository.Delete(cardToDelete.Id);
+            Card cardToDelete = await cardRepository.GetByNameAsync(card.Name);
+            await cardRepository.DeleteAsync(cardToDelete.Id);
 
             // Assert
-            Assert.ThrowsException<InvalidOperationException>(() => cardRepository.GetById(cardToDelete.Id));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await cardRepository.GetByIdAsync(cardToDelete.Id));
         }
-
     }
 }

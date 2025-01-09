@@ -13,7 +13,6 @@ public class PackageService : IPackageService
 
     public PackageService(StackRepository stackRepository, CardRepository cardRepository, CoinPurseRepository coinPurseRepository, Func<List<Card>, int, List<Card>> cardSelectionStrategy)
     {
-
         _stackRepository = stackRepository;
         _cardRepository = cardRepository;
         _coinPurseRepository = coinPurseRepository;
@@ -28,17 +27,18 @@ public class PackageService : IPackageService
         _coinPurseRepository = new CoinPurseRepository(_connectionString);
     }
 
+    // TODO: Created package should be saved in DB, info sent back to user, new command to choose cards, should not happen on server-side
     /// <summary>
-    /// 
+    /// Allows a user to purchase a package
     /// </summary>
     /// <param name="userId"></param>
     /// <param name="packageType"></param>
     /// <exception cref="InvalidOperationException"></exception>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public void PurchasePackage(int userId, GlobalEnums.PackageType packageType)
+    public async Task PurchasePackageAsync(int userId, GlobalEnums.PackageType packageType)
     {
         // Get corresponding CoinPurse
-        CoinPurse coinPurse = _coinPurseRepository.GetByUserId(userId);
+        CoinPurse coinPurse = await _coinPurseRepository.GetByUserIdAsync(userId);
 
         // Get the price of the package
         int packagePrice = (int)packageType;
@@ -63,7 +63,7 @@ public class PackageService : IPackageService
         int possibleDecisions = packageType == GlobalEnums.PackageType.Legendary ? 6 : 4;
 
         // Get random cards from the database
-        List<Card> randomCards = _cardRepository.GetRandomCards(amountOfCards);
+        List<Card> randomCards = await _cardRepository.GetRandomCardsAsync(amountOfCards);
 
         // Let the user choose the cards
         List<Card> userCardSelection = GetUserCardSelection(randomCards, possibleDecisions);
@@ -74,10 +74,10 @@ public class PackageService : IPackageService
         */
 
         // Add the cards to the users stack
-        _stackRepository.AddCardsToUser(userId, userCardSelection);
+        await _stackRepository.AddCardsToUserAsync(userId, userCardSelection);
 
         // Update the user's coin purse in the repository
-        _coinPurseRepository.UpdateCoinPurse(coinPurse);
+        await _coinPurseRepository.UpdateCoinPurseAsync(coinPurse);
 
         Console.WriteLine("Package purchased successfully!");
         Console.WriteLine("Cards added to your personal cards!");
@@ -120,16 +120,29 @@ public class PackageService : IPackageService
         for (int i = 0; i < cardsToChoose; i++)
         {
             int choice;
+            bool validInput;
             do
             {
                 Console.WriteLine($"Choose card {i + 1}:");
-                choice = int.Parse(Console.ReadLine()) - 1;
+                string input = Console.ReadLine();
+                validInput = int.TryParse(input, out choice);
+                choice -= 1; // Adjust for zero-based index
 
-                if (chosenIndices.Contains(choice))
+                if (!validInput)
+                {
+                    Console.WriteLine("Invalid input. Please enter a number.");
+                }
+                else if (choice < 0 || choice >= randomCards.Count)
+                {
+                    Console.WriteLine("Invalid choice. Please select a valid card.");
+                    validInput = false;
+                }
+                else if (chosenIndices.Contains(choice))
                 {
                     Console.WriteLine("You have already chosen this card. Please select a different card.");
+                    validInput = false;
                 }
-            } while (chosenIndices.Contains(choice) || choice < 0 || choice >= randomCards.Count);
+            } while (!validInput);
 
             chosenIndices.Add(choice);
             selectedCards.Add(randomCards[choice]);
@@ -137,6 +150,7 @@ public class PackageService : IPackageService
 
         return selectedCards;
     }
+
 
 
     // Used for testing purposes

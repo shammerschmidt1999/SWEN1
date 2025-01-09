@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using SWEN1_MCTG.Interfaces;
 using SWEN1_MCTG.Classes.Exceptions;
@@ -34,15 +33,15 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
         /// </summary>
         /// <param name="e"> Console arguments </param>
         /// <returns> bool if request was successful or not </returns>
-        public override bool Handle(HttpSvrEventArgs e)
+        public override Task<bool> HandleAsync(HttpSvrEventArgs e)
         {
             if ((e.Path.TrimEnd('/', ' ', '\t') == "/users") && (e.Method == "POST"))
             {
-                return _CreateUser(e);
+                return _CreateUserAsync(e);
             }
             else if (e.Path.StartsWith("/users/") && (e.Method == "GET"))
             {
-                return _QueryUser(e);
+                return _QueryUserAsync(e);
             }
             else if (e.Path.StartsWith("/users/") && (e.Method == "PUT"))
             {
@@ -51,11 +50,11 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                 if (match.Success)
                 {
                     string username = match.Groups["username"].Value;
-                    return _UpdateUser(e, username);
+                    return _UpdateUserAsync(e, username);
                 }
             }
 
-            return false;
+            return Task.FromResult(false);
         }
 
         /// <summary>
@@ -63,7 +62,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
         /// </summary>
         /// <param name="e"> Server Event Arguments </param>
         /// <returns> True on successful user creation, false on unsuccessful user creation </returns>
-        private bool _CreateUser(HttpSvrEventArgs e)
+        private async Task<bool> _CreateUserAsync(HttpSvrEventArgs e)
         {
             JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
             int status = HttpStatusCode.BAD_REQUEST;
@@ -77,7 +76,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                     string password = (string)json["Password"]!;
 
                     // Check if the user already exists
-                    if (_userRepository.Exists(username))
+                    if (await _userRepository.ExistsAsync(username))
                     {
                         status = HttpStatusCode.BAD_REQUEST;
                         reply = new JsonObject()
@@ -90,14 +89,14 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                     {
                         // Create the new user
                         User newUser = new User(username, password);
-                        _userRepository.Add(newUser);
-                        User addedUser = _userRepository.GetByUsername(username);
+                        await _userRepository.AddAsync(newUser);
+                        User addedUser = await _userRepository.GetByUsernameAsync(username);
 
                         CoinPurse coinPurse = new CoinPurse();
                         Coin startingCoin = new Coin(GlobalEnums.CoinType.Diamond);
                         coinPurse.AddCoin(startingCoin);
                         coinPurse.UserId = addedUser.Id;
-                        _coinPurseRepository.AddCoinPurse(coinPurse);
+                        await _coinPurseRepository.AddCoinPurseAsync(coinPurse);
 
                         status = HttpStatusCode.OK;
                         reply = new JsonObject()
@@ -126,20 +125,20 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
         /// </summary>
         /// <param name="e"> Server Event Arguments </param>
         /// <returns> True on successful query, false on unsuccessful query </returns>
-        private bool _QueryUser(HttpSvrEventArgs e)
+        private async Task<bool> _QueryUserAsync(HttpSvrEventArgs e)
         {
             JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
             int status = HttpStatusCode.BAD_REQUEST;
 
             try
             {
-                (bool Success, User? User) ses = Token.Authenticate(e);
+                (bool Success, User? User) ses = await Token.AuthenticateBearerAsync(e);
 
                 if (ses.Success)
                 {
-                    User? user = _userRepository.GetByUsername(e.Path[7..]);
-                    Stack userStack = _stackRepository.GetByUserId(ses.User!.Id);
-                    CoinPurse userCoinPurse = _coinPurseRepository.GetByUserId(ses.User!.Id);
+                    User? user = await _userRepository.GetByUsernameAsync(e.Path[7..]);
+                    Stack userStack = await _stackRepository.GetByUserIdAsync(ses.User!.Id);
+                    CoinPurse userCoinPurse = await _coinPurseRepository.GetByUserIdAsync(ses.User!.Id);
 
                     if (user == null)
                     {
@@ -178,18 +177,18 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
             return true;
         }
 
-        private bool _UpdateUser(HttpSvrEventArgs e, string username)
+        private async Task<bool> _UpdateUserAsync(HttpSvrEventArgs e, string username)
         {
             JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
             int status = HttpStatusCode.BAD_REQUEST;
 
             try
             {
-                (bool Success, User? User) ses = Token.Authenticate(e);
+                (bool Success, User? User) ses = await Token.AuthenticateBearerAsync(e);
 
                 if (ses.Success)
                 {
-                    User? user = _userRepository.GetByUsername(username);
+                    User? user = await _userRepository.GetByUsernameAsync(username);
 
                     if (user == null)
                     {
@@ -215,7 +214,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                             }
                             if (newCoins != null)
                             {
-                                CoinPurse userCoinPurse = _coinPurseRepository.GetByUserId(user.Id);
+                                CoinPurse userCoinPurse = await _coinPurseRepository.GetByUserIdAsync(user.Id);
                                 userCoinPurse.Coins.Clear();
 
                                 foreach (var coinType in newCoins)
@@ -229,10 +228,10 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                                         }
                                     }
                                 }
-                                _coinPurseRepository.UpdateCoinPurse(userCoinPurse);
+                                await _coinPurseRepository.UpdateCoinPurseAsync(userCoinPurse);
                             }
 
-                            _userRepository.Update(user);
+                            await _userRepository.UpdateAsync(user);
 
                             status = HttpStatusCode.OK;
                             reply = new JsonObject() { ["success"] = true, ["message"] = "User updated successfully." };

@@ -1,6 +1,9 @@
 ﻿using Npgsql;
 using SWEN1_MCTG.Classes;
 using SWEN1_MCTG.Data.Repositories.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SWEN1_MCTG.Data.Repositories.Classes
 {
@@ -17,15 +20,15 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             _cardRepository = new CardRepository(connectionString);
             _nToMUserQueryString = $@"
                 SELECT uc.user_id, uc.card_id, uc.in_deck, uc.card_type
-                FROM {_tableName} uc
+                FROM {TableName} uc
                 WHERE uc.user_id = @UserId";
 
             _nToMCardQueryString = $@"
                 SELECT uc.user_id, uc.card_id, uc.in_deck, uc.card_type
-                FROM {_tableName} uc
+                FROM {TableName} uc
                 WHERE uc.card_id = @CardId";
 
-            _nToMInsertQueryString = $"INSERT INTO {_tableName} (user_id, card_id, in_deck, card_type, instance_id) " +
+            _nToMInsertQueryString = $"INSERT INTO {TableName} (user_id, card_id, in_deck, card_type, instance_id) " +
                                      $"VALUES (@UserId, @CardId, @InDeck, @CardType, @InstanceId)";
         }
 
@@ -68,47 +71,36 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
 
             do
             {
-                Card card = CreateCard(reader);
+                Card card = Task.Run(() => CreateCardAsync(reader)).Result;
                 stack.Cards.Add(card);
             } while (reader.Read());
 
             return stack;
         }
 
-        /// <summary>
-        /// Creates a card from a database entry
-        /// </summary>
-        /// <param name="reader"> The NpgsqlDataReader </param>
-        /// <returns> Card entity created from the DB </returns>
-        public Card CreateCard(NpgsqlDataReader reader)
+        public async Task<Card> CreateCardAsync(NpgsqlDataReader reader)
         {
             int cardId = reader.GetInt32(reader.GetOrdinal("card_id"));
             bool inDeck = reader.GetBoolean(reader.GetOrdinal("in_deck"));
             string cardType = reader.GetString(reader.GetOrdinal("card_type"));
 
             // Fetch card details using CardRepository
-            Card card = _cardRepository.GetById(cardId);
+            Card card = await _cardRepository.GetByIdAsync(cardId);
             card.SetInDeck(inDeck);
 
             return card;
         }
 
-        /// <summary>
-        /// Gets a users Cards by the users Id
-        /// </summary>
-        /// <param name="userId"> The users Id </param>
-        /// <returns> A stack that holds the cards of the user </returns>
-        /// <exception cref="InvalidOperationException"> If the user is not found in the DB </exception>
-        public Stack GetByUserId(int userId)
+        public async Task<Stack> GetByUserIdAsync(int userId)
         {
-            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
+            await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+            await connection.OpenAsync();
 
-            NpgsqlCommand command = new NpgsqlCommand(_nToMUserQueryString, connection);
+            await using NpgsqlCommand command = new NpgsqlCommand(_nToMUserQueryString, connection);
             command.Parameters.AddWithValue("@UserId", userId);
 
-            NpgsqlDataReader reader = command.ExecuteReader();
-            if (reader.Read())
+            await using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
             {
                 return MapReaderToEntity(reader);
             }
@@ -116,22 +108,16 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             throw new InvalidOperationException($"Stack for user with Id {userId} not found.");
         }
 
-        /// <summary>
-        /// Gets 
-        /// </summary>
-        /// <param name="cardId"> Gets a stack that has this card </param>
-        /// <returns> A stack entity </returns>
-        /// <exception cref="InvalidOperationException"> If there is no card with cardId found in the DB </exception>
-        public Stack GetByCardId(int cardId)
+        public async Task<Stack> GetByCardIdAsync(int cardId)
         {
-            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
+            await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+            await connection.OpenAsync();
 
-            NpgsqlCommand command = new NpgsqlCommand(_nToMCardQueryString, connection);
+            await using NpgsqlCommand command = new NpgsqlCommand(_nToMCardQueryString, connection);
             command.Parameters.AddWithValue("@CardId", cardId);
 
-            NpgsqlDataReader reader = command.ExecuteReader();
-            if (reader.Read())
+            await using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
             {
                 return MapReaderToEntity(reader);
             }
@@ -139,33 +125,26 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             throw new InvalidOperationException($"Stack for card with Id {cardId} not found.");
         }
 
-        /// <summary>
-        /// Sets the inDeck bool of a card belonging to a user
-        /// </summary>
-        /// <param name="inDeck"> True (is in Deck); false (is not in Deck) </param>
-        /// <param name="cardId"> The cards Id </param>
-        /// <param name="userId"> The users Id </param>
-        /// <exception cref="InvalidOperationException"> If the relationship between the card and the user is not found </exception>
-        public void SetCardInDeck(bool inDeck, int cardId, int userId)
+        public async Task SetCardInDeckAsync(bool inDeck, int cardId, int userId)
         {
-            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
+            await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+            await connection.OpenAsync();
 
             // Fetch the specific card instance from the database
             string selectQuery = $@"
             SELECT instance_id
-            FROM {_tableName}
+            FROM {TableName}
             WHERE card_id = @CardId AND user_id = @UserId
             LIMIT 1";
 
-            NpgsqlCommand selectCommand = new NpgsqlCommand(selectQuery, connection);
+            await using NpgsqlCommand selectCommand = new NpgsqlCommand(selectQuery, connection);
             selectCommand.Parameters.AddWithValue("@CardId", cardId);
             selectCommand.Parameters.AddWithValue("@UserId", userId);
 
             Guid instanceId;
-            using (NpgsqlDataReader reader = selectCommand.ExecuteReader())
+            await using (NpgsqlDataReader reader = await selectCommand.ExecuteReaderAsync())
             {
-                if (reader.Read())
+                if (await reader.ReadAsync())
                 {
                     instanceId = reader.GetGuid(reader.GetOrdinal("instance_id"));
                 }
@@ -177,61 +156,54 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
 
             // Update the in_deck status for the specific card instance
             string updateQuery = $@"
-            UPDATE {_tableName}
+            UPDATE {TableName}
             SET in_deck = @InDeck
             WHERE card_id = @CardId AND user_id = @UserId AND instance_id = @InstanceId";
 
-            NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
+            await using NpgsqlCommand updateCommand = new NpgsqlCommand(updateQuery, connection);
             updateCommand.Parameters.AddWithValue("@InDeck", inDeck);
             updateCommand.Parameters.AddWithValue("@CardId", cardId);
             updateCommand.Parameters.AddWithValue("@UserId", userId);
             updateCommand.Parameters.AddWithValue("@InstanceId", instanceId);
 
-            int rowsAffected = updateCommand.ExecuteNonQuery();
+            int rowsAffected = await updateCommand.ExecuteNonQueryAsync();
             if (rowsAffected == 0)
             {
                 throw new InvalidOperationException($"Card instance with Id {cardId} and InstanceId {instanceId} not found for user with Id {userId}");
             }
         }
 
-        /// <summary>
-        /// Adds a list of cards to a user
-        /// </summary>
-        /// <param name="userId"> The id of the user that gets the cards </param>
-        /// <param name="cards"> The List of cards the user adds to his cards </param>
-        public void AddCardsToUser(int userId, List<Card> cards)
+        public async Task AddCardsToUserAsync(int userId, List<Card> cards)
         {
-            using (NpgsqlConnection connection = new NpgsqlConnection(_connectionString))
+            await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
+            await using (NpgsqlTransaction transaction = await connection.BeginTransactionAsync())
             {
-                connection.Open();
-
-                using (NpgsqlTransaction transaction = connection.BeginTransaction())
+                try
                 {
-                    try
+                    foreach (Card card in cards)
                     {
-                        foreach (Card card in cards)
+                        await using (NpgsqlCommand command = new NpgsqlCommand(_nToMInsertQueryString, connection))
                         {
-                            using (NpgsqlCommand command = new NpgsqlCommand(_nToMInsertQueryString, connection))
-                            {
-                                command.Parameters.AddWithValue("@UserId", userId);
-                                command.Parameters.AddWithValue("@CardId", card.Id);
-                                command.Parameters.AddWithValue("@InDeck", card.InDeck);
+                            command.Parameters.AddWithValue("@UserId", userId);
+                            command.Parameters.AddWithValue("@CardId", card.Id);
+                            command.Parameters.AddWithValue("@InDeck", card.InDeck);
 
-                                string cardType = card is MonsterCard ? "MonsterCard" : "SpellCard";
-                                command.Parameters.AddWithValue("@CardType", NpgsqlTypes.NpgsqlDbType.Unknown, cardType);
-                                command.Parameters.AddWithValue("@InstanceId", Guid.NewGuid());
+                            string cardType = card is MonsterCard ? "MonsterCard" : "SpellCard";
+                            command.Parameters.AddWithValue("@CardType", NpgsqlTypes.NpgsqlDbType.Unknown, cardType);
+                            command.Parameters.AddWithValue("@InstanceId", Guid.NewGuid());
 
-                                command.ExecuteNonQuery();
-                            }
+                            await command.ExecuteNonQueryAsync();
                         }
+                    }
 
-                        transaction.Commit();
-                    }
-                    catch (Exception)
-                    {
-                        transaction.Rollback();
-                        throw;
-                    }
+                    await transaction.CommitAsync();
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    throw;
                 }
             }
         }

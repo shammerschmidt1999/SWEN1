@@ -25,15 +25,15 @@ public class DeckHandler : Handler, IHandler
     /// </summary>
     /// <param name="e"> Console arguments </param>
     /// <returns> bool if request was successful or not </returns>
-    public override bool Handle(HttpSvrEventArgs e)
+    public override async Task<bool> HandleAsync(HttpSvrEventArgs e)
     {
         if ((e.Path.TrimEnd('/', ' ', '\t') == "/deck") && (e.Method == "GET"))
         {
-            return _DisplayDeck(e);
+            return await _DisplayDeckAsync(e);
         }
         else if ((e.Path.TrimEnd('/', ' ', '\t') == "/deck") && (e.Method == "PUT"))
         {
-            return _EditDeck(e);
+            return await _EditDeckAsync(e);
         }
         return false;
     }
@@ -43,22 +43,22 @@ public class DeckHandler : Handler, IHandler
     /// </summary>
     /// <param name="e"> HttpSvrEventArgs </param>
     /// <returns>TRUE if operation was successful; FALSE if not </returns>
-    public bool _DisplayDeck(HttpSvrEventArgs e)
+    private async Task<bool> _DisplayDeckAsync(HttpSvrEventArgs e)
     {
         JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
         int status = HttpStatusCode.BAD_REQUEST;
 
         try
         {
-            (bool Success, User? User) ses = Token.Authenticate(e);
+            (bool Success, User? User) ses = await Token.AuthenticateBearerAsync(e);
 
             if (ses.Success)
             {
-                User user = _userRepository.GetByUsername(ses.User!.Username);
-                Stack userCards = _stackRepository.GetByUserId(ses.User!.Id);
+                User user = await _userRepository.GetByUsernameAsync(ses.User!.Username);
+                Stack userCards = await _stackRepository.GetByUserIdAsync(ses.User!.Id);
 
                 // Format the message as a JSON array
-                JsonArray cardsArray = _generateDeckArray(userCards);
+                JsonArray cardsArray = await _generateDeckArrayAsync(userCards);
 
                 if (cardsArray.Count == 0)
                 {
@@ -99,7 +99,7 @@ public class DeckHandler : Handler, IHandler
     /// </summary>
     /// <param name="userCards"> The cards of the user </param>
     /// <returns> JSON Array with information of each card </returns>
-    private JsonArray _generateDeckArray(Stack userCards)
+    private async Task<JsonArray> _generateDeckArrayAsync(Stack userCards)
     {
         JsonArray cardsArray = new JsonArray();
 
@@ -134,19 +134,19 @@ public class DeckHandler : Handler, IHandler
     /// </summary>
     /// <param name="e"> HttpSvrEventArgs </param>
     /// <returns> TRUE if operation was successful; FALSE if not </returns>
-    public bool _EditDeck(HttpSvrEventArgs e)
+    private async Task<bool> _EditDeckAsync(HttpSvrEventArgs e)
     {
         JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
         int status = HttpStatusCode.BAD_REQUEST;
 
         try
         {
-            (bool Success, User? User) ses = Token.Authenticate(e);
+            (bool Success, User? User) ses = await Token.AuthenticateBearerAsync(e);
 
             if (ses.Success)
             {
-                User user = _userRepository.GetByUsername(ses.User!.Username);
-                Stack userCards = _stackRepository.GetByUserId(ses.User!.Id);
+                User user = await _userRepository.GetByUsernameAsync(ses.User!.Username);
+                Stack userCards = await _stackRepository.GetByUserIdAsync(ses.User!.Id);
 
                 // Parse the JSON payload
                 JsonArray cardNames = JsonNode.Parse(e.Payload)?.AsArray() ?? new JsonArray();
@@ -174,7 +174,7 @@ public class DeckHandler : Handler, IHandler
                             }
                             card.SetInDeck(true);
                         }
-                        _stackRepository.SetCardInDeck(card.InDeck, card.Id, user.Id);
+                        await _stackRepository.SetCardInDeckAsync(card.InDeck, card.Id, user.Id);
                     }
                 }
 

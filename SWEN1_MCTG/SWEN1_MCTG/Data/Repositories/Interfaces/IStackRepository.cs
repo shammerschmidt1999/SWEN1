@@ -5,9 +5,9 @@ namespace SWEN1_MCTG.Data.Repositories.Interfaces;
 
 public interface IStackRepository : IRepository<Stack>
 {
-    Card CreateCard(NpgsqlDataReader reader);
-    Stack GetByUserId(int id);
-    Stack GetByCardId(int id);
-    void SetCardInDeck(bool inDeck, int cardId, int userId);
-    void AddCardsToUser(int userId, List<Card> cards);
+    Task<Card> CreateCardAsync(NpgsqlDataReader reader);
+    Task<Stack> GetByUserIdAsync(int id);
+    Task<Stack> GetByCardIdAsync(int id);
+    Task SetCardInDeckAsync(bool inDeck, int cardId, int userId);
+    Task AddCardsToUserAsync(int userId, List<Card> cards);
 }

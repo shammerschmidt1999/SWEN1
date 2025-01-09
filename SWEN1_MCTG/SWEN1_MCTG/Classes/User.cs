@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using SWEN1_MCTG.Interfaces;
 using SWEN1_MCTG.Classes.Exceptions;
 using Npgsql;
+using SWEN1_MCTG.Data.Repositories.Classes;
 
 namespace SWEN1_MCTG.Classes
 {
@@ -103,27 +104,6 @@ namespace SWEN1_MCTG.Classes
             set => _draws = value;
         }
 
-        /// <summary>
-        /// Changes user data if the token is valid
-        /// </summary>
-        /// <param name="token"> Token string </param>
-        /// <exception cref="UserException"> Exception on wrong token </exception>
-        public void Save(string token)
-        {
-            (bool Success, User? User) auth = Token.Authenticate(token);
-            if (auth.Success)
-            {
-                if (auth.User!.Username != _username)
-                {
-                    throw new UserException("Trying to change other user's data.");
-                }
-
-            }
-            else
-            {
-                throw new UserException("Authentication failed");
-            }
-        }
 
         /// <summary>
         /// Compares the given username and password with the stored ones, creates Token on success
@@ -131,50 +111,16 @@ namespace SWEN1_MCTG.Classes
         /// <param name="username"> Provided username </param>
         /// <param name="password"> Provided password </param>
         /// <returns> Success status and created token </returns>
-        public static (bool Success, string Token) Logon(string username, string password)
+        public static async Task<(bool Success, string Token)> LogonAsync(string username, string password)
         {
-            User? user = ValidateCredentials(username, password);
+            UserRepository userRepository = new UserRepository(AppSettings.GetConnectionString("TestConnection"));
+            User? user = await userRepository.ValidateCredentialsAsync(username, password);
             if (user != null)
             {
-                string token = Token._CreateTokenFor(user);
+                string token = await Token._CreateTokenForAsync(user);
                 return (true, token);
             }
             return (false, string.Empty);
         }
-
-        // TODO: Move this to UserRepository?
-        /// <summary>
-        /// Validates the given credentials
-        /// </summary>
-        /// <param name="username"> Given username </param>
-        /// <param name="password"> Given password </param>
-        /// <returns> User entity with provided credentials </returns>
-        private static User? ValidateCredentials(string username, string password)
-        {
-            string connectionString = AppSettings.GetConnectionString("TestConnection");
-
-            NpgsqlConnection connection = new NpgsqlConnection(connectionString);
-            connection.Open();
-
-            NpgsqlCommand command = new NpgsqlCommand("SELECT id, username, password FROM users WHERE username = @username AND password = @password", connection);
-            string hashedPassword = PasswordHelper.HashPassword(password);
-
-            command.Parameters.AddWithValue("username", username);
-            command.Parameters.AddWithValue("password", hashedPassword);
-
-            using NpgsqlDataReader reader = command.ExecuteReader();
-            if (reader.Read())
-            {
-                return new User
-                {
-                    Id = reader.GetInt32(0),
-                    Username = reader.GetString(1),
-                    Password = reader.GetString(2)
-                };
-            }
-
-            return null;
-        }
-
     }
 }

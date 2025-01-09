@@ -28,12 +28,13 @@ namespace SWEN1_MCTG.Tests
         }
 
         [TestMethod]
-        public void TestPurchaseBasicPackage_WithSufficientCoins()
+        public async Task TestPurchaseBasicPackage_WithSufficientCoins()
         {
             // Arrange
             int userId = 1; // TestUserID
-            CoinPurse coinPurse = _coinPurseRepository.GetByUserId(userId);
-            int previousCardAmount = _stackRepository.GetByUserId(userId).Cards.Count;
+            CoinPurse coinPurse = await _coinPurseRepository.GetByUserIdAsync(userId);
+            Stack previousStack = await _stackRepository.GetByUserIdAsync(userId);
+            int previousCardAmount = previousStack.Cards.Count;
 
             coinPurse.AddCoins(new List<Coin>
             {
@@ -43,7 +44,7 @@ namespace SWEN1_MCTG.Tests
             });
 
             int previousCoinValue = coinPurse.GetCoinsValue();
-            _coinPurseRepository.UpdateCoinPurse(coinPurse);
+            await _coinPurseRepository.UpdateCoinPurseAsync(coinPurse);
 
             // Mock card selection strategy for testing
             Func<List<Card>, int, List<Card>> cardSelectionStrategy = (cards, toChoose) => cards.Take(toChoose).ToList();
@@ -51,24 +52,25 @@ namespace SWEN1_MCTG.Tests
             _packageService = new PackageService(_stackRepository, _cardRepository, _coinPurseRepository, cardSelectionStrategy);
 
             // Act
-            _packageService.PurchasePackage(userId, GlobalEnums.PackageType.Basic);
+            await _packageService.PurchasePackageAsync(userId, GlobalEnums.PackageType.Basic);
 
             // Assert
-            CoinPurse updatedCoinPurse = _coinPurseRepository.GetByUserId(userId);
-            Stack userStack = _stackRepository.GetByUserId(userId);
+            CoinPurse updatedCoinPurse = await _coinPurseRepository.GetByUserIdAsync(userId);
+            Stack userStack = await _stackRepository.GetByUserIdAsync(userId);
 
             Assert.AreEqual(previousCoinValue - 5, updatedCoinPurse.GetCoinsValue()); // Basic package costs 5 coins
             Assert.AreEqual(previousCardAmount + 1, userStack.Cards.Count); // 1 card added for a Basic package
         }
 
         [TestMethod]
-        public void TestPurchaseLegendaryPackage_WithSufficientCoins()
+        public async Task TestPurchaseLegendaryPackage_WithSufficientCoins()
         {
             // Arrange
             int userId = 1; // TestUserID
-            _coinPurseRepository.RemoveAllCoinsFromPurse(userId); // Clear all coins
-            CoinPurse coinPurse = _coinPurseRepository.GetByUserId(userId);
-            int previousCardAmount = _stackRepository.GetByUserId(userId).Cards.Count;
+            await _coinPurseRepository.GetByUserIdAsync(userId); // Clear all coins
+            CoinPurse coinPurse = await _coinPurseRepository.GetByUserIdAsync(userId);
+            Stack previousStack = await _stackRepository.GetByUserIdAsync(userId);
+            int previousCardAmount = previousStack.Cards.Count;
 
             coinPurse.AddCoins(new List<Coin>
             {
@@ -81,7 +83,7 @@ namespace SWEN1_MCTG.Tests
             coinPurse.ConvertCoins(GlobalEnums.CoinType.Gold, GlobalEnums.CoinType.Platinum); // 2 Gold -> 1 Platinum
             coinPurse.ConvertCoins(GlobalEnums.CoinType.Platinum, GlobalEnums.CoinType.Diamond); // 2 Platinum -> 1 Diamond
 
-            _coinPurseRepository.UpdateCoinPurse(coinPurse);
+            await _coinPurseRepository.UpdateCoinPurseAsync(coinPurse);
 
             // Mock card selection strategy for testing
             Func<List<Card>, int, List<Card>> cardSelectionStrategy = (cards, toChoose) => cards.Take(toChoose).ToList();
@@ -89,9 +91,9 @@ namespace SWEN1_MCTG.Tests
             // Act
             _packageService = new PackageService(_stackRepository, _cardRepository, _coinPurseRepository, cardSelectionStrategy);
 
-            _packageService.PurchasePackage(userId, GlobalEnums.PackageType.Legendary);
-            CoinPurse updatedCoinPurse = _coinPurseRepository.GetByUserId(userId);
-            Stack userStack = _stackRepository.GetByUserId(userId);
+            await _packageService.PurchasePackageAsync(userId, GlobalEnums.PackageType.Legendary);
+            CoinPurse updatedCoinPurse = await _coinPurseRepository.GetByUserIdAsync(userId);
+            Stack userStack = await _stackRepository.GetByUserIdAsync(userId);
 
             // Assert
             Assert.AreEqual(1, updatedCoinPurse.GetCoinsValue()); // All coins used except 1 Bronze
@@ -99,17 +101,17 @@ namespace SWEN1_MCTG.Tests
         }
 
         [TestMethod]
-        public void TestPurchasePackage_InsufficientCoins()
+        public async Task TestPurchasePackage_InsufficientCoins()
         {
             // Arrange
             int userId = 1;
-            _coinPurseRepository.RemoveAllCoinsFromPurse(userId); // Clear all coins
-            CoinPurse coinPurse = _coinPurseRepository.GetByUserId(userId);
+            await _coinPurseRepository.GetByUserIdAsync(userId); // Clear all coins
+            CoinPurse coinPurse = await _coinPurseRepository.GetByUserIdAsync(userId);
             coinPurse.AddCoins(new List<Coin>
             {
                 new Coin(GlobalEnums.CoinType.Bronze) // Only 1 coin, insufficient for any package
             });
-            _coinPurseRepository.UpdateCoinPurse(coinPurse);
+            await _coinPurseRepository.UpdateCoinPurseAsync(coinPurse);
 
             // Mock card selection strategy for testing
             Func<List<Card>, int, List<Card>> cardSelectionStrategy = (cards, toChoose) => cards.Take(toChoose).ToList();
@@ -118,7 +120,7 @@ namespace SWEN1_MCTG.Tests
 
             // Act & Assert
             Assert.ThrowsException<InvalidOperationException>(() =>
-                _packageService.PurchasePackage(userId, GlobalEnums.PackageType.Basic));
+                _packageService.PurchasePackageAsync(userId, GlobalEnums.PackageType.Basic));
         }
     }
 }

@@ -2,6 +2,7 @@
 using Npgsql;
 using SWEN1_MCTG.Classes;
 using SWEN1_MCTG.Data.Repositories.Interfaces;
+using System.Threading.Tasks;
 
 namespace SWEN1_MCTG.Data.Repositories.Classes
 {
@@ -12,16 +13,16 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
         public UserRepository(string connectionString)
             : base(connectionString, "users")
         {
-            _getByUsernameQuery = $"SELECT * FROM {_tableName} WHERE Username = @Username";
+            _getByUsernameQuery = $"SELECT * FROM {TableName} WHERE Username = @Username";
         }
 
         protected override User CreateEntity() { return new User(); }
 
-        public new void Add(User entity)
+        public new async Task AddAsync(User entity)
         {
             // Hash the password before adding the user
             entity.Password = PasswordHelper.HashPassword(entity.Password);
-            base.Add(entity);
+            await base.AddAsync(entity);
         }
 
         protected override User MapReaderToEntity(NpgsqlDataReader reader)
@@ -76,7 +77,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
                 throw new InvalidOperationException("No valid properties found to insert.");
             }
 
-            return $"INSERT INTO {_tableName} ({string.Join(", ", columns)}) VALUES ({string.Join(", ", values)}) RETURNING Id";
+            return $"INSERT INTO {TableName} ({string.Join(", ", columns)}) VALUES ({string.Join(", ", values)}) RETURNING Id";
         }
 
         /// <summary>
@@ -85,16 +86,16 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
         /// <param name="username"> Provided username </param>
         /// <returns> Corresponding user entity </returns>
         /// <exception cref="InvalidOperationException"> If user is not found in db </exception>
-        public User GetByUsername(string username)
+        public async Task<User> GetByUsernameAsync(string username)
         {
-            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
+            await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+            await connection.OpenAsync();
 
-            NpgsqlCommand command = new NpgsqlCommand(_getByUsernameQuery, connection);
+            await using NpgsqlCommand command = new NpgsqlCommand(_getByUsernameQuery, connection);
             command.Parameters.AddWithValue("@Username", username);
 
-            NpgsqlDataReader reader = command.ExecuteReader();
-            if (reader.Read())
+            await using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
             {
                 return MapReaderToEntity(reader);
             }
@@ -107,36 +108,69 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
         /// </summary>
         /// <param name="username"> Provided username </param>
         /// <returns> True if user exits in db; Else false </returns>
-        public bool Exists(string username)
+        public async Task<bool> ExistsAsync(string username)
         {
-            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
+            await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+            await connection.OpenAsync();
 
-            NpgsqlCommand command = new NpgsqlCommand(_getByUsernameQuery, connection);
+            await using NpgsqlCommand command = new NpgsqlCommand(_getByUsernameQuery, connection);
             command.Parameters.AddWithValue("@Username", username);
 
-            NpgsqlDataReader reader = command.ExecuteReader();
-            return reader.Read();
+            await using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
+            return await reader.ReadAsync();
         }
 
         /// <summary>
         /// Updates a user in the db
         /// </summary>
         /// <param name="entity"> The user entity and the data that should be stored in the DB </param>
-        public void Update(User entity)
+        public async Task UpdateAsync(User entity)
         {
-            NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
+            await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+            await connection.OpenAsync();
 
-            string updateQuery = $"UPDATE {_tableName} SET Username = @Username, Password = @Password, Elo = @Elo WHERE Id = @Id";
+            string updateQuery = $"UPDATE {TableName} SET Username = @Username, Password = @Password, Elo = @Elo WHERE Id = @Id";
 
-            NpgsqlCommand command = new NpgsqlCommand(updateQuery, connection);
+            await using NpgsqlCommand command = new NpgsqlCommand(updateQuery, connection);
             command.Parameters.AddWithValue("@Username", entity.Username);
             command.Parameters.AddWithValue("@Password", entity.Password);
             command.Parameters.AddWithValue("@Elo", entity.Elo);
             command.Parameters.AddWithValue("@Id", entity.Id);
 
-            command.ExecuteNonQuery();
+            await command.ExecuteNonQueryAsync();
+        }
+
+        /// <summary>
+        /// Validates the given credentials
+        /// </summary>
+        /// <param name="username"> Given username </param>
+        /// <param name="password"> Given password </param>
+        /// <returns> User entity with provided credentials </returns>
+        public async Task<User?> ValidateCredentialsAsync(string username, string password)
+        {
+            string connectionString = AppSettings.GetConnectionString("TestConnection");
+
+            NpgsqlConnection connection = new NpgsqlConnection(connectionString);
+            connection.Open();
+
+            NpgsqlCommand command = new NpgsqlCommand("SELECT id, username, password FROM users WHERE username = @username AND password = @password", connection);
+            string hashedPassword = PasswordHelper.HashPassword(password);
+
+            command.Parameters.AddWithValue("username", username);
+            command.Parameters.AddWithValue("password", hashedPassword);
+
+            using NpgsqlDataReader reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                return new User
+                {
+                    Id = reader.GetInt32(0),
+                    Username = reader.GetString(1),
+                    Password = reader.GetString(2)
+                };
+            }
+
+            return null;
         }
     }
 }

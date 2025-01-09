@@ -4,5 +4,5 @@ namespace SWEN1_MCTG.Data;
 
 public interface IPackageService
 {
-    void PurchasePackage(int userId, GlobalEnums.PackageType packageType);
+    Task PurchasePackageAsync(int userId, GlobalEnums.PackageType packageType);
 }

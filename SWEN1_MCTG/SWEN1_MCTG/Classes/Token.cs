@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using SWEN1_MCTG.Classes.HttpSvr;
+using SWEN1_MCTG.Data.Repositories.Interfaces;
 
 namespace SWEN1_MCTG.Classes
 {
     public static class Token
     {
         private const string _ALPHABET = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        private static ITokenRepository _tokenRepository;
+        private static ITokenRepository? _tokenRepository;
 
         public static void Initialize(ITokenRepository tokenRepository)
         {
@@ -19,7 +22,7 @@ namespace SWEN1_MCTG.Classes
         /// </summary>
         /// <param name="user"> User entity </param>
         /// <returns> Token string </returns>
-        internal static string _CreateTokenFor(User user)
+        internal static async Task<string> _CreateTokenForAsync(User user)
         {
             string rval = string.Empty;
             Random rnd = new();
@@ -29,7 +32,10 @@ namespace SWEN1_MCTG.Classes
                 rval += _ALPHABET[rnd.Next(0, 62)];
             }
 
-            _tokenRepository.CreateToken(rval, user.Id);
+            if (_tokenRepository != null)
+            {
+                await _tokenRepository.CreateTokenAsync(rval, user.Id);
+            }
 
             return rval;
         }
@@ -39,9 +45,13 @@ namespace SWEN1_MCTG.Classes
         /// </summary>
         /// <param name="token"> Token string </param>
         /// <returns> TRUE and the user entity if successful; FALSE and null if not </returns>
-        public static (bool Success, User? User) Authenticate(string token)
+        public static async Task<(bool Success, User? User)> AuthenticateTokenAsync(string token)
         {
-            return _tokenRepository.Authenticate(token);
+            if (_tokenRepository != null)
+            {
+                return await _tokenRepository.AuthenticateAsync(token);
+            }
+            return (false, null);
         }
 
         /// <summary>
@@ -49,15 +59,15 @@ namespace SWEN1_MCTG.Classes
         /// </summary>
         /// <param name="e"> HTTP Server Args </param>
         /// <returns> TRUE and a User entity if successfully authenticated; FALSE and null else</returns>
-        public static (bool Success, User? User) Authenticate(HttpSvrEventArgs e)
+        public static async Task<(bool Success, User? User)> AuthenticateBearerAsync(HttpSvrEventArgs e)
         {
             foreach (HttpHeader i in e.Headers)
             {
                 if (i.Name == "Authorization")
                 {
-                    if (i.Value[..7] == "Bearer ")
+                    if (i.Value.StartsWith("Bearer "))
                     {
-                        return Authenticate(i.Value[7..].Trim());
+                        return await AuthenticateTokenAsync(i.Value[7..].Trim());
                     }
                     break;
                 }

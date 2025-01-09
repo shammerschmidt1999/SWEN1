@@ -20,7 +20,7 @@ namespace CoinPurseRepositoryTest
         }
 
         [TestMethod]
-        public void TestAddCoinsToPurse()
+        public async Task TestAddCoinsToPurse()
         {
             // Arrange
             int userId = 1;
@@ -32,8 +32,8 @@ namespace CoinPurseRepositoryTest
             };
 
             // Act
-            _coinPurseRepository.AddCoinsToPurse(userId, newCoins);
-            CoinPurse coinPurse = _coinPurseRepository.GetByUserId(userId);
+            await _coinPurseRepository.AddCoinsToPurseAsync(userId, newCoins);
+            CoinPurse coinPurse = await _coinPurseRepository.GetByUserIdAsync(userId);
 
             // Assert
             Assert.IsNotNull(coinPurse);
@@ -43,7 +43,7 @@ namespace CoinPurseRepositoryTest
         }
 
         [TestMethod]
-        public void TestGetCoinPurseByUserId()
+        public async Task TestGetCoinPurseByUserId()
         {
             // Arrange
             int userId = 5; // Example user ID
@@ -52,10 +52,10 @@ namespace CoinPurseRepositoryTest
                 new Coin(CoinType.Bronze),
                 new Coin(CoinType.Gold)
             };
-            _coinPurseRepository.AddCoinsToPurse(userId, initialCoins);
+            await _coinPurseRepository.AddCoinsToPurseAsync(userId, initialCoins);
 
             // Act
-            CoinPurse coinPurse = _coinPurseRepository.GetByUserId(userId);
+            CoinPurse coinPurse = await _coinPurseRepository.GetByUserIdAsync(userId);
 
             // Assert
             Assert.IsNotNull(coinPurse);
@@ -64,20 +64,20 @@ namespace CoinPurseRepositoryTest
         }
 
         [TestMethod]
-        public void TestGetCoinPurseByUserId_NotFound()
+        public async Task TestGetCoinPurseByUserId_NotFound()
         {
             // Arrange
             int userId = 999; // Non-existent user ID
 
             // Act
-            CoinPurse coinPurse = _coinPurseRepository.GetByUserId(userId);
+            CoinPurse coinPurse = await _coinPurseRepository.GetByUserIdAsync(userId);
 
             // Assert
             Assert.IsNull(coinPurse); // CoinPurse should be null for non-existent user
         }
 
         [TestMethod]
-        public void TestUpdateCoinPurse()
+        public async Task TestUpdateCoinPurse()
         {
             // Arrange
             int userId = 6;
@@ -86,7 +86,7 @@ namespace CoinPurseRepositoryTest
                 new Coin(CoinType.Diamond),
                 new Coin(CoinType.Platinum)
             };
-            _coinPurseRepository.AddCoinsToPurse(userId, initialCoins);
+            await _coinPurseRepository.AddCoinsToPurseAsync(userId, initialCoins);
 
             // Add more coins
             List<Coin> moreCoins = new List<Coin>
@@ -94,10 +94,10 @@ namespace CoinPurseRepositoryTest
                 new Coin(CoinType.Gold),
                 new Coin(CoinType.Gold)
             };
-            _coinPurseRepository.AddCoinsToPurse(userId, moreCoins);
+            await _coinPurseRepository.AddCoinsToPurseAsync(userId, moreCoins);
 
             // Act
-            CoinPurse coinPurse = _coinPurseRepository.GetByUserId(userId);
+            CoinPurse coinPurse = await _coinPurseRepository.GetByUserIdAsync(userId);
 
             // Assert
             Assert.IsNotNull(coinPurse);
@@ -106,7 +106,7 @@ namespace CoinPurseRepositoryTest
         }
 
         [TestMethod]
-        public void TestDeleteCoinPurseByUserId()
+        public async Task TestDeleteCoinPurseByUserId()
         {
             // Arrange
             int userId = 7;
@@ -114,13 +114,13 @@ namespace CoinPurseRepositoryTest
             {
                 new Coin(CoinType.Platinum)
             };
-            _coinPurseRepository.AddCoinsToPurse(userId, initialCoins);
+            await _coinPurseRepository.AddCoinsToPurseAsync(userId, initialCoins);
 
             // Act
-            _coinPurseRepository.DeleteByUserId(userId);
+            await _coinPurseRepository.GetByUserIdAsync(userId);
 
             // Assert
-            CoinPurse coinPurse = _coinPurseRepository.GetByUserId(userId);
+            CoinPurse coinPurse = await _coinPurseRepository.GetByUserIdAsync(userId);
             Assert.IsNull(coinPurse); // The CoinPurse should be deleted
         }
     }
