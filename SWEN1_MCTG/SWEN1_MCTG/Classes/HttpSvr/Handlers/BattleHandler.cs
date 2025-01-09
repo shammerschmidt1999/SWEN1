@@ -10,7 +10,7 @@ using SWEN1_MCTG.Interfaces;
 using static SWEN1_MCTG.GlobalEnums;
 using SWEN1_MCTG.Data.Repositories.Classes;
 using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 public class BattleHandler : Handler, IHandler
 {
@@ -108,20 +108,16 @@ public class BattleHandler : Handler, IHandler
             await _userRepository.UpdateAsync(player2);
 
             // Create response
-            reply = new JsonObject
+            status = HttpStatusCode.OK;
+            reply = new JsonObject()
             {
                 ["success"] = true,
                 ["message"] = "Battle completed.",
                 ["result"] = result.ToString(),
-                ["battleLog"] = JsonConvert.SerializeObject(battle.BattleLog)
+                ["battleLog"] = battle.BattleLog // Directly use the JsonArray here
             };
-            status = HttpStatusCode.OK;
         }
         catch (TimeoutException ex)
-        {
-            reply = new JsonObject { ["success"] = false, ["message"] = ex.Message };
-        }
-        catch (UserException ex)
         {
             reply = new JsonObject { ["success"] = false, ["message"] = ex.Message };
         }
@@ -130,7 +126,10 @@ public class BattleHandler : Handler, IHandler
             reply = new JsonObject { ["success"] = false, ["message"] = "Unexpected error: " + ex.Message };
         }
 
-        e.Reply(status, reply.ToJsonString());
+        var options = new JsonSerializerOptions { WriteIndented = true };
+        string jsonResponse = JsonSerializer.Serialize(reply, options);
+
+        e.Reply(status, jsonResponse);
         return true;
     }
 

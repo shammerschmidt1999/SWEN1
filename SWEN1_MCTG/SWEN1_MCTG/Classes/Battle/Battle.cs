@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using SWEN1_MCTG.Interfaces;
 
@@ -14,9 +15,9 @@ namespace SWEN1_MCTG.Classes.Battle
         {
             _player1 = player1;
             _player2 = player2;
-            _battleLog = new List<string>();
             _roundCount = 0;
             _maxRounds = 100;
+            _battleLog = new JsonArray();
         }
 
         // Fields
@@ -24,7 +25,7 @@ namespace SWEN1_MCTG.Classes.Battle
         private User _player2;
         private int _roundCount;
         private int _maxRounds;
-        private List<string> _battleLog;
+        private JsonArray _battleLog;
 
         // Properties
         public User Player1
@@ -44,7 +45,7 @@ namespace SWEN1_MCTG.Classes.Battle
             set => _roundCount = value;
         }
 
-        public List<string> BattleLog
+        public JsonArray BattleLog
         {
             get => _battleLog;
             set => _battleLog = value;
@@ -69,9 +70,6 @@ namespace SWEN1_MCTG.Classes.Battle
 
         private void BattleRound()
         {
-
-            StartingMessage();
-
             Card card1 = _player1.UserDeck.GetRandomCardFromStack();
             Card card2 = _player2.UserDeck.GetRandomCardFromStack();
             string winnerName = "Draw";
@@ -85,18 +83,43 @@ namespace SWEN1_MCTG.Classes.Battle
             {
                 _player1.UserDeck.AddCardToStack(card2);
                 _player2.UserDeck.Cards.Remove(card2);
+                winnerName = _player1.Username;
             }
             else if (result == GlobalEnums.RoundResults.Defeat)
             {
                 _player2.UserDeck.AddCardToStack(card1);
                 _player1.UserDeck.Cards.Remove(card1);
+                winnerName = _player2.Username;
             }
 
-            // Add formatted log
-            _battleLog.Add($"--- Round {_roundCount} ---");
-            _battleLog.Add($"{_player1.Username} ({card1.Name}) [{damage1}] vs {_player2.Username} ({card2.Name}) [{damage2}]");
-            _battleLog.Add($"Round Winner: {winnerName}");
-            _battleLog.Add("");
+            LogBattleRound(_roundCount, _player1, _player2, card1, card2, damage1, damage2, winnerName);
+        }
+
+        private void LogBattleRound(int roundNumber, User player1, User player2, Card card1, Card card2, double damage1, double damage2, string winnerName)
+        {
+            JsonObject battleLogEntry = new JsonObject()
+            {
+                ["RoundNumber"] = roundNumber,
+                ["Player1"] = player1.Username,
+                ["Player2"] = player2.Username,
+                ["Player1Card"] = new JsonObject()
+                {
+                    ["Name"] = card1.Name,
+                    ["ElementType"] = card1.ElementType.ToString(),
+                    ["Damage"] = card1.Damage,
+                    ["Damage after Rules"] = damage1
+                },
+                ["Player2Card"] = new JsonObject()
+                {
+                    ["Name"] = card2.Name,
+                    ["ElementType"] = card2.ElementType.ToString(),
+                    ["Damage"] = card2.Damage,
+                    ["Damage after Rules"] = damage2
+                },
+                ["RoundWinner"] = winnerName
+            };
+
+            _battleLog.Add(battleLogEntry);
         }
 
         /// <summary>
@@ -225,24 +248,6 @@ namespace SWEN1_MCTG.Classes.Battle
             }
 
             return result;
-        }
-
-        private void StartingMessage()
-        {
-            _battleLog.Add($"Battle between {_player1.Username} and {_player2.Username} starts now...");
-            _battleLog.Add($"{_player1.Username}'s deck: ");
-
-            foreach (Card card in _player1.UserDeck.Cards)
-            {
-                _battleLog.Add($"{card.Name}");
-            }
-
-            _battleLog.Add($"{_player2.Username}'s deck: ");
-
-            foreach (Card card in _player2.UserDeck.Cards)
-            {
-                _battleLog.Add($"{card.Name}");
-            }
         }
     }
 }
