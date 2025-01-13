@@ -85,11 +85,6 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
 
         public async Task<List<Card>> GetUserDeckAsync(User user)
         {
-            if (user == null)
-            {
-                return null;
-            }
-
             await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
             await connection.OpenAsync();
 

@@ -57,51 +57,75 @@ namespace SWEN1_MCTG.Classes.Battle
         }
 
         // Methods
-        public async Task<GlobalEnums.RoundResults> StartBattleAsync()
+        public GlobalEnums.RoundResults StartBattle()
         {
+            // Battle until max rounds or one player has no cards left
             while (_roundCount < _maxRounds && _player1.UserDeck.Cards.Count > 0 && _player2.UserDeck.Cards.Count > 0)
             {
-                _roundCount++;
-                BattleRound();
+                _roundCount++; // Increment round count
+                BattleRound(); // Start a battle round
             }
 
+            // Return result of the battle
             return DetermineWinner();
         }
 
+        /// <summary>
+        /// Represents one battle round
+        /// </summary>
         private void BattleRound()
         {
+            // Get random cards from both players
             Card card1 = _player1.UserDeck.GetRandomCardFromStack();
             Card card2 = _player2.UserDeck.GetRandomCardFromStack();
+
+            // Declare winner name, default is draw
             string winnerName = "Draw";
 
+            // Calculate the damage of both cards against each other
             double damage1 = CalculateDamage(card1, card2, card1.Damage);
             double damage2 = CalculateDamage(card2, card1, card2.Damage);
 
+            // Compare the damage of both cards
             GlobalEnums.RoundResults result = CompareDamage(damage1, damage2);
 
             if (result == GlobalEnums.RoundResults.Victory)
             {
-                _player1.UserDeck.AddCardToStack(card2);
-                _player2.UserDeck.Cards.Remove(card2);
-                winnerName = _player1.Username;
+                _player1.UserDeck.AddCardToStack(card2); // Add losers card to winners deck
+                _player2.UserDeck.Cards.Remove(card2); // Remove losers card from losers deck
+                winnerName = _player1.Username; // Set winner name
             }
             else if (result == GlobalEnums.RoundResults.Defeat)
             {
-                _player2.UserDeck.AddCardToStack(card1);
-                _player1.UserDeck.Cards.Remove(card1);
-                winnerName = _player2.Username;
+                _player2.UserDeck.AddCardToStack(card1); // Add losers card to winners deck
+                _player1.UserDeck.Cards.Remove(card1); // Remove losers card from losers deck
+                winnerName = _player2.Username; // Set winner name
             }
 
+            // Log the battle round
             LogBattleRound(_roundCount, _player1, _player2, card1, card2, damage1, damage2, winnerName);
         }
 
+        /// <summary>
+        /// Logs the battle round
+        /// </summary>
+        /// <param name="roundNumber"> Current round number </param>
+        /// <param name="player1"> Player 1 user entity </param>
+        /// <param name="player2"> Player 2 user entity </param>
+        /// <param name="card1"> Player 1 card entity </param>
+        /// <param name="card2"> Player 2 card entity </param>
+        /// <param name="damage1"> Damage after rules of card 1 </param>
+        /// <param name="damage2"> Damage after rules of card 2</param>
+        /// <param name="winnerName"> Name of the player with higher damage, or "Draw" </param>
         private void LogBattleRound(int roundNumber, User player1, User player2, Card card1, Card card2, double damage1, double damage2, string winnerName)
         {
             JsonObject battleLogEntry = new JsonObject()
             {
                 ["RoundNumber"] = roundNumber,
                 ["Player1"] = player1.Username,
+                ["Player1 CardAmount"] = player1.UserDeck.Cards.Count,
                 ["Player2"] = player2.Username,
+                ["Player2 CardAmount"] = player2.UserDeck.Cards.Count,
                 ["Player1Card"] = new JsonObject()
                 {
                     ["Name"] = card1.Name,
@@ -230,6 +254,10 @@ namespace SWEN1_MCTG.Classes.Battle
             return card1Damage;
         }
 
+        /// <summary>
+        /// Determines the winner of the battle
+        /// </summary>
+        /// <returns> RoundResult enum variable representing result </returns>
         private GlobalEnums.RoundResults DetermineWinner()
         {
             GlobalEnums.RoundResults result;

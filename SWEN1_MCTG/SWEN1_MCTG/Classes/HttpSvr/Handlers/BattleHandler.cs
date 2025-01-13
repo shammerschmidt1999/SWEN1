@@ -44,37 +44,48 @@ public class BattleHandler : Handler, IHandler
         try
         {
             // Authorization
+            
             string? token = e.Headers.FirstOrDefault(h => h.Name == "Authorization")?.Value?.Split(' ').Last();
-            if (token == null) throw new UserException("Authorization token is missing");
+            if (token == null) 
+                throw new UserException("Authorization token is missing");
 
+            // Authenticate user and get user entity
             User user = await AuthenticateUser(token) ?? throw new UserException("Authorization failed");
 
             // Enqueue user for battle
             TaskCompletionSource<(User, User, HttpSvrEventArgs)> tcs = new();
+
+            // Set the HttpSvrEventArgs for the opponent to null
             HttpSvrEventArgs? opponentEventArgs = null;
 
+            // Lock the queue
             lock (BattleQueueLock)
             {
-                if (BattleQueue.Count > 0)
+                if (BattleQueue.Count > 0) // If there is a player in the queue
                 {
-                    var existingTcs = BattleQueue.Dequeue();
-                    var opponent = (ValueTuple<User, HttpSvrEventArgs>)existingTcs.Task.AsyncState!;
-                    opponentEventArgs = opponent.Item2;
-                    existingTcs.SetResult((opponent.Item1, user, e));
-                    tcs.SetResult((user, opponent.Item1, e));
+                    var existingTcs = BattleQueue.Dequeue(); // Get the player from the queue
+                    var opponent = (ValueTuple<User, HttpSvrEventArgs>)existingTcs.Task.AsyncState!; // Get the opponent
+                    opponentEventArgs = opponent.Item2; // Set the opponentEventArgs
+                    existingTcs.SetResult((opponent.Item1, user, e)); // Set the result
+                    tcs.SetResult((user, opponent.Item1, e)); // Set the result --> COMMENT FURTHER
                 }
-                else
+                else // If there is no other player in the queue
                 {
-                    tcs = new TaskCompletionSource<(User, User, HttpSvrEventArgs)>((user, e));
-                    BattleQueue.Enqueue(tcs);
-                    return true;
+                    tcs = new TaskCompletionSource<(User, User, HttpSvrEventArgs)>((user, e)); // Set tcs to the current user
+                    BattleQueue.Enqueue(tcs); // Enqueue the current user
+                    return true; // Return true
                 }
             }
 
-            var task = await Task.WhenAny(tcs.Task, Task.Delay(TimeSpan.FromSeconds(30)));
-            if (task != tcs.Task) throw new TimeoutException("No opponent found within the allowed time.");
-
+            // Wait for the opponent
+            // The opponent is the first player in the queue
             var (player1, player2, player1EventArgs) = await tcs.Task;
+
+            // Check if the players are the same user
+            if (player1.Id == player2.Id)
+            {
+                throw new BattleException("You cannot battle yourself.");
+            }
 
             // Load player decks
             List<Card> player1Deck = await _stackRepository.GetUserDeckAsync(player1);
@@ -88,25 +99,17 @@ public class BattleHandler : Handler, IHandler
             {
                 try
                 {
-                    var battle = new Battle(player1, player2);
-                    RoundResults result = await battle.StartBattleAsync();
+                    Battle battle = new Battle(player1, player2);
+                    RoundResults result = battle.StartBattle();
 
                     // Update stats
                     UpdatePlayerStats(player1, result == RoundResults.Victory ? RoundResults.Victory : RoundResults.Defeat);
                     UpdatePlayerStats(player2, result == RoundResults.Defeat ? RoundResults.Victory : RoundResults.Defeat);
 
                     // Send battle result to both players
-                    var options = new JsonSerializerOptions { WriteIndented = true };
-                    var battleLog = battle.BattleLog;
-                    var jsonResponse = JsonSerializer.Serialize(new JsonObject
-                    {
-                        ["success"] = true,
-                        ["message"] = "Battle completed.",
-                        ["result"] = result.ToString(),
-                        ["battleLog"] = battleLog,
-                        ["battleWinner"] = result == RoundResults.Victory ? player1.Username : player2.Username
-                    }, options);
+                    String jsonResponse = GenerateResponse(result, battle.BattleLog, player1, player2);
 
+                    // Send response to both players
                     player1EventArgs.Reply(HttpStatusCode.OK, jsonResponse);
                     opponentEventArgs?.Reply(HttpStatusCode.OK, jsonResponse);
 
@@ -132,6 +135,11 @@ public class BattleHandler : Handler, IHandler
         }
     }
 
+    /// <summary>
+    /// Method to update the player stats based on the battle result
+    /// </summary>
+    /// <param name="user"> One of the two players </param>
+    /// <param name="result"> Their result </param>
     private void UpdatePlayerStats(User user, GlobalEnums.RoundResults result)
     {
         switch (result)
@@ -152,9 +160,37 @@ public class BattleHandler : Handler, IHandler
         }
     }
 
+    /// <summary>
+    /// Authenticates the user with the given token
+    /// </summary>
+    /// <param name="token"> The users token string </param>
+    /// <returns> TRUE and user entity if successful; FALSE and null else</returns>
     private async Task<User?> AuthenticateUser(string token)
     {
         var authResult = await Token.AuthenticateTokenAsync(token);
         return authResult.Success ? authResult.User : null;
+    }
+
+    /// <summary>
+    /// Generates the response for the battle
+    /// </summary>
+    /// <param name="result"> Result of the battle </param>
+    /// <param name="battleLog"> BattleLog JsonArray of the battle </param>
+    /// <param name="player1"> Player 1 entity </param>
+    /// <param name="player2"> Player 2 entity </param>
+    /// <returns> Formatted string with battle information </returns>
+    private string GenerateResponse(RoundResults result, JsonArray battleLog, User player1, User player2)
+    {
+        JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true };
+        string response = JsonSerializer.Serialize(new JsonObject
+        {
+            ["success"] = true,
+            ["message"] = "Battle completed.",
+            ["result"] = result.ToString(),
+            ["battleLog"] = battleLog,
+            ["battleWinner"] = result == RoundResults.Victory ? player1.Username : player2.Username
+        }, options);
+
+        return response;
     }
 }
