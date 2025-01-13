@@ -22,7 +22,7 @@ namespace SWEN1_MCTG.Classes
         public User(string username, string password)
         {
             _username = username;
-            _password = password;
+            _password = PasswordHelper.HashPassword(password);
             _userCards = new Stack();
             _userDeck = new Stack();
             _userCoinPurse = new CoinPurse();
@@ -31,6 +31,26 @@ namespace SWEN1_MCTG.Classes
             _defeats = 0;
             _draws = 0;
         }
+
+        public User(int id, string username, string password, int defeats, int draws, int elo, int wins)
+        {
+            _id = id;
+            _username = username;
+            _password = password;
+            _defeats = defeats;
+            _draws = draws;
+            _elo = elo;
+            _wins = wins;
+        }
+
+        public User(int id, string username, string password)
+        {
+            _id = id;
+            _username = username;
+            _password = password;
+        }
+
+
 
         // Fields
         private int _id;
@@ -48,24 +68,24 @@ namespace SWEN1_MCTG.Classes
         public int Id
         {
             get => _id;
-            set => _id = value;
+            private set => _id = value;
         }
         public string Username
         {
             get => _username;
-            set => _username = value;
+            private set => _username = value;
         }
 
         public string Password
         {
             get => _password;
-            set => _password = value;
+            private set => _password = value;
         }
 
         public Stack UserCards
         {
             get => _userCards;
-            set => _userCards = value;
+            private set => _userCards = value;
         }
 
         public CoinPurse UserCoinPurse
@@ -121,6 +141,16 @@ namespace SWEN1_MCTG.Classes
                 return (true, token);
             }
             return (false, string.Empty);
+        }
+
+        public void changeUsername(string username)
+        {
+            Username = username;
+        }
+
+        public void changePassword(string password)
+        {
+            Password = PasswordHelper.HashPassword(password);
         }
     }
 }

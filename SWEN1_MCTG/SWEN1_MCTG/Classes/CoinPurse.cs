@@ -80,6 +80,7 @@ namespace SWEN1_MCTG.Classes
             return true;
         }
 
+        // TODO: Maybe remove this method
         /// <summary>
         /// Converts coins of a lower value to a higher value if possible.
         /// </summary>
@@ -114,15 +115,6 @@ namespace SWEN1_MCTG.Classes
         private int GetCoinsValueByType(GlobalEnums.CoinType coinType)
         {
             return _coins.Where(c => c.CoinType == coinType).Sum(c => c.Value);
-        }
-
-        /// <summary>
-        /// Removes a coin object from the Coin List
-        /// </summary>
-        /// <param name="coinToRemove"> Coin to be removed from the Coin List </param>
-        public void RemoveCoin(Coin coinToRemove)
-        {
-            _coins.Remove(coinToRemove);
         }
 
         /// <summary>

@@ -120,8 +120,10 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
 
         protected override CoinPurse MapReaderToEntity(NpgsqlDataReader reader)
         {
-            CoinPurse coinPurse = new CoinPurse();
-            coinPurse.UserId = reader.GetInt32(reader.GetOrdinal("user_id"));
+            CoinPurse coinPurse = new CoinPurse
+            {
+                UserId = reader.GetInt32(reader.GetOrdinal("user_id"))
+            };
 
             // Add coins based on the stored values in the database
             int bronzeCount = reader.GetInt32(reader.GetOrdinal("bronze"));
@@ -130,11 +132,11 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             int platinumCount = reader.GetInt32(reader.GetOrdinal("platinum"));
             int diamondCount = reader.GetInt32(reader.GetOrdinal("diamond"));
 
-            coinPurse.AddCoins(GenerateCoins(GlobalEnums.CoinType.Bronze, bronzeCount));
-            coinPurse.AddCoins(GenerateCoins(GlobalEnums.CoinType.Silver, silverCount));
-            coinPurse.AddCoins(GenerateCoins(GlobalEnums.CoinType.Gold, goldCount));
-            coinPurse.AddCoins(GenerateCoins(GlobalEnums.CoinType.Platinum, platinumCount));
-            coinPurse.AddCoins(GenerateCoins(GlobalEnums.CoinType.Diamond, diamondCount));
+            coinPurse.AddCoins(GenerateCoins(CoinType.Bronze, bronzeCount));
+            coinPurse.AddCoins(GenerateCoins(CoinType.Silver, silverCount));
+            coinPurse.AddCoins(GenerateCoins(CoinType.Gold, goldCount));
+            coinPurse.AddCoins(GenerateCoins(CoinType.Platinum, platinumCount));
+            coinPurse.AddCoins(GenerateCoins(CoinType.Diamond, diamondCount));
 
             return coinPurse;
         }

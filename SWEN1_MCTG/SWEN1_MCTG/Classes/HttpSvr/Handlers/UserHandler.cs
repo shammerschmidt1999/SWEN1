@@ -92,10 +92,10 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                         await _userRepository.AddAsync(newUser);
                         User addedUser = await _userRepository.GetByUsernameAsync(username);
 
-                        CoinPurse coinPurse = new CoinPurse();
-                        Coin startingCoin = new Coin(GlobalEnums.CoinType.Diamond);
-                        coinPurse.AddCoin(startingCoin);
-                        coinPurse.UserId = addedUser.Id;
+                        CoinPurse coinPurse = new CoinPurse(GlobalEnums.CoinType.Diamond)
+                        {
+                            UserId = addedUser.Id
+                        };
                         await _coinPurseRepository.AddAsync(coinPurse);
 
                         status = HttpStatusCode.OK;
@@ -206,11 +206,11 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
 
                             if (!string.IsNullOrEmpty(newUsername))
                             {
-                                user.Username = newUsername;
+                                user.changeUsername(newUsername);
                             }
                             if (!string.IsNullOrEmpty(newPassword))
                             {
-                                user.Password = newPassword;
+                                user.changePassword(newPassword);
                             }
                             if (newCoins != null)
                             {

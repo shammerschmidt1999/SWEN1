@@ -9,8 +9,9 @@ namespace SWEN1_MCTG.Interfaces
 {
     public interface IPackage
     {
-        void AddCard(Card card);
-        void RemoveCard(Card card);
+        void AddCards(List<Card> cards);
+        int GetAmountOfCards();
+        int GetPossibleDecisions();
     }
 
 }

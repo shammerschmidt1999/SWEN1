@@ -39,6 +39,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Curl Scripts", "Curl Script
 		Curl Scripts\MonsterTradingCards.ShowUnconfiguredDeck.curl.bat = Curl Scripts\MonsterTradingCards.ShowUnconfiguredDeck.curl.bat
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "for Presentation", "for Presentation", "{EC943BF6-A212-4FC7-BB11-9AD5CF786392}"
+	ProjectSection(SolutionItems) = preProject
+		Curl Scripts\MonsterTradingCards.FullTest.curl.bat = Curl Scripts\MonsterTradingCards.FullTest.curl.bat
+		MonsterTradingCards.FullTest.Preparation.curl.bat = MonsterTradingCards.FullTest.Preparation.curl.bat
+		MonsterTradingCards.FullTest.UserCreation.curl.bat = MonsterTradingCards.FullTest.UserCreation.curl.bat
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -94,6 +101,7 @@ Global
 		{8158683B-6662-4A81-BA50-906A57F0AC2E} = {6DEF644C-5D89-4B35-A0E5-2A2C3B903498}
 		{F56C6DE8-F41D-4FEB-BB9C-1D4857553024} = {6DEF644C-5D89-4B35-A0E5-2A2C3B903498}
 		{2ADA2605-B3FD-4ADD-86A4-7A6F9EDB21B2} = {817E6AC0-1532-4869-811D-A6EF5AB10F32}
+		{EC943BF6-A212-4FC7-BB11-9AD5CF786392} = {9504AD84-B9E8-4EEE-9692-C9909D6C5394}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {03A6ABD7-FB71-4AF3-B4C3-D5FD9B94256A}

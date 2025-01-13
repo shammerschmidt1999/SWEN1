@@ -20,13 +20,6 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
 
         protected override User CreateEntity() { return new User(); }
 
-        public new async Task AddAsync(User entity)
-        {
-            // Hash the password before adding the user
-            entity.Password = PasswordHelper.HashPassword(entity.Password);
-            await base.AddAsync(entity);
-        }
-
         protected override User MapReaderToEntity(NpgsqlDataReader reader)
         {
             User entity = CreateEntity();
@@ -165,12 +158,11 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             using NpgsqlDataReader reader = command.ExecuteReader();
             if (reader.Read())
             {
-                return new User
-                {
-                    Id = reader.GetInt32(0),
-                    Username = reader.GetString(1),
-                    Password = reader.GetString(2)
-                };
+                return new User(
+                    reader.GetInt32(0),
+                    reader.GetString(1),
+                    reader.GetString(2)
+                    );
             }
 
             return null;

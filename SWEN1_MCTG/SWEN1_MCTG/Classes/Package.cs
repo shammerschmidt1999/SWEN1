@@ -1,4 +1,5 @@
 ﻿using SWEN1_MCTG.Interfaces;
+using static SWEN1_MCTG.GlobalEnums;
 
 namespace SWEN1_MCTG.Classes
 {
@@ -9,50 +10,67 @@ namespace SWEN1_MCTG.Classes
         private int _price;
         private GlobalEnums.PackageType _packageType;
         private int _amountOfCards;
+        private int _possibleDecisions;
         private List<Card> _cards = new List<Card>();
+
+        public Package(GlobalEnums.PackageType packageType)
+        {
+            _packageType = packageType;
+            _price = (int)packageType;
+            _amountOfCards = GetAmountOfCards();
+            _possibleDecisions = GetPossibleDecisions();
+        }
 
         // Properties
         public int Price
         {
             get => _price;
-            set => _price = value;
+            private set => _price = value;
         }
 
         public List<Card> Cards
         {
             get => _cards;
-            set => _cards = value;
+            private set => _cards = value;
         }
 
         public GlobalEnums.PackageType PackageType
         {
             get => _packageType;
-            set => _packageType = value;
+            private set => _packageType = value;
         }
 
         public int AmountOfCards
         {
             get => _amountOfCards;
-            set => _amountOfCards = value;
+            private set => _amountOfCards = value;
         }
 
-        // Methods
-        /// <summary>
-        /// Adds a card to the package
-        /// </summary>
-        /// <param name="card"> The card to be added </param>
-        public void AddCard(Card card)
+        public int PossibleDecisions
         {
-            _cards.Add(card);
+            get => _possibleDecisions;
+            set => _possibleDecisions = value;
         }
 
-        /// <summary>
-        /// Removes from the package
-        /// </summary>
-        /// <param name="card"> The card to be removed </param>
-        public void RemoveCard(Card card)
+        public void AddCards(List<Card> cards)
         {
-            _cards.Remove(card);
+            _cards.AddRange(cards);
+        }
+
+        public int GetAmountOfCards()
+        {
+            return PackageType switch
+            {
+                GlobalEnums.PackageType.Basic => 5,
+                GlobalEnums.PackageType.Premium => 10,
+                GlobalEnums.PackageType.Legendary => 12,
+                _ => throw new ArgumentOutOfRangeException(nameof(PackageType), "Package type not found")
+            };
+        }
+
+        public int GetPossibleDecisions()
+        {
+            return PackageType == GlobalEnums.PackageType.Legendary ? 6 : 4;
         }
     }
 }

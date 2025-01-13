@@ -134,7 +134,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
                 return MapReaderToEntity(reader);
             }
 
-            throw new InvalidOperationException($"Stack for user with Id {userId} not found.");
+            return null;
         }
 
         public async Task<Stack> GetByCardIdAsync(int cardId)

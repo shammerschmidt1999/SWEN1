@@ -60,17 +60,14 @@ public class TokenRepository : ITokenRepository
 
         if (await reader.ReadAsync())
         {
-            User user = new User
-            {
-                Id = reader.GetInt32(0),
-                Username = reader.GetString(1),
-                Password = reader.GetString(2),
-                Defeats = reader.GetInt32(3),
-                Draws = reader.GetInt32(4),
-                Elo = reader.GetInt32(5),
-                Wins = reader.GetInt32(6)
-
-            };
+            User user = new User(
+                reader.GetInt32(0),
+                reader.GetString(1),
+                reader.GetString(2),
+                reader.GetInt32(3),
+                reader.GetInt32(4),
+                reader.GetInt32(5),
+                reader.GetInt32(6));
             return (true, user);
         }
 

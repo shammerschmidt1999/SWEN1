@@ -9,14 +9,12 @@ public class PackageService : IPackageService
     private readonly CardRepository _cardRepository;
     private readonly CoinPurseRepository _coinPurseRepository;
     private readonly string _connectionString;
-    private readonly Func<List<Card>, int, List<Card>> _cardSelectionStrategy; // Used for testing
 
     public PackageService(StackRepository stackRepository, CardRepository cardRepository, CoinPurseRepository coinPurseRepository, Func<List<Card>, int, List<Card>> cardSelectionStrategy)
     {
         _stackRepository = stackRepository;
         _cardRepository = cardRepository;
         _coinPurseRepository = coinPurseRepository;
-        _cardSelectionStrategy = cardSelectionStrategy ?? DefaultCardSelection; // Used for testing
     }
 
     public PackageService()
@@ -40,38 +38,38 @@ public class PackageService : IPackageService
         // Get corresponding CoinPurse
         CoinPurse coinPurse = await _coinPurseRepository.GetByUserIdAsync(userId);
 
-        // Get the price of the package
-        int packagePrice = (int)packageType;
 
         // Check if user has enough coins to purchase package
-        if (coinPurse.GetCoinsValue() < packagePrice)
+        if (coinPurse.GetCoinsValue() < (int)packageType)
         {
             throw new InvalidOperationException("Not enough coins to purchase package");
         }
 
-        // Extract the exact coins needed for the package
-        Dictionary<GlobalEnums.CoinType, int> coinsUsed = coinPurse.ExtractCoins(packagePrice);
-        if (coinsUsed == null)
-        {
-            throw new InvalidOperationException("Failed to extract the required coins for the package");
-        }
+        // Create the package
+        Package package = new Package(packageType);
 
         // Determine the amount of cards to be drawn from the database
-        int amountOfCards = GetAmountOfCards(packageType);
+        int amountOfCards = package.AmountOfCards;
 
         // Determine the amount of decisions the user can make
-        int possibleDecisions = packageType == GlobalEnums.PackageType.Legendary ? 6 : 4;
+        int possibleDecisions = package.PossibleDecisions;
 
         // Get random cards from the database
         List<Card> randomCards = await _cardRepository.GetRandomCardsAsync(amountOfCards);
 
-        // Let the user choose the cards
-        List<Card> userCardSelection = GetUserCardSelection(randomCards, possibleDecisions);
+        // Add cards to package
+        package.AddCards(randomCards);
 
-        /* For testing purposes, the user's card selection is determined by the DefaultCardSelection method.
-         * This method reads the user's input to select cards.
-        List<Card> userCardSelection = _cardSelectionStrategy(randomCards, possibleDecisions);
-        */
+        // Let the user choose the cards
+        List<Card> userCardSelection = GetUserCardSelection(package.Cards, possibleDecisions);
+
+        // Extract the exact coins needed for the package
+        Dictionary<GlobalEnums.CoinType, int> coinsUsed = coinPurse.ExtractCoins(package.Price);
+
+        if (coinsUsed == null)
+        {
+            throw new InvalidOperationException("Failed to extract the required coins for the package");
+        }
 
         // Add the cards to the users stack
         await _stackRepository.AddCardsToUserAsync(userId, userCardSelection);
@@ -81,23 +79,6 @@ public class PackageService : IPackageService
 
         Console.WriteLine("Package purchased successfully!");
         Console.WriteLine("Cards added to your personal cards!");
-    }
-
-    /// <summary>
-    /// Get the amount of cards that should be drawn from the database
-    /// </summary>
-    /// <param name="packageType"> The type of Package the user wants to purchase </param>
-    /// <returns> An integer that represents the size of the package according to the packageType </returns>
-    /// <exception cref="ArgumentOutOfRangeException"> In case a non-existing packageType is entered </exception>
-    private int GetAmountOfCards(GlobalEnums.PackageType packageType)
-    {
-        return packageType switch
-        {
-            GlobalEnums.PackageType.Basic => 5,
-            GlobalEnums.PackageType.Premium => 10,
-            GlobalEnums.PackageType.Legendary => 12,
-            _ => throw new ArgumentOutOfRangeException(nameof(packageType), "Package type not found")
-        };
     }
 
     /// <summary>
@@ -146,29 +127,6 @@ public class PackageService : IPackageService
 
             chosenIndices.Add(choice);
             selectedCards.Add(randomCards[choice]);
-        }
-
-        return selectedCards;
-    }
-
-
-
-    // Used for testing purposes
-    // Chooses random cards from the drawn cards to simulate user decision
-    private List<Card> DefaultCardSelection(List<Card> randomCards, int cardsToChoose)
-    {
-        Console.WriteLine("Select cards:");
-        for (int i = 0; i < randomCards.Count; i++)
-        {
-            Console.WriteLine($"{i + 1}: {randomCards[i].Name}");
-        }
-
-        List<Card> selectedCards = new List<Card>();
-        for (int i = 0; i < cardsToChoose; i++)
-        {
-            Console.WriteLine($"Choose card {i + 1}:");
-            int choice = int.Parse(Console.ReadLine());
-            selectedCards.Add(randomCards[choice - 1]);
         }
 
         return selectedCards;

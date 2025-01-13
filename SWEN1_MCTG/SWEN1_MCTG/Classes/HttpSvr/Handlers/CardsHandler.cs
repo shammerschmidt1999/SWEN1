@@ -49,20 +49,12 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers;
 
             if (ses.Success)
             {
-                User user = await _userRepository.GetByUsernameAsync(ses.User!.Username);
                 Stack userCards = await _stackRepository.GetByUserIdAsync(ses.User!.Id);
 
-                // Format the message as a JSON array
-                JsonArray cardsArray = _generateCardArray(userCards);
-
-                if (cardsArray.Count == 0)
+                if (userCards == null)
                 {
                     status = HttpStatusCode.NO_CONTENT;
-                    reply = new JsonObject() 
-                    {
-                        ["success"] = false, 
-                        ["message"] = "No cards found."
-                    };
+                    reply = new JsonObject() { ["success"] = false, ["message"] = "No cards found." };
                 }
                 else
                 {
@@ -70,7 +62,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers;
                     reply = new JsonObject()
                     {
                         ["success"] = true,
-                        ["message"] = cardsArray
+                        ["message"] = _generateCardArray(userCards)
                     };
                 }
             }
