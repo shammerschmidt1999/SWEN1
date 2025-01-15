@@ -44,8 +44,8 @@ public class BattleHandler : Handler, IHandler
         try
         {
             // Authorization
-            
             string? token = e.Headers.FirstOrDefault(h => h.Name == "Authorization")?.Value?.Split(' ').Last();
+
             if (token == null) 
                 throw new UserException("Authorization token is missing");
 

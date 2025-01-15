@@ -8,7 +8,6 @@ public interface ICoinPurseRepository : IRepository<CoinPurse>
     List<Coin> GenerateCoins(CoinType coinType, int count);
     Task<CoinPurse> GetByUserIdAsync(int userId);
     Task DeleteByUserIdAsync(int userId);
-    //Task AddCoinPurseAsync(CoinPurse coinPurse);
     Task UpdateCoinPurseAsync(CoinPurse coinPurse);
     Task AddCoinsToPurseAsync(int userId, IEnumerable<Coin> coins);
     Task<bool> RemoveCoinsFromPurseAsync(int userId, int amount);

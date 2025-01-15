@@ -15,7 +15,5 @@ namespace SWEN1_MCTG.Classes
             : base(name, damage, elementType)
         {
         }
-
-        public SpellCard() { }
     }
 }

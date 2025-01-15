@@ -37,7 +37,11 @@ namespace SWEN1_MCTG.Classes.Battle
         public GlobalEnums.RoundResults StartBattle()
         {
             // Battle until max rounds or one player has no cards left
-            while (_roundCount < _maxRounds && _player1.UserDeck.Cards.Count > 0 && _player2.UserDeck.Cards.Count > 0)
+            while (
+                    _roundCount < _maxRounds 
+                   && _player1.UserDeck.Cards.Count > 0 
+                   && _player2.UserDeck.Cards.Count > 0
+                   )
             {
                 _roundCount++; // Increment round count
                 BattleRound(); // Start a battle round

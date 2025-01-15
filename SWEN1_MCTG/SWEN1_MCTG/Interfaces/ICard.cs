@@ -10,5 +10,4 @@ namespace SWEN1_MCTG.Interfaces
     {
         void SetInDeck(bool inDeck);
     }
-
 }
