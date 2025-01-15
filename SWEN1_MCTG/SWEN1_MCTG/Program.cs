@@ -27,6 +27,7 @@ namespace SWEN1_MCTG
             Console.WriteLine(e.Method);
             Console.WriteLine(e.Path);
             Console.WriteLine();
+
             foreach (HttpHeader i in e.Headers)
             {
                 Console.WriteLine(i.Name + ": " + i.Value);

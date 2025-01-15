@@ -21,39 +21,16 @@ namespace SWEN1_MCTG.Classes.Battle
         }
 
         // Fields
-        private User _player1;
-        private User _player2;
+        private readonly User _player1;
+        private readonly User _player2;
         private int _roundCount;
-        private int _maxRounds;
+        private readonly int _maxRounds;
         private JsonArray _battleLog;
-
-        // Properties
-        public User Player1
-        {
-            get => _player1;
-            set => _player1 = value;
-        }
-
-        public User Player2
-        {
-            get => _player2;
-            set => _player2 = value;
-        }
-        public int RoundCount
-        {
-            get => _roundCount;
-            set => _roundCount = value;
-        }
 
         public JsonArray BattleLog
         {
             get => _battleLog;
             set => _battleLog = value;
-        }
-
-        public int MaxRounds
-        {
-            get => _maxRounds;
         }
 
         // Methods

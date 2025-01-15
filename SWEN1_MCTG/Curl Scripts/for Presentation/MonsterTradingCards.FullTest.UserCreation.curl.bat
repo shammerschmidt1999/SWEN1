@@ -65,37 +65,37 @@ if %pauseFlag%==1 pause
 
 echo 3) edit user data
 echo.
-curl -i -X GET http://localhost:10001/users/fulltestusercreation1 --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION1"
+curl -i -X GET http://localhost:10001/users/ --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION1"
 echo "Should return HTTP 200 - and current user data"
 echo.
-curl -i -X GET http://localhost:10001/users/FullTestUserCreation2 --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION2"
+curl -i -X GET http://localhost:10001/users/ --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION2"
 echo "Should return HTTP 200 - and current user data"
 echo.
-curl -i -X PUT http://localhost:10001/users/FullTestUserCreation1 --header "Content-Type: application/json" --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION1" -d "{\"Username\": \"FullTestUser1CreationNewName\",\"Password\": \"FullTestUser1CreationNewPassword\",\"Coins\": {\"Bronze\": 10,\"Diamond\": 5}}"
+curl -i -X PUT http://localhost:10001/users/ --header "Content-Type: application/json" --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION1" -d "{\"Username\": \"FullTestUser1CreationNewName\",\"Password\": \"FullTestUser1CreationNewPassword\",\"Coins\": {\"Bronze\": 10,\"Diamond\": 5}}"
 echo "Should return HTTP 2xx"
 echo.
-curl -i -X PUT http://localhost:10001/users/FullTestUserCreation2 --header "Content-Type: application/json" --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION2" -d "{\"Username\": \"FullTestUser2CreationNewName\",\"Password\": \"FullTestUser2CreationNewName\",\"Coins\": {\"Gold\": 1,\"Diamond\": 0}}"
+curl -i -X PUT http://localhost:10001/users/ --header "Content-Type: application/json" --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION2" -d "{\"Username\": \"FullTestUser2CreationNewName\",\"Password\": \"FullTestUser2CreationNewName\",\"Coins\": {\"Gold\": 1,\"Diamond\": 0}}"
 echo "Should return HTTP 2xx"
 echo.
-curl -i -X GET http://localhost:10001/users/FullTestUserCreation1 --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION1"
+curl -i -X GET http://localhost:10001/users/ --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION1"
 echo "Should return HTTP 200 - and new user data"
 echo.
-curl -i -X GET http://localhost:10001/users/FullTestUserCreation2 --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION2"
+curl -i -X GET http://localhost:10001/users/ --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION2"
 echo "Should return HTTP 200 - and new user data"
 echo.
 echo.
 echo should fail:
-curl -i -X GET http://localhost:10001/users/FullTestUserCreation2 --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION1"
+curl -i -X GET http://localhost:10001/users/ --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION1"
 echo "Should return HTTP 4xx"
 echo.
-curl -i -X GET http://localhost:10001/users/FullTestUserCreation1 --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION2"
+curl -i -X GET http://localhost:10001/users/ --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION2"
 echo "Should return HTTP 4xx"
 echo.
-curl -i -X PUT http://localhost:10001/users/FullTestUserCreation2 --header "Content-Type: application/json" --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION1" -d "{\"Name\": \"Hoax\",  \"Bio\": \"me playin...\", \"Image\": \":-)\"}"
+curl -i -X PUT http://localhost:10001/users/ --header "Content-Type: application/json" --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION1" -d "{\"Name\": \"Hoax\",  \"Bio\": \"me playin...\", \"Image\": \":-)\"}"
 echo "Should return HTTP 4xx"
 echo.
-curl -i -X PUT http://localhost:10001/users/FullTestUserCreation1 --header "Content-Type: application/json" --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION2" -d "{\"Name\": \"Hoax\", \"Bio\": \"me codin...\",  \"Image\": \":-D\"}"
+curl -i -X PUT http://localhost:10001/users/ --header "Content-Type: application/json" --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION2" -d "{\"Name\": \"Hoax\", \"Bio\": \"me codin...\",  \"Image\": \":-D\"}"
 echo "Should return HTTP 4xx"
 echo.
-curl -i -X GET http://localhost:10001/users/someGuy  --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION1"
+curl -i -X GET http://localhost:10001/users/ --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION1"
 echo "Should return HTTP 4xx"

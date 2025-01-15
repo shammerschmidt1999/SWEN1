@@ -39,6 +39,11 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
             return false;
         }
 
+        /// <summary>
+        /// Displays the stats of the user
+        /// </summary>
+        /// <param name="e"> HttpSvrEventArgs </param>
+        /// <returns> TRUE if operation was successful; FALSE on failure </returns>
         private async Task<bool> _DisplayStatsAsync(HttpSvrEventArgs e)
         {
             JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
@@ -51,15 +56,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                 if (ses.Success)
                 { 
                     status = HttpStatusCode.OK;
-                    reply = new JsonObject()
-                        {
-                            ["success"] = true,
-                            ["Username"] = ses.User.Username,
-                            ["Elo"] = ses.User.Elo,
-                            ["Wins"] = ses.User.Wins,
-                            ["Defeats"] = ses.User.Defeats,
-                            ["Draws"] = ses.User.Draws
-                    };
+                    reply = _GenerateStats(ses.User);
                 }
                 else
                 {
@@ -82,26 +79,23 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
             return true;
         }
 
-
-        private JsonArray _generateScoreboardArray(List<(string Username, int Elo)> users)
+        /// <summary>
+        /// Generates a JSON reply for the user stats
+        /// </summary>
+        /// <param name="user"> User entity </param>
+        /// <returns> JSONObject containing user data </returns>
+        private JsonObject _GenerateStats(User user)
         {
-            JsonArray array = new JsonArray();
-            int rank = 1;
-
-            foreach (var user in users)
+            JsonObject reply = new JsonObject()
             {
-                JsonObject obj = new JsonObject()
-                {
-                    ["rank"] = rank,
-                    ["username"] = user.Username,
-                    ["elo"] = user.Elo
-                };
-
-                rank++;
-                array.Add(obj);
-            }
-
-            return array;
+                ["success"] = true,
+                ["Username"] = user.Username,
+                ["Elo"] = user.Elo,
+                ["Wins"] = user.Wins,
+                ["Defeats"] = user.Defeats,
+                ["Draws"] = user.Draws
+            };
+            return reply;
         }
 
     }

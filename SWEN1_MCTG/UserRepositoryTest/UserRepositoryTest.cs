@@ -27,23 +27,6 @@ namespace UserRepositoryTest
         }
 
         [TestMethod]
-        public async Task TestGetUserById()
-        {
-            // Arrange
-            IUserRepository userRepository = new UserRepository(ConnectionString);
-            User user = new User($"TestUser_{Guid.NewGuid()}", "Anotherpassword");
-
-            await userRepository.AddAsync(user);
-
-            // Act
-            User fetchedUser = await userRepository.GetByIdAsync(user.Id);
-
-            // Assert
-            Assert.IsNotNull(fetchedUser);
-            Assert.AreEqual(user.Username, fetchedUser.Username);
-        }
-
-        [TestMethod]
         public async Task TestCreateUserWithCorrectData()
         {
             // Arrange

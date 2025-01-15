@@ -38,24 +38,6 @@ public class BattleTests
     }
 
     [TestMethod]
-    public void Constructor_CreateBattle_PropertiesAreSetCorrectly()
-    {
-        int roundCount = 0;
-        int maxRounds = 100;
-
-        // Create the battle
-        Battle testBattle = new Battle(player1, player2);
-
-        // Assert the properties
-        Assert.AreEqual(player1Username, testBattle.Player1.Username);
-        Assert.AreEqual(player1Password, testBattle.Player1.Password);
-        Assert.AreEqual(player2Username, testBattle.Player2.Username);
-        Assert.AreEqual(player2Password, testBattle.Player2.Password);
-        Assert.AreEqual(roundCount, testBattle.RoundCount);
-        Assert.AreEqual(maxRounds, testBattle.MaxRounds);
-    }
-
-    [TestMethod]
     public void CalculateDamage_SpellVsSpellDamage_SpellAttackAgainstEffectiveElementDoublesCardDamage()
     {
         string player1CardName = "Player1SpellCard";

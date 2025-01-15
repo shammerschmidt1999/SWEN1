@@ -43,6 +43,11 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
             return false;
         }
 
+        /// <summary>
+        /// Method to purchase a package
+        /// </summary>
+        /// <param name="e"> HttpSvrEventArgs </param>
+        /// <returns> TRUE on success; FALSE on failure </returns>
         private async Task<bool> _PurchasePackageAsync(HttpSvrEventArgs e)
         {
             JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };

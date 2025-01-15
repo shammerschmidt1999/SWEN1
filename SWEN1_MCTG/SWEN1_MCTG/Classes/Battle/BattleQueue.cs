@@ -3,5 +3,4 @@
 public static class BattleQueue
 {
     private static Queue<User> _queue = new Queue<User>();
-    public static int Count => _queue.Count;
 }

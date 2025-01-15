@@ -45,13 +45,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
             }
             else if (e.Path.StartsWith("/users/") && (e.Method == "PUT"))
             {
-                // Match the path pattern for user data
-                Match match = Regex.Match(e.Path.TrimEnd('/', ' ', '\t'), @"^/users/(?<username>[^/]+)$");
-                if (match.Success)
-                {
-                    string username = match.Groups["username"].Value;
-                    return await _UpdateUserAsync(e, username);
-                }
+                return await _UpdateUserAsync(e);
             }
 
             return false;
@@ -136,7 +130,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
 
                 if (ses.Success)
                 {
-                    User? user = await _userRepository.GetByUsernameAsync(e.Path[7..]);
+                    User? user = await _userRepository.GetByUsernameAsync(ses.User.Username);
                     Stack userStack = await _stackRepository.GetByUserIdAsync(ses.User!.Id);
                     CoinPurse userCoinPurse = await _coinPurseRepository.GetByUserIdAsync(ses.User!.Id);
 
@@ -148,18 +142,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                     else
                     {
                         status = HttpStatusCode.OK;
-                        reply = new JsonObject()
-                        {
-                            ["success"] = true,
-                            ["username"] = user!.Username,
-                            ["cardAmount"] = userStack!.Cards.Count,
-                            ["coinAmount"] = userCoinPurse.Coins.Count,
-                            ["coinsValue"] = userCoinPurse!.GetCoinsValue(),
-                            ["elo"] = user!.Elo,
-                            ["wins"] = user!.Wins,
-                            ["defeats"] = user!.Defeats,
-                            ["draws"] = user!.Draws
-                        };
+                        reply = _GenerateUserData(user, userStack, userCoinPurse);
                     }
                 }
                 else
@@ -177,20 +160,19 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
             return true;
         }
 
-        private async Task<bool> _UpdateUserAsync(HttpSvrEventArgs e, string username)
+        private async Task<bool> _UpdateUserAsync(HttpSvrEventArgs e)
         {
             JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
             int status = HttpStatusCode.BAD_REQUEST;
 
             try
             {
-                (bool Success, User? User) ses = await Token.AuthenticateBearerAsync(e);
+                (bool Success, User? user) ses = await Token.AuthenticateBearerAsync(e);
 
                 if (ses.Success)
                 {
-                    User? user = await _userRepository.GetByUsernameAsync(username);
 
-                    if (user == null)
+                    if (ses.user == null)
                     {
                         status = HttpStatusCode.NOT_FOUND;
                         reply = new JsonObject() { ["success"] = false, ["message"] = "User not found." };
@@ -206,15 +188,15 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
 
                             if (!string.IsNullOrEmpty(newUsername))
                             {
-                                user.changeUsername(newUsername);
+                                ses.user.changeUsername(newUsername);
                             }
                             if (!string.IsNullOrEmpty(newPassword))
                             {
-                                user.changePassword(newPassword);
+                                ses.user.changePassword(newPassword);
                             }
                             if (newCoins != null)
                             {
-                                CoinPurse userCoinPurse = await _coinPurseRepository.GetByUserIdAsync(user.Id);
+                                CoinPurse userCoinPurse = await _coinPurseRepository.GetByUserIdAsync(ses.user.Id);
                                 userCoinPurse.Coins.Clear();
 
                                 foreach (var coinType in newCoins)
@@ -231,7 +213,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                                 await _coinPurseRepository.UpdateCoinPurseAsync(userCoinPurse);
                             }
 
-                            await _userRepository.UpdateAsync(user);
+                            await _userRepository.UpdateAsync(ses.user);
 
                             status = HttpStatusCode.OK;
                             reply = new JsonObject() { ["success"] = true, ["message"] = "User updated successfully." };
@@ -249,8 +231,51 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                 reply = new JsonObject() { ["success"] = false, ["message"] = "Unexpected error." };
             }
 
-            e.Reply(status, reply?.ToJsonString());
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            e.Reply(status, reply?.ToJsonString(options));
             return true;
+        }
+
+        private JsonObject _GenerateUserData(User user, Stack stack, CoinPurse coinPurse)
+        {
+            JsonObject reply;
+
+            if (stack == null)
+            {
+                reply = new JsonObject()
+                {
+                    ["success"] = true,
+                    ["username"] = user.Username,
+                    ["cardAmount"] = 0,
+                    ["coinAmount"] = coinPurse.Coins.Count,
+                    ["coinsValue"] = coinPurse.GetCoinsValue(),
+                    ["elo"] = user.Elo,
+                    ["wins"] = user.Wins,
+                    ["defeats"] = user.Defeats,
+                    ["draws"] = user.Draws
+                };
+            }
+            else
+            {
+                reply = new JsonObject()
+                {
+                    ["success"] = true,
+                    ["username"] = user!.Username,
+                    ["cardAmount"] = stack!.Cards.Count,
+                    ["coinAmount"] = coinPurse.Coins.Count,
+                    ["coinsValue"] = coinPurse!.GetCoinsValue(),
+                    ["elo"] = user!.Elo,
+                    ["wins"] = user!.Wins,
+                    ["defeats"] = user!.Defeats,
+                    ["draws"] = user!.Draws
+                };
+            }
+
+            return reply;
         }
     }
 }

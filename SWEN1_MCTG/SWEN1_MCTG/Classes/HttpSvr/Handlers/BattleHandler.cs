@@ -77,8 +77,7 @@ public class BattleHandler : Handler, IHandler
                 }
             }
 
-            // Wait for the opponent
-            // The opponent is the first player in the queue
+            // Await the task completion source
             var (player1, player2, player1EventArgs) = await tcs.Task;
 
             // Check if the players are the same user

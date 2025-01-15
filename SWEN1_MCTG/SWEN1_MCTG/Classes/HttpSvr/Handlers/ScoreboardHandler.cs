@@ -39,6 +39,11 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
             return false;
         }
 
+        /// <summary>
+        /// Method to display the scoreboard including all users
+        /// </summary>
+        /// <param name="e"> HttpSvrEventArgs </param>
+        /// <returns> TRUE if operation was successful; FALSE on failure </returns>
         private async Task<bool> _DisplayScoreboardAsync(HttpSvrEventArgs e)
         {
             JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
@@ -95,6 +100,11 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
         }
 
 
+        /// <summary>
+        /// Generates a JSON array containing the scoreboard data   
+        /// </summary>
+        /// <param name="users"> List of Usernames with their elo </param>
+        /// <returns> JSON array containing the scoreboard data </returns>
         private JsonArray _generateScoreboardArray(List<(string Username, int Elo)> users)
         {
             JsonArray array = new JsonArray();

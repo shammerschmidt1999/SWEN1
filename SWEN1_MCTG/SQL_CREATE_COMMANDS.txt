@@ -1,0 +1,89 @@
+#############################################################
+############## NECESSARY SQL COMMANDS FOR DB ################
+#############################################################
+
+### CREATE TYPES ###
+
+ - Card Type -
+CREATE TYPE card_type AS ENUM
+    ('SpellCard', 'MonsterCard');
+	
+- Coin Type -
+CREATE TYPE coin_type AS ENUM
+    ('Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond');
+
+- Element Type -
+CREATE TYPE element_type AS ENUM
+    ('Fire', 'Water', 'Normal');
+
+- Monster Type -
+CREATE TYPE public.monster_type AS ENUM
+    ('Dragon', 'Goblin', 'Knight', 'Wizard', 'Ork', 'FireElve', 'Kraken');
+
+#############################################################
+
+### CREATE TABLES ###
+
+- Cards -
+CREATE TABLE IF NOT EXISTS cards
+(
+    id integer NOT NULL DEFAULT nextval('cards_id_seq'::regclass),
+    name character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    damage double precision NOT NULL,
+    elementtype element_type NOT NULL,
+    monstertype monster_type,
+    card_type card_type NOT NULL,
+    CONSTRAINT cards_pkey PRIMARY KEY (id)
+);
+# Note: Pre-made cards are found in a seperate text file with INSERT statements
+
+- Users -
+CREATE TABLE IF NOT EXISTS users
+(
+    id integer NOT NULL DEFAULT nextval('users_id_seq'::regclass),
+    username character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    password character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    elo integer NOT NULL DEFAULT 100,
+    defeats integer NOT NULL DEFAULT 0,
+    wins integer NOT NULL DEFAULT 0,
+    draws integer NOT NULL DEFAULT 0,
+    CONSTRAINT users_pkey PRIMARY KEY (id),
+    CONSTRAINT users_username_key UNIQUE (username)
+);
+
+- Coin Purses -
+CREATE TABLE IF NOT EXISTS coin_purses
+(
+    user_id integer NOT NULL,
+    bronze integer DEFAULT 0,
+    silver integer DEFAULT 0,
+    gold integer DEFAULT 0,
+    platinum integer DEFAULT 0,
+    diamond integer DEFAULT 0,
+    CONSTRAINT coin_purses_pkey PRIMARY KEY (user_id)
+);
+
+- Tokens -
+CREATE TABLE IF NOT EXISTS tokens
+(
+    user_id integer NOT NULL,
+    token character varying(36) COLLATE pg_catalog."default" NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT tokens_pkey PRIMARY KEY (token),
+    CONSTRAINT tokens_token_key UNIQUE (token),
+    CONSTRAINT tokens_user_id_fkey FOREIGN KEY (user_id)
+        REFERENCES public.users (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE
+);
+
+- User_Cards -
+CREATE TABLE IF NOT EXISTS user_cards
+(
+    user_id integer NOT NULL,
+    card_id integer NOT NULL,
+    in_deck boolean NOT NULL,
+    card_type card_type NOT NULL,
+    instance_id uuid NOT NULL DEFAULT gen_random_uuid(),
+    CONSTRAINT user_cards_pkey PRIMARY KEY (user_id, card_id, instance_id)
+);
