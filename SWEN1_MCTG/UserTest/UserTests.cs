@@ -33,7 +33,7 @@ public class UserTests
     public void Constructor_CreateUser_UsernameAndPasswordEqualToStringParameters()
     {
         Assert.AreEqual(playerUsername, createdUser.Username);
-        Assert.AreEqual(playerPassword, createdUser.Password);
+        Assert.AreEqual(PasswordHelper.HashPassword(playerPassword), createdUser.Password);
     }
 
     [TestMethod]

@@ -9,5 +9,10 @@ namespace SWEN1_MCTG.Interfaces
 {
     public interface IUser
     {
+        public void ChangeUsername(string username);
+        public void ChangePassword(string password);
+        public void ChangeUserDeck(Stack newDeck);
+        public void ApplyBattleResult(GlobalEnums.RoundResults result);
+
     }
 }

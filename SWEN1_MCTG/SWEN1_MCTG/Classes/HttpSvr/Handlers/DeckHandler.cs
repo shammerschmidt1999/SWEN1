@@ -54,7 +54,6 @@ public class DeckHandler : Handler, IHandler
 
             if (ses.Success)
             {
-                User user = await _userRepository.GetByUsernameAsync(ses.User!.Username);
                 Stack userCards = await _stackRepository.GetByUserIdAsync(ses.User!.Id);
 
                 // Format the message as a JSON array
@@ -145,8 +144,8 @@ public class DeckHandler : Handler, IHandler
 
             if (ses.Success)
             {
-                User user = await _userRepository.GetByUsernameAsync(ses.User!.Username);
-                Stack userCards = await _stackRepository.GetByUserIdAsync(ses.User!.Id);
+                User user = ses.User!;
+                Stack userCards = await _stackRepository.GetByUserIdAsync(user.Id);
 
                 // Parse the JSON payload
                 JsonArray cardNames = JsonNode.Parse(e.Payload)?.AsArray() ?? new JsonArray();
@@ -154,6 +153,9 @@ public class DeckHandler : Handler, IHandler
                 foreach (JsonNode cardNameNode in cardNames)
                 {
                     string cardName = cardNameNode.ToString();
+
+                    // Only select the cards with the given name
+                    // Removes possibility of accessing cards that the user does not own
                     List<Card> cards = userCards.Cards.Where(c => c.Name == cardName).ToList();
 
                     foreach (Card card in cards)

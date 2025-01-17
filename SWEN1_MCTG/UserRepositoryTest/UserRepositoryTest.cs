@@ -1,3 +1,4 @@
+using SWEN1_MCTG;
 using SWEN1_MCTG.Classes;
 using SWEN1_MCTG.Data.Repositories;
 using SWEN1_MCTG.Data.Repositories.Classes;
@@ -24,6 +25,75 @@ namespace UserRepositoryTest
             User fetchedUser = await userRepository.GetByUsernameAsync(user.Username);
             Assert.IsNotNull(fetchedUser);
             Assert.AreEqual(user.Username, fetchedUser.Username);
+        }
+
+        [TestMethod]
+        public async Task TestUserStatsAfterVictory()
+        {
+            // Arrange
+            IUserRepository userRepository = new UserRepository(ConnectionString);
+            User user = new User($"TestUser_{Guid.NewGuid()}", "Anotherpassword");
+            int oldElo = user.Elo;
+            int oldWins = user.Wins;
+
+            // Act
+            await userRepository.AddAsync(user);
+            User createdUser = await userRepository.GetByUsernameAsync(user.Username);
+
+            createdUser.ApplyBattleResult(GlobalEnums.RoundResults.Victory);
+            await userRepository.UpdateAsync(createdUser);
+
+            User updatedUser = await userRepository.GetByUsernameAsync(user.Username);
+
+            // Assert
+            Assert.AreEqual(oldElo + 5, updatedUser.Elo);
+            Assert.AreEqual(oldWins + 1, updatedUser.Wins);
+        }
+
+        [TestMethod]
+        public async Task TestUserStatsAfterDraw()
+        {
+            // Arrange
+            IUserRepository userRepository = new UserRepository(ConnectionString);
+            User user = new User($"TestUser_{Guid.NewGuid()}", "Anotherpassword");
+            int oldElo = user.Elo;
+            int oldDraws = user.Draws;
+
+            // Act
+            await userRepository.AddAsync(user);
+            User createdUser = await userRepository.GetByUsernameAsync(user.Username);
+
+            createdUser.ApplyBattleResult(GlobalEnums.RoundResults.Draw);
+            await userRepository.UpdateAsync(createdUser);
+
+            User updatedUser = await userRepository.GetByUsernameAsync(user.Username);
+
+            // Assert
+            Assert.AreEqual(oldElo, updatedUser.Elo);
+            Assert.AreEqual(oldDraws + 1, updatedUser.Draws);
+        }
+
+        [TestMethod]
+        public async Task TestUserStatsAfterDefeat()
+        {
+            // Arrange
+            IUserRepository userRepository = new UserRepository(ConnectionString);
+            User user = new User($"TestUser_{Guid.NewGuid()}", "Anotherpassword");
+            int oldElo = user.Elo;
+            int oldDefeats = user.Defeats;
+
+            // Act
+            await userRepository.AddAsync(user);
+            User createdUser = await userRepository.GetByUsernameAsync(user.Username);
+
+            createdUser.ApplyBattleResult(GlobalEnums.RoundResults.Defeat);
+            await userRepository.UpdateAsync(createdUser);
+
+            User updatedUser = await userRepository.GetByUsernameAsync(user.Username);
+
+            // Assert
+            Assert.AreEqual(oldElo - 3, updatedUser.Elo);
+            Assert.AreEqual(oldDefeats + 1, updatedUser.Defeats);
         }
 
         [TestMethod]

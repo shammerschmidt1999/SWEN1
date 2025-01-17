@@ -1,5 +1,4 @@
 ﻿using static SWEN1_MCTG.GlobalEnums;
-using SWEN1_MCTG.Classes.Battle;
 using SWEN1_MCTG.Classes.Exceptions;
 using SWEN1_MCTG.Classes.HttpSvr.Handlers;
 using SWEN1_MCTG.Classes.HttpSvr;
@@ -16,7 +15,11 @@ public class BattleHandler : Handler, IHandler
     private readonly string _connectionString;
     private readonly IStackRepository _stackRepository;
     private readonly IUserRepository _userRepository;
+
+    // Queue to manage battle requests
     private static readonly Queue<TaskCompletionSource<(User, User, HttpSvrEventArgs)>> BattleQueue = new();
+
+    // Lock object to ensure thread safety when accessing the queue
     private static readonly object BattleQueueLock = new();
 
     public BattleHandler()
@@ -43,7 +46,7 @@ public class BattleHandler : Handler, IHandler
 
         try
         {
-            // Authorization
+            // Extract token from request
             string? token = e.Headers.FirstOrDefault(h => h.Name == "Authorization")?.Value?.Split(' ').Last();
 
             if (token == null) 
@@ -52,7 +55,7 @@ public class BattleHandler : Handler, IHandler
             // Authenticate user and get user entity
             User user = await AuthenticateUser(token) ?? throw new UserException("Authorization failed");
 
-            // Enqueue user for battle
+            // Create a task completion source for the battle
             TaskCompletionSource<(User, User, HttpSvrEventArgs)> tcs = new();
 
             // Set the HttpSvrEventArgs for the opponent to null
@@ -63,21 +66,22 @@ public class BattleHandler : Handler, IHandler
             {
                 if (BattleQueue.Count > 0) // If there is a player in the queue
                 {
-                    var existingTcs = BattleQueue.Dequeue(); // Get the player from the queue
-                    var opponent = (ValueTuple<User, HttpSvrEventArgs>)existingTcs.Task.AsyncState!; // Get the opponent
-                    opponentEventArgs = opponent.Item2; // Set the opponentEventArgs
-                    existingTcs.SetResult((opponent.Item1, user, e)); // Set the result
-                    tcs.SetResult((user, opponent.Item1, e)); // Set the result --> COMMENT FURTHER
+                    var existingTcs = BattleQueue.Dequeue(); // Get the tcs from the first connection
+                    var opponent = (ValueTuple<User, HttpSvrEventArgs>)existingTcs.Task.AsyncState!; // Get the user entity and args from the tcs created by the first connection
+                    opponentEventArgs = opponent.Item2; // Set the opponentEventArgs (first connection)
+                    existingTcs.SetResult((opponent.Item1, user, e)); // Set the TCS for the first connection (First connected user, second connected user, args)
+                    tcs.SetResult((user, opponent.Item1, e)); // Set the TCS for the second connection (Second connected user, first connected user, args)
                 }
                 else // If there is no other player in the queue
                 {
-                    tcs = new TaskCompletionSource<(User, User, HttpSvrEventArgs)>((user, e)); // Set tcs to the current user
-                    BattleQueue.Enqueue(tcs); // Enqueue the current user
-                    return true; // Return true
+                    tcs = new TaskCompletionSource<(User, User, HttpSvrEventArgs)>((user, e)); // Assign the user that connects first and their Args to the tcs
+                    BattleQueue.Enqueue(tcs); // Enqueue the tcs with the information
+                    return true; // Return true indicating the user is waiting for an opponent
                 }
             }
 
-            // Await the task completion source
+            // Await the task completion source to get the battle participants
+            // player1 is the second connected user, player2 is the first connected user, player1EventArgs is the second connected user's args
             var (player1, player2, player1EventArgs) = await tcs.Task;
 
             // Check if the players are the same user
@@ -90,10 +94,16 @@ public class BattleHandler : Handler, IHandler
             List<Card> player1Deck = await _stackRepository.GetUserDeckAsync(player1);
             List<Card> player2Deck = await _stackRepository.GetUserDeckAsync(player2);
 
-            player1.UserDeck = new Stack { Cards = player1Deck };
-            player2.UserDeck = new Stack { Cards = player2Deck };
+            player1.ChangeUserDeck(new Stack(player1.Id, player1Deck));
+            player2.ChangeUserDeck(new Stack(player2.Id, player2Deck));
 
-            // Start battle asynchronously
+            // Cancel battle if userDeck is empty
+            if (player1Deck.Count == 0 || player2Deck.Count == 0)
+            {
+                throw new BattleException("One of the players has an empty deck.");
+            }
+
+            // Start battle in a new thread
             _ = Task.Run(async () =>
             {
                 try
@@ -106,11 +116,11 @@ public class BattleHandler : Handler, IHandler
                     UpdatePlayerStats(player2, result == RoundResults.Defeat ? RoundResults.Victory : RoundResults.Defeat);
 
                     // Send battle result to both players
-                    String jsonResponse = GenerateResponse(result, battle.BattleLog, player1, player2);
+                    string jsonResponse = GenerateResponse(result, battle.BattleLog, player1, player2);
 
                     // Send response to both players
-                    player1EventArgs.Reply(HttpStatusCode.OK, jsonResponse);
-                    opponentEventArgs?.Reply(HttpStatusCode.OK, jsonResponse);
+                    player1EventArgs.Reply(HttpStatusCode.OK, jsonResponse); // Reply to the first player (second connected)
+                    opponentEventArgs?.Reply(HttpStatusCode.OK, jsonResponse); // Reply to the second player (first connected)
 
                     // Update player stats in database
                     await _userRepository.UpdateAsync(player1);
@@ -141,29 +151,14 @@ public class BattleHandler : Handler, IHandler
     /// <param name="result"> Their result </param>
     private void UpdatePlayerStats(User user, RoundResults result)
     {
-        switch (result)
-        {
-            case RoundResults.Defeat:
-                user.Defeats++;
-                user.Elo -= 3;
-                break;
-
-            case RoundResults.Draw:
-                user.Draws++;
-                break;
-
-            case RoundResults.Victory:
-                user.Wins++;
-                user.Elo += 5;
-                break;
-        }
+        user.ApplyBattleResult(result);
     }
 
     /// <summary>
     /// Authenticates the user with the given token
     /// </summary>
     /// <param name="token"> The users token string </param>
-    /// <returns> TRUE and user entity if successful; FALSE and null else</returns>
+    /// <returns> user entity if successful; null else</returns>
     private async Task<User?> AuthenticateUser(string token)
     {
         var authResult = await Token.AuthenticateTokenAsync(token);
@@ -181,13 +176,26 @@ public class BattleHandler : Handler, IHandler
     private string GenerateResponse(RoundResults result, JsonArray battleLog, User player1, User player2)
     {
         JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true };
+
+        string battleWinner = "Draw";
+
+        switch (result)
+        {
+            case RoundResults.Defeat:
+                battleWinner = player2.Username;
+                break;
+            case RoundResults.Victory:
+                battleWinner = player1.Username;
+                break;
+        }
+
         string response = JsonSerializer.Serialize(new JsonObject
         {
             ["success"] = true,
             ["message"] = "Battle completed.",
             ["result"] = result.ToString(),
             ["battleLog"] = battleLog,
-            ["battleWinner"] = result == RoundResults.Victory ? player1.Username : player2.Username
+            ["battleWinner"] = battleWinner
         }, options);
 
         return response;

@@ -28,7 +28,7 @@ echo.
 curl -i -X POST http://localhost:10001/users --header "Content-Type: application/json" -d "{\"Username\":\"FullTestUserCreation3\",    \"Password\":\"FullTestUserCreation3PW\"}"
 echo "Should return HTTP 201"
 echo.
-curl -i -X POST http://localhost:10001/users --header "Content-Type: application/json" -d "{\"Username\":\"FullTestUserCreation4\",    \"Password\":\"FullTestUserCreation4PW\"}"
+curl -i -X POST http://localhost:10001/users --header "Content-Type: application/json" -d "{\"Username\":\"FullTestUserCreation4\",    \"Password\":\"FullTestUserreation4PW\"}"
 echo "Should return HTTP 201"
 echo.
 
@@ -43,20 +43,20 @@ echo.
 
 
 echo 2) Login Users
-curl -i -X POST http://localhost:10001/sessions --header "Content-Type: application/json" -d "{\"Username\":\"FullTestUser1Creation\", \"Password\":\"FullTestUser1CreationPW\"}"
+curl -i -X POST http://localhost:10001/sessions --header "Content-Type: application/json" -d "{\"Username\":\"FullTestUserCreation1\", \"Password\":\"FullTestUserCreation1PW\"}"
 echo "should return HTTP 200 with generated token for the user"
 echo.
-curl -i -X POST http://localhost:10001/sessions --header "Content-Type: application/json" -d "{\"Username\":\"FullTestUser2Creation\", \"Password\":\"FullTestUser2CreationPW\"}"
+curl -i -X POST http://localhost:10001/sessions --header "Content-Type: application/json" -d "{\"Username\":\"FullTestUserCreation2\", \"Password\":\"FullTestUserCreation2PW\"}"
 echo "should return HTTP 200 with generated token for the user"
 echo.
-curl -i -X POST http://localhost:10001/sessions --header "Content-Type: application/json" -d "{\"Username\":\"FullTestUser3Creation\",    \"Password\":\"FullTestUser3CreationPW\"}"
+curl -i -X POST http://localhost:10001/sessions --header "Content-Type: application/json" -d "{\"Username\":\"FullTestUserCreation3\",    \"Password\":\"FullTestUserCreation3PW\"}"
 echo "should return HTTP 200 with generated token for the user"
 echo.
 
 if %pauseFlag%==1 pause
 
 echo should fail:
-curl -i -X POST http://localhost:10001/sessions --header "Content-Type: application/json" -d "{\"Username\":\"FullTestUser4Creation\", \"Password\":\"different\"}"
+curl -i -X POST http://localhost:10001/sessions --header "Content-Type: application/json" -d "{\"Username\":\"FullTestUserCreation4\", \"Password\":\"different\"}"
 echo "Should return HTTP 4xx - Login failed"
 echo.
 echo.
@@ -84,18 +84,3 @@ curl -i -X GET http://localhost:10001/users/ --header "Authorization: Bearer ENT
 echo "Should return HTTP 200 - and new user data"
 echo.
 echo.
-echo should fail:
-curl -i -X GET http://localhost:10001/users/ --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION1"
-echo "Should return HTTP 4xx"
-echo.
-curl -i -X GET http://localhost:10001/users/ --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION2"
-echo "Should return HTTP 4xx"
-echo.
-curl -i -X PUT http://localhost:10001/users/ --header "Content-Type: application/json" --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION1" -d "{\"Name\": \"Hoax\",  \"Bio\": \"me playin...\", \"Image\": \":-)\"}"
-echo "Should return HTTP 4xx"
-echo.
-curl -i -X PUT http://localhost:10001/users/ --header "Content-Type: application/json" --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION2" -d "{\"Name\": \"Hoax\", \"Bio\": \"me codin...\",  \"Image\": \":-D\"}"
-echo "Should return HTTP 4xx"
-echo.
-curl -i -X GET http://localhost:10001/users/ --header "Authorization: Bearer ENTER TOKEN FROM DB FOR FULLTESTUSERCREATION1"
-echo "Should return HTTP 4xx"

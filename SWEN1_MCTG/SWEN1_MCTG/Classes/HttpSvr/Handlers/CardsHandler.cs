@@ -81,11 +81,11 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers;
         return true;
     }
 
-        /// <summary>
-        /// Generates an Array with the information of the users cards
-        /// </summary>
-        /// <param name="userCards"> The users cards </param>
-        /// <returns> A JsonArray with the user cards data </returns>
+    /// <summary>
+    /// Generates an Array with the information of the users cards
+    /// </summary>
+    /// <param name="userCards"> The users cards </param>
+    /// <returns> A JsonArray with the user cards data </returns>
     private JsonArray _generateCardArray(Stack userCards)
     {
 
@@ -111,5 +111,4 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers;
 
         return cardsArray;
     }
-
 }

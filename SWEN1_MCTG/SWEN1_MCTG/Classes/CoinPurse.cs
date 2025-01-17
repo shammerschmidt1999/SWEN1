@@ -15,10 +15,16 @@ namespace SWEN1_MCTG.Classes
         {
         }
 
-        public CoinPurse(CoinType coinType)
+        public CoinPurse(int userId)
+        {
+            _userId = userId;
+        }
+
+        public CoinPurse(CoinType coinType, int userId)
         {
             Coin firstCoin = new Coin(coinType);
             _coins.Add(firstCoin);
+            _userId = userId;
         }
 
         // Fields
@@ -35,7 +41,7 @@ namespace SWEN1_MCTG.Classes
         public int UserId
         {
             get => _userId;
-            set => _userId = value;
+            private set => _userId = value;
         }
 
         // Methods
@@ -80,43 +86,6 @@ namespace SWEN1_MCTG.Classes
             return true;
         }
 
-        // TODO: Maybe remove this method
-        /// <summary>
-        /// Converts coins of a lower value to a higher value if possible.
-        /// </summary>
-        /// <param name="fromType">The type of coin to convert from.</param>
-        /// <param name="toType">The type of coin to convert to.</param>
-        /// <returns>True if conversion was successful; otherwise, false.</returns>
-        public bool ConvertCoins(CoinType fromType, CoinType toType)
-        {
-            int fromValue = (int)fromType;
-            int toValue = (int)toType;
-
-            if (toValue <= fromValue || GetCoinsValueByType(fromType) < toValue)
-            {
-                return false; // Cannot convert
-            }
-
-            int requiredCount = toValue / fromValue;
-            if (RemoveCoins(fromType, requiredCount))
-            {
-                AddCoin(new Coin(toType));
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Gets the total value of coins of a specific type.
-        /// </summary>
-        /// <param name="coinType">The type of coin.</param>
-        /// <returns>Total value of coins of the specified type.</returns>
-        private int GetCoinsValueByType(CoinType coinType)
-        {
-            return _coins.Where(c => c.CoinType == coinType).Sum(c => c.Value);
-        }
-
         /// <summary>
         /// Gets the sum of the coin values in the Coin List
         /// </summary>
@@ -154,7 +123,7 @@ namespace SWEN1_MCTG.Classes
 
                 if (coinCount > 0 && targetValue > 0)
                 {
-                    // Determine the maximum number of coins we can use
+                    // Determine the maximum number of coins to use
                     int coinsToUse = Math.Min(targetValue / coinValue, coinCount);
                     if (coinsToUse > 0)
                     {
@@ -194,7 +163,7 @@ namespace SWEN1_MCTG.Classes
                 }
             }
 
-            // If the target value is not met, rollback changes and return null
+            // If the target value is not met, revert changes and return null
             if (targetValue > 0)
             {
                 // Add the removed coins back to the purse

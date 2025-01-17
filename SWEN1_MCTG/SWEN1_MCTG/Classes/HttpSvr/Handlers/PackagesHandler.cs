@@ -67,7 +67,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                             (PackageType)Enum.Parse(typeof(PackageType),
                                 (string)json["packageType"]!);
 
-                        User user = await _userRepository.GetByUsernameAsync(ses.User!.Username);
+                        User user = ses.User!;
                         await _packageService.PurchasePackageAsync(user.Id, packageType);
 
                         status = HttpStatusCode.OK;

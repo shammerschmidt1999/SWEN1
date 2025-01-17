@@ -87,10 +87,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                         await _userRepository.AddAsync(newUser);
                         User addedUser = await _userRepository.GetByUsernameAsync(username);
 
-                        CoinPurse coinPurse = new CoinPurse(CoinType.Diamond)
-                        {
-                            UserId = addedUser.Id
-                        };
+                        CoinPurse coinPurse = new CoinPurse(CoinType.Diamond, addedUser.Id);
                         await _coinPurseRepository.AddAsync(coinPurse);
 
                         status = HttpStatusCode.OK;
@@ -131,20 +128,11 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
 
                 if (ses.Success)
                 {
-                    User? user = await _userRepository.GetByUsernameAsync(ses.User.Username);
-                    Stack userStack = await _stackRepository.GetByUserIdAsync(ses.User!.Id);
-                    CoinPurse userCoinPurse = await _coinPurseRepository.GetByUserIdAsync(ses.User!.Id);
-
-                    if (user == null)
-                    {
-                        status = HttpStatusCode.NOT_FOUND;
-                        reply = new JsonObject() { ["success"] = false, ["message"] = "User not found." };
-                    }
-                    else
-                    {
-                        status = HttpStatusCode.OK;
-                        reply = _GenerateUserData(user, userStack, userCoinPurse);
-                    }
+                    User user = ses.User!;
+                    Stack userStack = await _stackRepository.GetByUserIdAsync(user.Id);
+                    CoinPurse userCoinPurse = await _coinPurseRepository.GetByUserIdAsync(user.Id);
+                    status = HttpStatusCode.OK;
+                    reply = _GenerateUserData(user, userStack, userCoinPurse);
                 }
                 else
                 {
@@ -189,11 +177,11 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
 
                             if (!string.IsNullOrEmpty(newUsername))
                             {
-                                ses.user.changeUsername(newUsername);
+                                ses.user.ChangeUsername(newUsername);
                             }
                             if (!string.IsNullOrEmpty(newPassword))
                             {
-                                ses.user.changePassword(newPassword);
+                                ses.user.ChangePassword(newPassword);
                             }
                             if (newCoins != null)
                             {

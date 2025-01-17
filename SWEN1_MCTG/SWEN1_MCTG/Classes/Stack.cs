@@ -14,6 +14,12 @@ namespace SWEN1_MCTG.Classes
         {
         }
 
+        public Stack(int userId, List<Card> cards)
+        {
+            _userId = userId;
+            _cards = cards;
+        }
+
         // Fields
         private List<Card> _cards = new List<Card>();
         private int _userId;
@@ -22,13 +28,13 @@ namespace SWEN1_MCTG.Classes
         public List<Card> Cards
         {
             get => _cards;
-            set => _cards = value;
+            private set => _cards = value;
         }
 
         public int UserId
         {
             get => _userId;
-            set => _userId = value;
+            private set => _userId = value;
         }
 
         // Methods

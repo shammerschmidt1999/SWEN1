@@ -146,16 +146,16 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
         {
             string connectionString = AppSettings.GetConnectionString("DefaultConnection");
 
-            NpgsqlConnection connection = new NpgsqlConnection(connectionString);
-            connection.Open();
+            await using NpgsqlConnection connection = new NpgsqlConnection(connectionString);
+            await connection.OpenAsync();
 
-            NpgsqlCommand command = new NpgsqlCommand("SELECT id, username, password FROM users WHERE username = @username AND password = @password", connection);
+            await using NpgsqlCommand command = new NpgsqlCommand("SELECT id, username, password FROM users WHERE username = @username AND password = @password", connection);
             string hashedPassword = PasswordHelper.HashPassword(password);
 
             command.Parameters.AddWithValue("username", username);
             command.Parameters.AddWithValue("password", hashedPassword);
 
-            using NpgsqlDataReader reader = command.ExecuteReader();
+            await using NpgsqlDataReader reader = command.ExecuteReader();
             if (reader.Read())
             {
                 return new User(

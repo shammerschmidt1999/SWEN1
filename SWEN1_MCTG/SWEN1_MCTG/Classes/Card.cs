@@ -16,8 +16,6 @@ namespace SWEN1_MCTG.Classes
             _inDeck = false;
         }
 
-        protected Card() { }
-
         // Fields
         protected int _id;
         protected string _name;

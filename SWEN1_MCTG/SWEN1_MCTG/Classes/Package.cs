@@ -49,14 +49,23 @@ namespace SWEN1_MCTG.Classes
         public int PossibleDecisions
         {
             get => _possibleDecisions;
-            set => _possibleDecisions = value;
+            private set => _possibleDecisions = value;
         }
 
+        /// <summary>
+        /// Add cards to package
+        /// </summary>
+        /// <param name="cards"> Cards to be added </param>
         public void AddCards(List<Card> cards)
         {
             _cards.AddRange(cards);
         }
 
+        /// <summary>
+        /// Get amount of cards in package
+        /// </summary>
+        /// <returns> int with amount of cards </returns>
+        /// <exception cref="ArgumentOutOfRangeException"> if there is an invalid packagetype </exception>
         public int GetAmountOfCards()
         {
             return PackageType switch
@@ -68,6 +77,10 @@ namespace SWEN1_MCTG.Classes
             };
         }
 
+        /// <summary>
+        /// Calculate the possible decisions the user can make
+        /// </summary>
+        /// <returns> int representing the possible decisions </returns>
         public int GetPossibleDecisions()
         {
             return PackageType == PackageType.Legendary ? 6 : 4;

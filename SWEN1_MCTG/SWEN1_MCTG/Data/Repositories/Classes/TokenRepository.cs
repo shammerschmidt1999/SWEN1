@@ -24,7 +24,6 @@ public class TokenRepository : ITokenRepository
         _connectionString = connectionString;
     }
 
-    // TODO: Add only one token per user to database
     /// <summary>
     /// Creates a token for the user and stores it in the db
     /// </summary>

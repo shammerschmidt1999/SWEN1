@@ -56,7 +56,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                 if (ses.Success)
                 { 
                     status = HttpStatusCode.OK;
-                    reply = _GenerateStats(ses.User);
+                    reply = _GenerateStats(ses.User!);
                 }
                 else
                 {

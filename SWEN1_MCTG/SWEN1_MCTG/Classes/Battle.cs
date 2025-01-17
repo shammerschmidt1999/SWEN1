@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using SWEN1_MCTG.Interfaces;
 using static SWEN1_MCTG.GlobalEnums;
 
-namespace SWEN1_MCTG.Classes.Battle
+namespace SWEN1_MCTG.Classes
 {
     public class Battle : IBattle
     {
@@ -37,10 +37,13 @@ namespace SWEN1_MCTG.Classes.Battle
         // Methods
         public RoundResults StartBattle()
         {
+            // First log entry for battle start
+            LogBattleStart(_player1, _player2);
+
             // Battle until max rounds or one player has no cards left
             while (
-                    _roundCount < _maxRounds 
-                   && _player1.UserDeck.Cards.Count > 0 
+                    _roundCount < _maxRounds
+                   && _player1.UserDeck.Cards.Count > 0
                    && _player2.UserDeck.Cards.Count > 0
                    )
             {
@@ -129,12 +132,31 @@ namespace SWEN1_MCTG.Classes.Battle
         }
 
         /// <summary>
+        /// Logs the start of the battle
+        /// </summary>
+        /// <param name="player1"> Player 1 entity </param>
+        /// <param name="player2"> Player 2 entity </param>
+        private void LogBattleStart(User player1, User player2)
+        {
+            JsonObject battleLogEntry = new JsonObject()
+            {
+                ["RoundNumber"] = "Battle Start",
+                ["Player1"] = player1.Username,
+                ["Player1 CardAmount"] = player1.UserDeck.Cards.Count,
+                ["Player2"] = player2.Username,
+                ["Player2 CardAmount"] = player2.UserDeck.Cards.Count,
+            };
+
+            _battleLog.Add(battleLogEntry);
+        }
+
+        /// <summary>
         /// Compares the calculated damage of two cards
         /// </summary>
         /// <param name="player1Damage"> Damage of player 1 </param>
         /// <param name="player2Damage"> Damage of player 2 </param>
         /// <returns> RoundResult Enum Value </returns>
-        public RoundResults CompareDamage(double player1Damage, double player2Damage)
+        private RoundResults CompareDamage(double player1Damage, double player2Damage)
         {
             if (player1Damage > player2Damage)
                 return RoundResults.Victory;
@@ -151,8 +173,8 @@ namespace SWEN1_MCTG.Classes.Battle
         /// <param name="card1"></param>
         /// <param name="card2"></param>
         /// <param name="card1Damage"></param>
-        /// <returns></returns>
-        public double CalculateDamage(Card card1, Card card2, double card1Damage)
+        /// <returns> The damage after rules are applied </returns>
+        private double CalculateDamage(Card card1, Card card2, double card1Damage)
         {
             double calculatedDamage = card1Damage;
 
@@ -175,7 +197,7 @@ namespace SWEN1_MCTG.Classes.Battle
         /// <param name="card2ElementType"> Type of element the first card plays against </param>
         /// <param name="card1Damage"> Damage of card1 </param>
         /// <returns> The damage with consideration of element synergies </returns>
-        public double CalculateSpellVsSpellDamage(SpellCard card1, ElementType card2ElementType, double card1Damage)
+        private double CalculateSpellVsSpellDamage(SpellCard card1, ElementType card2ElementType, double card1Damage)
         {
             if (card1.ElementType == ElementType.Water && card2ElementType == ElementType.Fire)
                 return card1Damage * 2;
@@ -204,7 +226,7 @@ namespace SWEN1_MCTG.Classes.Battle
         /// <param name="card2"> Card that the first card plays against </param>
         /// <param name="card1Damage"> Damage of card1 </param>
         /// <returns> The damage with consideration of element synergies and monster synergies </returns>
-        public double CalculateSpellVsMonsterDamage(SpellCard card1, MonsterCard card2, double card1Damage)
+        private double CalculateSpellVsMonsterDamage(SpellCard card1, MonsterCard card2, double card1Damage)
         {
             if (card2.MonsterType == MonsterType.Kraken)
                 return 0;
@@ -222,7 +244,7 @@ namespace SWEN1_MCTG.Classes.Battle
         /// <param name="card2"> Card that the first card plays against </param>
         /// <param name="card1Damage"> Damage of card1 </param>
         /// <returns> The damage with consideration of monster synergies </returns>
-        public double CalculateMonsterVsMonsterDamage(MonsterCard card1, MonsterCard card2, double card1Damage)
+        private double CalculateMonsterVsMonsterDamage(MonsterCard card1, MonsterCard card2, double card1Damage)
         {
             if (card1.MonsterType == MonsterType.Goblin && card2.MonsterType == MonsterType.Dragon)
                 return 0;
@@ -258,6 +280,17 @@ namespace SWEN1_MCTG.Classes.Battle
             }
 
             return result;
+        }
+
+        // Used for testing purposes
+        public double CalculateDamageTest(Card card1, Card card2, double card1Damage)
+        {
+            return CalculateDamage(card1, card2, card1Damage);
+        }
+
+        public RoundResults CompareDamageTest(double player1Damage, double player2Damage)
+        {
+            return CompareDamage(player1Damage, player2Damage);
         }
     }
 }

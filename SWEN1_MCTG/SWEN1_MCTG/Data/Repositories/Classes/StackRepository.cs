@@ -69,10 +69,10 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
         protected override Stack MapReaderToEntity(NpgsqlDataReader reader)
         {
             Stack stack = new Stack
-            {
-                UserId = reader.GetInt32(reader.GetOrdinal("user_id")),
-                Cards = new List<Card>()
-            };
+                (
+                reader.GetInt32(reader.GetOrdinal("user_id")),
+                new List<Card>()
+                );
 
             do
             {

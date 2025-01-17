@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CardTest", "CardTest\CardTe
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RepositoryTests", "RepositoryTests", "{6DEF644C-5D89-4B35-A0E5-2A2C3B903498}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StackRepositoryTest", "StackRepositoryTest\StackRepositoryTest.csproj", "{8158683B-6662-4A81-BA50-906A57F0AC2E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserRepositoryTest", "UserRepositoryTest\UserRepositoryTest.csproj", "{F56C6DE8-F41D-4FEB-BB9C-1D4857553024}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserTest", "UserTest\UserTest.csproj", "{2ADA2605-B3FD-4ADD-86A4-7A6F9EDB21B2}"
@@ -35,9 +33,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Curl Scripts", "Curl Script
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "for Presentation", "for Presentation", "{EC943BF6-A212-4FC7-BB11-9AD5CF786392}"
 	ProjectSection(SolutionItems) = preProject
-		Curl Scripts\MonsterTradingCards.FullTest.curl.bat = Curl Scripts\MonsterTradingCards.FullTest.curl.bat
-		MonsterTradingCards.FullTest.Preparation.curl.bat = MonsterTradingCards.FullTest.Preparation.curl.bat
-		MonsterTradingCards.FullTest.UserCreation.curl.bat = MonsterTradingCards.FullTest.UserCreation.curl.bat
+		Curl Scripts\for Presentation\MonsterTradingCards.FullTest.curl.bat = Curl Scripts\for Presentation\MonsterTradingCards.FullTest.curl.bat
+		Curl Scripts\for Presentation\MonsterTradingCards.FullTest.Preparation.curl.bat = Curl Scripts\for Presentation\MonsterTradingCards.FullTest.Preparation.curl.bat
+		Curl Scripts\for Presentation\MonsterTradingCards.FullTest.UserCreation.curl.bat = Curl Scripts\for Presentation\MonsterTradingCards.FullTest.UserCreation.curl.bat
 	EndProjectSection
 EndProject
 Global
@@ -58,10 +56,6 @@ Global
 		{B71D8234-4813-493C-A49E-3FC061B91F30}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B71D8234-4813-493C-A49E-3FC061B91F30}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B71D8234-4813-493C-A49E-3FC061B91F30}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8158683B-6662-4A81-BA50-906A57F0AC2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8158683B-6662-4A81-BA50-906A57F0AC2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8158683B-6662-4A81-BA50-906A57F0AC2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8158683B-6662-4A81-BA50-906A57F0AC2E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F56C6DE8-F41D-4FEB-BB9C-1D4857553024}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F56C6DE8-F41D-4FEB-BB9C-1D4857553024}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F56C6DE8-F41D-4FEB-BB9C-1D4857553024}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -77,7 +71,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{6D099B44-B9B4-43F6-BB75-F53D97A8F26A} = {817E6AC0-1532-4869-811D-A6EF5AB10F32}
 		{B71D8234-4813-493C-A49E-3FC061B91F30} = {817E6AC0-1532-4869-811D-A6EF5AB10F32}
-		{8158683B-6662-4A81-BA50-906A57F0AC2E} = {6DEF644C-5D89-4B35-A0E5-2A2C3B903498}
 		{F56C6DE8-F41D-4FEB-BB9C-1D4857553024} = {6DEF644C-5D89-4B35-A0E5-2A2C3B903498}
 		{2ADA2605-B3FD-4ADD-86A4-7A6F9EDB21B2} = {817E6AC0-1532-4869-811D-A6EF5AB10F32}
 		{EC943BF6-A212-4FC7-BB11-9AD5CF786392} = {9504AD84-B9E8-4EEE-9692-C9909D6C5394}

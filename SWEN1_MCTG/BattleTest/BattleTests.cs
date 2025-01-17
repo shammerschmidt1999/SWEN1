@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using SWEN1_MCTG;
 using SWEN1_MCTG.Classes;
-using SWEN1_MCTG.Classes.Battle;
 using static SWEN1_MCTG.GlobalEnums;
 
 namespace BattleTest;
@@ -53,7 +52,7 @@ public class BattleTests
 
         Battle testBattle = new Battle(player1, player2);
 
-        double calculatedDamage = testBattle.CalculateDamage(player1SpellCard, player2SpellCard, player1CardDamage);
+        double calculatedDamage = testBattle.CalculateDamageTest(player1SpellCard, player2SpellCard, player1CardDamage);
 
         Assert.AreEqual(player1CardDamage * 2, calculatedDamage);
     }
@@ -73,7 +72,7 @@ public class BattleTests
 
         Battle testBattle = new Battle(player1, player2);
 
-        double calculatedDamage = testBattle.CalculateDamage(player1SpellCard, player2SpellCard, player1CardDamage);
+        double calculatedDamage = testBattle.CalculateDamageTest(player1SpellCard, player2SpellCard, player1CardDamage);
 
         Assert.AreEqual(player1CardDamage / 2, calculatedDamage);
     }
@@ -93,7 +92,7 @@ public class BattleTests
 
         Battle testBattle = new Battle(player1, player2);
 
-        double calculatedDamage = testBattle.CalculateDamage(player1SpellCard, player2SpellCard, player1CardDamage);
+        double calculatedDamage = testBattle.CalculateDamageTest(player1SpellCard, player2SpellCard, player1CardDamage);
 
         Assert.AreEqual(player1CardDamage, calculatedDamage);
     }
@@ -115,7 +114,7 @@ public class BattleTests
 
         Battle testBattle = new Battle(player1, player2);
 
-        double calculatedDamage = testBattle.CalculateDamage(player1SpellCard, player2MonsterCard, player1CardDamage);
+        double calculatedDamage = testBattle.CalculateDamageTest(player1SpellCard, player2MonsterCard, player1CardDamage);
 
         Assert.AreEqual(spellDamageAgainstKraken, calculatedDamage);
     }
@@ -136,7 +135,7 @@ public class BattleTests
 
         Battle testBattle = new Battle(player1, player2);
 
-        double calculatedDamage = testBattle.CalculateDamage(player1SpellCard, player2MonsterCard, player1CardDamage);
+        double calculatedDamage = testBattle.CalculateDamageTest(player1SpellCard, player2MonsterCard, player1CardDamage);
 
         Assert.AreEqual(player1CardDamage * 2, calculatedDamage);
     }
@@ -157,7 +156,7 @@ public class BattleTests
 
         Battle testBattle = new Battle(player1, player2);
 
-        double calculatedDamage = testBattle.CalculateDamage(player1SpellCard, player2MonsterCard, player1CardDamage);
+        double calculatedDamage = testBattle.CalculateDamageTest(player1SpellCard, player2MonsterCard, player1CardDamage);
 
         Assert.AreEqual(player1CardDamage, calculatedDamage);
     }
@@ -180,7 +179,7 @@ public class BattleTests
 
         Battle testBattle = new Battle(player1, player2);
 
-        double calculatedDamage = testBattle.CalculateDamage(player1MonsterCard, player2MonsterCard, player1CardDamage);
+        double calculatedDamage = testBattle.CalculateDamageTest(player1MonsterCard, player2MonsterCard, player1CardDamage);
 
         Assert.AreEqual(goblinDamageAgainstDragon, calculatedDamage);
     }
@@ -203,7 +202,7 @@ public class BattleTests
 
         Battle testBattle = new Battle(player1, player2);
 
-        double calculatedDamage = testBattle.CalculateDamage(player1MonsterCard, player2MonsterCard, player1CardDamage);
+        double calculatedDamage = testBattle.CalculateDamageTest(player1MonsterCard, player2MonsterCard, player1CardDamage);
 
         Assert.AreEqual(orkDamageAgainstWizard, calculatedDamage);
     }
@@ -226,7 +225,7 @@ public class BattleTests
 
         Battle testBattle = new Battle(player1, player2);
 
-        double calculatedDamage = testBattle.CalculateDamage(player1MonsterCard, player2MonsterCard, player1CardDamage);
+        double calculatedDamage = testBattle.CalculateDamageTest(player1MonsterCard, player2MonsterCard, player1CardDamage);
 
         Assert.AreEqual(dragonDamageAgainstFireElve, calculatedDamage);
     }
@@ -249,7 +248,7 @@ public class BattleTests
 
         Battle testBattle = new Battle(player1, player2);
 
-        double calculatedDamage = testBattle.CalculateDamage(player1MonsterCard, player2MonsterCard, player1CardDamage);
+        double calculatedDamage = testBattle.CalculateDamageTest(player1MonsterCard, player2MonsterCard, player1CardDamage);
 
         Assert.AreEqual(player1CardDamage, calculatedDamage);
     }
@@ -262,7 +261,7 @@ public class BattleTests
 
         Battle testBattle = new Battle(player1, player2);
 
-        RoundResults result = testBattle.CompareDamage(player1Damage, player2Damage);
+        RoundResults result = testBattle.CompareDamageTest(player1Damage, player2Damage);
         RoundResults victory = RoundResults.Victory;
 
         Assert.AreEqual(result, victory);
@@ -276,7 +275,7 @@ public class BattleTests
 
         Battle testBattle = new Battle(player1, player2);
 
-        RoundResults result = testBattle.CompareDamage(player1Damage, player2Damage);
+        RoundResults result = testBattle.CompareDamageTest(player1Damage, player2Damage);
         RoundResults draw = RoundResults.Draw;
 
         Assert.AreEqual(result, draw);
@@ -290,7 +289,7 @@ public class BattleTests
 
         Battle testBattle = new Battle(player1, player2);
 
-        RoundResults result = testBattle.CompareDamage(player1Damage, player2Damage);
+        RoundResults result = testBattle.CompareDamageTest(player1Damage, player2Damage);
         RoundResults defeat = RoundResults.Defeat;
 
         Assert.AreEqual(result, defeat);

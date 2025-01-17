@@ -14,16 +14,12 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
 {
     public class CardRepository : Repository<Card>, ICardRepository
     {
-        private readonly string GetByNameQuery;
-
-        public CardRepository() : base(null, null)
-        {
-        }
+        private readonly string _getByNameQuery;
 
         public CardRepository(string connectionString)
             : base(connectionString, "cards")
         {
-            GetByNameQuery = $"SELECT * FROM {TableName} WHERE name = @name";
+            _getByNameQuery = $"SELECT * FROM {TableName} WHERE name = @name";
         }
 
         protected override Card CreateEntity()
@@ -139,23 +135,6 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             card.Id = Convert.ToInt32(reader["Id"]);
 
             return card;
-        }
-
-        public async Task<Card> GetByNameAsync(string name)
-        {
-            await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
-            await connection.OpenAsync();
-
-            await using NpgsqlCommand command = new NpgsqlCommand(GetByNameQuery, connection);
-            command.Parameters.AddWithValue("@name", name);
-
-            await using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
-            {
-                return MapReaderToEntity(reader);
-            }
-
-            throw new InvalidOperationException($"Card with Name {name} not found.");
         }
 
         public async Task<List<Card>> GetRandomCardsAsync(int count)

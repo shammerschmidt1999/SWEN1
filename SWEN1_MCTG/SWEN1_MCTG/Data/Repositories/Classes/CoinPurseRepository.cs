@@ -10,8 +10,6 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
 {
     public class CoinPurseRepository : Repository<CoinPurse>, ICoinPurseRepository
     {
-        private readonly string _getCoinPurseByIdQuery = @"SELECT * FROM coin_purses WHERE user_id = @UserId";
-        private readonly string _deleteCoinPurseQuery = @"DELETE FROM coin_purses WHERE user_id = @UserId";
         private readonly string _updateCoinPurseQuery = @"UPDATE coin_purses SET Bronze = @Bronze, Silver = @Silver, Gold = @Gold, Platinum = @Platinum, Diamond = @Diamond WHERE user_id = @UserId";
         private readonly string _insertCoinPurseQuery = @"INSERT INTO coin_purses (user_id, bronze, silver, gold, platinum, diamond) VALUES (@UserId, @Bronze, @Silver, @Gold, @Platinum, @Diamond) ON CONFLICT (user_id) DO UPDATE SET bronze = @Bronze, silver = @Silver, gold = @Gold, platinum = @Platinum, diamond = @Diamond";
 
@@ -48,18 +46,6 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             throw new InvalidOperationException($"CoinPurse with UserId {userId} not found.");
         }
 
-        public async Task DeleteByUserIdAsync(int userId)
-        {
-            await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
-            await connection.OpenAsync();
-
-            string query = $"DELETE FROM {TableName} WHERE user_id = @userId";
-            await using NpgsqlCommand command = new NpgsqlCommand(query, connection);
-            command.Parameters.AddWithValue("@userId", userId);
-
-            await command.ExecuteNonQueryAsync();
-        }
-
         public async Task UpdateCoinPurseAsync(CoinPurse coinPurse)
         {
             await using NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
@@ -73,13 +59,6 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             await command.ExecuteNonQueryAsync();
         }
 
-        public async Task AddCoinsToPurseAsync(int userId, IEnumerable<Coin> coins)
-        {
-            CoinPurse coinPurse = await GetByUserIdAsync(userId);
-            coinPurse.AddCoins(coins);
-            await UpdateCoinPurseAsync(coinPurse);
-        }
-
         public async Task<bool> RemoveCoinsFromPurseAsync(int userId, int amount)
         {
             CoinPurse coinPurse = await GetByUserIdAsync(userId);
@@ -89,13 +68,6 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
                 await UpdateCoinPurseAsync(coinPurse);
             }
             return result;
-        }
-
-        public async Task RemoveAllCoinsFromPurseAsync(int userId)
-        {
-            CoinPurse coinPurse = await GetByUserIdAsync(userId);
-            coinPurse.Coins.Clear();
-            await UpdateCoinPurseAsync(coinPurse);
         }
 
         protected override CoinPurse CreateEntity()
@@ -120,10 +92,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
 
         protected override CoinPurse MapReaderToEntity(NpgsqlDataReader reader)
         {
-            CoinPurse coinPurse = new CoinPurse
-            {
-                UserId = reader.GetInt32(reader.GetOrdinal("user_id"))
-            };
+            CoinPurse coinPurse = new CoinPurse(reader.GetInt32(reader.GetOrdinal("user_id")));
 
             // Add coins based on the stored values in the database
             int bronzeCount = reader.GetInt32(reader.GetOrdinal("bronze"));

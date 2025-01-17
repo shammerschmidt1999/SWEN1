@@ -50,8 +50,6 @@ namespace SWEN1_MCTG.Classes
             _password = password;
         }
 
-
-
         // Fields
         private int _id;
         private string _username;
@@ -97,31 +95,31 @@ namespace SWEN1_MCTG.Classes
         public int Elo
         {
             get => _elo;
-            set => _elo = value;
+            private set => _elo = value;
         }
 
         public Stack UserDeck
         {
             get => _userDeck;
-            set => _userDeck = value;
+            private set => _userDeck = value;
         }
 
         public int Wins
         {
             get => _wins;
-            set => _wins = value;
+            private set => _wins = value;
         }
 
         public int Defeats
         {
             get => _defeats;
-            set => _defeats = value;
+            private set => _defeats = value;
         }
 
         public int Draws
         {
             get => _draws;
-            set => _draws = value;
+            private set => _draws = value;
         }
 
 
@@ -143,14 +141,37 @@ namespace SWEN1_MCTG.Classes
             return (false, string.Empty);
         }
 
-        public void changeUsername(string username)
+        public void ChangeUsername(string username)
         {
-            Username = username;
+            _username = username;
         }
 
-        public void changePassword(string password)
+        public void ChangePassword(string password)
         {
-            Password = PasswordHelper.HashPassword(password);
+            _password = PasswordHelper.HashPassword(password);
+        }
+
+        public void ChangeUserDeck(Stack newDeck)
+        {
+            _userDeck = newDeck;
+        }
+
+        public void ApplyBattleResult(GlobalEnums.RoundResults result)
+        {
+            switch (result)
+            {
+                case GlobalEnums.RoundResults.Defeat:
+                    _defeats++;
+                    _elo -= 3;
+                    break;
+                case GlobalEnums.RoundResults.Draw:
+                    _draws++;
+                    break;
+                case GlobalEnums.RoundResults.Victory:
+                    _wins++;
+                    _elo += 5;
+                    break;
+            }
         }
     }
 }
