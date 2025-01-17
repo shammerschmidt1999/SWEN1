@@ -17,7 +17,7 @@
     \textbf{Samuel Hammerschmidt} \\
     \href{https://github.com/shammerschmidt1999/SWEN1}{\texttt{GitHub: github.com/shammerschmidt1999/SWEN1}}
 }
-\date{Januar 2024}
+\date{Januar 2025}
 
 \begin{document}
 
@@ -143,6 +143,7 @@ Weiters half mir pgAdmin 4 speziell am Anfang der Datenbank-Entwicklung, da das 
 Die Unit Tests wurden mit dem \texttt{MSTest}-Framework implementiert. Vor allem die dadurch entstandene Trennung der Tests und des eigentlichen Codes, ermöglicht eine gute Übersicht des Repositories.
 Weiters hat das kontinuierliche Entwickeln von Tests während der Funktionsimplementierung dazu geführt, dass die Klassen und Methoden besser strukturiert und getestet wurden.
 
+
 \subsection{Klassenstruktur}
 Die Erstellung von eigenen Klassen für spezielle Operationen, wie z.B. \texttt{AppSettings} und \texttt{PasswordHelper}, hat sich als sinnvoll erwiesen, um den Code übersichtlicher zu halten und Verwirrung zu vermeiden.
 
@@ -177,6 +178,37 @@ Erstellung der finalen Abgabe & 4 \\ \hline
 \label{tab:timetable}
 \end{table}
 
+\pagebreak
+
 \section{UML-Diagramme}
+
+\subsection {Class Pattern}
+\noindent\textbf{Hinweis:} Hier wird nur die \texttt{Stack}-Class gezeigt, um das Pattern der Classes zu darzustellen. Der Aufbau ist für sämtliche Classes ähnlich.
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{Class_UML_Example_Stack.png}
+\caption{UML-Diagramm des Class Patterns}
+\label{fig:repository_pattern}
+\end{figure}
+\pagebreak
+
+\subsection {Repository Pattern}
+\noindent\textbf{Hinweis:} Hier wird nur das \texttt{UserRepository} gezeigt, um das Pattern der Repositories zu darzustellen. Der Aufbau ist für sämtliche Repositories ähnlich.
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{Repository_UML_Example_User.png}
+\caption{UML-Diagramm des Repository Patterns}
+\label{fig:repository_pattern}
+\end{figure}
+\pagebreak
+
+\subsection {Handler Pattern}
+\noindent\textbf{Hinweis:} Hier wird nur der \texttt{UserHandler} gezeigt, um das Pattern der Handler zu darzustellen. Der Aufbau ist für sämtliche Handler ähnlich.
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{Handler_UML_Example_User.png}
+\caption{UML-Diagramm des Handler Patterns}
+\label{fig:repository_pattern}
+\end{figure}
 
 \end{document}

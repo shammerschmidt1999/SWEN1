@@ -10,13 +10,6 @@ public class PackageService : IPackageService
     private readonly CoinPurseRepository _coinPurseRepository;
     private readonly string _connectionString;
 
-    public PackageService(StackRepository stackRepository, CardRepository cardRepository, CoinPurseRepository coinPurseRepository, Func<List<Card>, int, List<Card>> cardSelectionStrategy)
-    {
-        _stackRepository = stackRepository;
-        _cardRepository = cardRepository;
-        _coinPurseRepository = coinPurseRepository;
-    }
-
     public PackageService()
     {
         _connectionString = AppSettings.GetConnectionString("TestConnection");
@@ -25,7 +18,6 @@ public class PackageService : IPackageService
         _coinPurseRepository = new CoinPurseRepository(_connectionString);
     }
 
-    // TODO: Created package should be saved in DB, info sent back to user, new command to choose cards, should not happen on server-side
     /// <summary>
     /// Allows a user to purchase a package
     /// </summary>
@@ -37,7 +29,6 @@ public class PackageService : IPackageService
     {
         // Get corresponding CoinPurse
         CoinPurse coinPurse = await _coinPurseRepository.GetByUserIdAsync(userId);
-
 
         // Check if user has enough coins to purchase package
         if (coinPurse.GetCoinsValue() < (int)packageType)
@@ -106,29 +97,47 @@ public class PackageService : IPackageService
             {
                 Console.WriteLine($"Choose card {i + 1}:");
                 string input = Console.ReadLine();
-                validInput = int.TryParse(input, out choice);
-                choice -= 1; // Adjust for zero-based index
+                validInput = ValidateUserInput(input, randomCards.Count, chosenIndices, out choice);
 
-                if (!validInput)
+                if (validInput)
                 {
-                    Console.WriteLine("Invalid input. Please enter a number.");
-                }
-                else if (choice < 0 || choice >= randomCards.Count)
-                {
-                    Console.WriteLine("Invalid choice. Please select a valid card.");
-                    validInput = false;
-                }
-                else if (chosenIndices.Contains(choice))
-                {
-                    Console.WriteLine("You have already chosen this card. Please select a different card.");
-                    validInput = false;
+                    chosenIndices.Add(choice);
+                    selectedCards.Add(randomCards[choice]);
                 }
             } while (!validInput);
-
-            chosenIndices.Add(choice);
-            selectedCards.Add(randomCards[choice]);
         }
 
         return selectedCards;
+    }
+
+    /// <summary>
+    /// Validates the user's input for selecting cards
+    /// </summary>
+    /// <param name="input"> The user's input </param>
+    /// <param name="maxIndex"> The maximum valid index for card selection </param>
+    /// <param name="chosenIndices"> The set of already chosen indices </param>
+    /// <param name="choice"> The parsed choice if valid </param>
+    /// <returns> True if the input is valid; otherwise, false </returns>
+    private bool ValidateUserInput(string input, int maxIndex, HashSet<int> chosenIndices, out int choice)
+    {
+        bool validInput = int.TryParse(input, out choice);
+        choice -= 1; // Adjust for zero-based index
+
+        if (!validInput)
+        {
+            Console.WriteLine("Invalid input. Please enter a number.");
+        }
+        else if (choice < 0 || choice >= maxIndex)
+        {
+            Console.WriteLine("Invalid choice. Please select a valid card.");
+            validInput = false;
+        }
+        else if (chosenIndices.Contains(choice))
+        {
+            Console.WriteLine("You have already chosen this card. Please select a different card.");
+            validInput = false;
+        }
+
+        return validInput;
     }
 }
