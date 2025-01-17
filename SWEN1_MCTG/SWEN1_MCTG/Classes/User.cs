@@ -133,7 +133,7 @@ namespace SWEN1_MCTG.Classes
         /// <returns> Success status and created token </returns>
         public static async Task<(bool Success, string Token)> LogonAsync(string username, string password)
         {
-            UserRepository userRepository = new UserRepository(AppSettings.GetConnectionString("TestConnection"));
+            UserRepository userRepository = new UserRepository(AppSettings.GetConnectionString("DefaultConnection"));
             User? user = await userRepository.ValidateCredentialsAsync(username, password);
             if (user != null)
             {

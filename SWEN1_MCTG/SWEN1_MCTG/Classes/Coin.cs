@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SWEN1_MCTG.Interfaces;
+using static SWEN1_MCTG.GlobalEnums;
 
 namespace SWEN1_MCTG.Classes
 {
@@ -12,7 +13,7 @@ namespace SWEN1_MCTG.Classes
     public class Coin
     {
         // Constructor
-        public Coin(GlobalEnums.CoinType coinType)
+        public Coin(CoinType coinType)
         {
             _coinType = coinType;
             _value = (int)coinType;
@@ -20,12 +21,12 @@ namespace SWEN1_MCTG.Classes
 
         // Fields
         private int _value;
-        private GlobalEnums.CoinType _coinType;
+        private CoinType _coinType;
 
         // Properties
         public int Value => (int)_coinType;
 
-        public GlobalEnums.CoinType CoinType
+        public CoinType CoinType
         {
             get => _coinType;
             private set => _coinType = value;

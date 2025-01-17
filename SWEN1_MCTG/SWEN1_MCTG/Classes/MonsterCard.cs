@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SWEN1_MCTG.Interfaces;
+using static SWEN1_MCTG.GlobalEnums;
 
 namespace SWEN1_MCTG.Classes
 {
@@ -11,17 +12,17 @@ namespace SWEN1_MCTG.Classes
     public class MonsterCard : Card
     {
         // Constructor
-        public MonsterCard(string name, GlobalEnums.MonsterType monsterType, double damage, GlobalEnums.ElementType elementType)
+        public MonsterCard(string name, MonsterType monsterType, double damage, ElementType elementType)
             : base(name, damage, elementType)
         {
             _monsterType = monsterType;
         }
 
         // Fields
-        private GlobalEnums.MonsterType _monsterType;
+        private MonsterType _monsterType;
 
         // Properties
-        public GlobalEnums.MonsterType MonsterType
+        public MonsterType MonsterType
         {
             get => _monsterType;
             private set => _monsterType = value;

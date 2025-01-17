@@ -11,6 +11,7 @@ using System.Text.Json.Nodes;
 using SWEN1_MCTG.Data;
 using SWEN1_MCTG.Data.Repositories.Classes;
 using SWEN1_MCTG.Data.Repositories.Interfaces;
+using static SWEN1_MCTG.GlobalEnums;
 
 namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
 {
@@ -23,7 +24,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
 
         public PackagesHandler()
         {
-            _connectionString = AppSettings.GetConnectionString("TestConnection");
+            _connectionString = AppSettings.GetConnectionString("DefaultConnection");
             _cardRepository = new CardRepository(_connectionString);
             _userRepository = new UserRepository(_connectionString);
             _packageService = new PackageService();
@@ -62,8 +63,8 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                     JsonNode? json = JsonNode.Parse(e.Payload);
                     if (json != null)
                     {
-                        GlobalEnums.PackageType packageType = 
-                            (GlobalEnums.PackageType)Enum.Parse(typeof(GlobalEnums.PackageType),
+                        PackageType packageType = 
+                            (PackageType)Enum.Parse(typeof(PackageType),
                                 (string)json["packageType"]!);
 
                         User user = await _userRepository.GetByUsernameAsync(ses.User!.Username);

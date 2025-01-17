@@ -104,25 +104,25 @@ if %pauseFlag%==1 pause
 
 REM --------------------------------------------------
 echo 8) configure deck
-curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" --header "Authorization: Bearer fulltestuser1-mtcgtoken" -d "[\"Lancelot\", \"Cth-Un\", \"Tsunami\", \"Hellscream\"]"
+curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" --header "Authorization: Bearer fulltestuser1-mtcgtoken" -d "[\"Shipeater\", \"Hellfire\", \"Tsunami\", \"Tinkerer\"]"
 echo "Should return HTTP 2xx"
 echo.
 curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer fulltestuser1-mtcgtoken"
 echo "Should return HTTP 200 - and a list of all cards"
 echo.
-curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" --header "Authorization: Bearer fulltestuser2-mtcgtoken" -d "[\"Blizzard\", \"Gunshot\", \"Earthquake\", \"Deathwing\"]"
+curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" --header "Authorization: Bearer fulltestuser2-mtcgtoken" -d "[\"Shipeater\", \"Fireball\", \"Burned One\", \"Elminster\"]"
 echo "Should return HTTP 2xx"
 echo.
 curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer fulltestuser2-mtcgtoken"
 echo "Should return HTTP 200 - and a list of all cards"
 echo.
-curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" --header "Authorization: Bearer fulltestuser3-mtcgtoken" -d "[\"Blizzard\", \"Burned One\", \"Not available\", \"Glacial Spike\"]"
+curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" --header "Authorization: Bearer fulltestuser3-mtcgtoken" -d "[\"Fireball\", \"Lancelot\", \"TestSpellCard\", \"Shipeater\"]"
 echo "Should return HTTP 2xx"
 echo.
 curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer fulltestuser3-mtcgtoken"
 echo "Should return HTTP 200 - and a list of all cards"
 echo.
-curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" --header "Authorization: Bearer fulltestuser4-mtcgtoken" -d "[\"Brimstone\", \"Tide Knight\", \"Earthquake\", \"Tinkerer\", \"Gallywix\"]"
+curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" --header "Authorization: Bearer fulltestuser4-mtcgtoken" -d "[\"Brimstone\", \"Burned One\", \"Glacial Spike\", \"Elve Commander\", \"Deathwing\"]"
 echo "Should return HTTP 400 - and tell user that his deck is already full"
 echo.
 curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer fulltestuser4-mtcgtoken"
@@ -143,7 +143,7 @@ curl -i -X POST http://localhost:10001/battles --header "Authorization: Bearer f
 if %pauseFlag%==1 pause
 
 REM --------------------------------------------------
-echo 1) stats
+echo 10) stats
 curl -i -X GET http://localhost:10001/stats --header "Authorization: Bearer fulltestuser1-mtcgtoken"
 echo "Should return HTTP 200 - and user stats"
 echo.
@@ -161,7 +161,7 @@ echo.
 if %pauseFlag%==1 pause
 
 REM --------------------------------------------------
-echo 2) scoreboard
+echo 11) scoreboard
 curl -i -X GET http://localhost:10001/scoreboard --header "Authorization: Bearer fulltestuser2-mtcgtoken"
 echo "Should return HTTP 200 - and the scoreboard"
 echo.

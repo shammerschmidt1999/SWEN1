@@ -144,7 +144,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
         /// <returns> User entity with provided credentials </returns>
         public async Task<User?> ValidateCredentialsAsync(string username, string password)
         {
-            string connectionString = AppSettings.GetConnectionString("TestConnection");
+            string connectionString = AppSettings.GetConnectionString("DefaultConnection");
 
             NpgsqlConnection connection = new NpgsqlConnection(connectionString);
             connection.Open();

@@ -21,7 +21,7 @@ public class BattleHandler : Handler, IHandler
 
     public BattleHandler()
     {
-        _connectionString = AppSettings.GetConnectionString("TestConnection");
+        _connectionString = AppSettings.GetConnectionString("DefaultConnection");
         _stackRepository = new StackRepository(_connectionString);
         _userRepository = new UserRepository(_connectionString);
     }
@@ -139,7 +139,7 @@ public class BattleHandler : Handler, IHandler
     /// </summary>
     /// <param name="user"> One of the two players </param>
     /// <param name="result"> Their result </param>
-    private void UpdatePlayerStats(User user, GlobalEnums.RoundResults result)
+    private void UpdatePlayerStats(User user, RoundResults result)
     {
         switch (result)
         {

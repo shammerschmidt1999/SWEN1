@@ -14,7 +14,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers;
 
         public CardsHandler()
         {
-            _connectionString = AppSettings.GetConnectionString("TestConnection");
+            _connectionString = AppSettings.GetConnectionString("DefaultConnection");
             _userRepository = new UserRepository(_connectionString);
             _stackRepository = new StackRepository(_connectionString);
         }

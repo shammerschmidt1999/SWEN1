@@ -8,12 +8,12 @@ namespace SWEN1_MCTG.Classes
     {
         // Fields
         private int _price;
-        private GlobalEnums.PackageType _packageType;
+        private PackageType _packageType;
         private int _amountOfCards;
         private int _possibleDecisions;
         private List<Card> _cards = new List<Card>();
 
-        public Package(GlobalEnums.PackageType packageType)
+        public Package(PackageType packageType)
         {
             _packageType = packageType;
             _price = (int)packageType;
@@ -34,7 +34,7 @@ namespace SWEN1_MCTG.Classes
             private set => _cards = value;
         }
 
-        public GlobalEnums.PackageType PackageType
+        public PackageType PackageType
         {
             get => _packageType;
             private set => _packageType = value;
@@ -61,16 +61,16 @@ namespace SWEN1_MCTG.Classes
         {
             return PackageType switch
             {
-                GlobalEnums.PackageType.Basic => 5,
-                GlobalEnums.PackageType.Premium => 10,
-                GlobalEnums.PackageType.Legendary => 12,
+                PackageType.Basic => 5,
+                PackageType.Premium => 10,
+                PackageType.Legendary => 12,
                 _ => throw new ArgumentOutOfRangeException(nameof(PackageType), "Package type not found")
             };
         }
 
         public int GetPossibleDecisions()
         {
-            return PackageType == GlobalEnums.PackageType.Legendary ? 6 : 4;
+            return PackageType == PackageType.Legendary ? 6 : 4;
         }
     }
 }

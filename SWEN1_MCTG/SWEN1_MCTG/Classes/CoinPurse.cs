@@ -15,7 +15,7 @@ namespace SWEN1_MCTG.Classes
         {
         }
 
-        public CoinPurse(GlobalEnums.CoinType coinType)
+        public CoinPurse(CoinType coinType)
         {
             Coin firstCoin = new Coin(coinType);
             _coins.Add(firstCoin);
@@ -63,7 +63,7 @@ namespace SWEN1_MCTG.Classes
         /// <param name="coinType"> The type of coin to remove </param>
         /// <param name="count"> Number of coins to remove </param>
         /// <returns> True if successful; otherwise, false </returns>
-        public bool RemoveCoins(GlobalEnums.CoinType coinType, int count)
+        public bool RemoveCoins(CoinType coinType, int count)
         {
             List<Coin> coinsToRemove = _coins.Where(c => c.CoinType == coinType).Take(count).ToList();
 
@@ -87,7 +87,7 @@ namespace SWEN1_MCTG.Classes
         /// <param name="fromType">The type of coin to convert from.</param>
         /// <param name="toType">The type of coin to convert to.</param>
         /// <returns>True if conversion was successful; otherwise, false.</returns>
-        public bool ConvertCoins(GlobalEnums.CoinType fromType, GlobalEnums.CoinType toType)
+        public bool ConvertCoins(CoinType fromType, CoinType toType)
         {
             int fromValue = (int)fromType;
             int toValue = (int)toType;
@@ -112,7 +112,7 @@ namespace SWEN1_MCTG.Classes
         /// </summary>
         /// <param name="coinType">The type of coin.</param>
         /// <returns>Total value of coins of the specified type.</returns>
-        private int GetCoinsValueByType(GlobalEnums.CoinType coinType)
+        private int GetCoinsValueByType(CoinType coinType)
         {
             return _coins.Where(c => c.CoinType == coinType).Sum(c => c.Value);
         }
@@ -131,7 +131,7 @@ namespace SWEN1_MCTG.Classes
         /// </summary>
         /// <param name="targetValue"> The total value to extract </param>
         /// <returns> A dictionary of CoinType and the count of coins used, or null if the operation fails </returns>
-        public Dictionary<GlobalEnums.CoinType, int> ExtractCoins(int targetValue)
+        public Dictionary<CoinType, int> ExtractCoins(int targetValue)
         {
             if (targetValue > GetCoinsValue())
             {
@@ -140,11 +140,11 @@ namespace SWEN1_MCTG.Classes
             }
 
             // Result dictionary to track the coins used
-            Dictionary<GlobalEnums.CoinType, int> coinsUsed = new Dictionary<GlobalEnums.CoinType, int>();
+            Dictionary<CoinType, int> coinsUsed = new Dictionary<CoinType, int>();
 
             // Sort the coin types by their value in descending order
-            IOrderedEnumerable<CoinType> sortedCoinTypes = Enum.GetValues(typeof(GlobalEnums.CoinType))
-                .Cast<GlobalEnums.CoinType>()
+            IOrderedEnumerable<CoinType> sortedCoinTypes = Enum.GetValues(typeof(CoinType))
+                .Cast<CoinType>()
                 .OrderByDescending(ct => (int)ct);
 
             foreach (CoinType coinType in sortedCoinTypes)

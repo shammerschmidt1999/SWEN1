@@ -1,5 +1,6 @@
 ﻿using System;
 using SWEN1_MCTG.Interfaces;
+using static SWEN1_MCTG.GlobalEnums;
 
 namespace SWEN1_MCTG.Classes
 {
@@ -7,7 +8,7 @@ namespace SWEN1_MCTG.Classes
     public abstract class Card : ICard
     {
         // Constructor
-        protected Card(string name, double damage, GlobalEnums.ElementType elementType)
+        protected Card(string name, double damage, ElementType elementType)
         {
             _name = name;
             _damage = damage;
@@ -21,7 +22,7 @@ namespace SWEN1_MCTG.Classes
         protected int _id;
         protected string _name;
         protected double _damage;
-        protected GlobalEnums.ElementType _elementType;
+        protected ElementType _elementType;
         protected bool _inDeck;
         protected Guid _instanceId;
 
@@ -43,7 +44,7 @@ namespace SWEN1_MCTG.Classes
             private set => _damage = value;
         }
 
-        public GlobalEnums.ElementType ElementType
+        public ElementType ElementType
         {
             get => _elementType;
             private set => _elementType = value;

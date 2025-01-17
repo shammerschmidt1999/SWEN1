@@ -8,6 +8,7 @@ using Npgsql;
 using SWEN1_MCTG.Classes;
 using SWEN1_MCTG.Data.Repositories.Interfaces;
 using SWEN1_MCTG.Interfaces;
+using static SWEN1_MCTG.GlobalEnums;
 
 namespace SWEN1_MCTG.Data.Repositories.Classes
 {
@@ -113,10 +114,10 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
             {
                 card = new MonsterCard(
                     reader["Name"].ToString() ?? throw new InvalidOperationException("Name is null."),
-                    (GlobalEnums.MonsterType)Enum.Parse(typeof(GlobalEnums.MonsterType),
+                    (MonsterType)Enum.Parse(typeof(MonsterType),
                         reader["monstertype"].ToString() ?? throw new InvalidOperationException("Monster type is null.")),
                     Convert.ToDouble(reader["Damage"]),
-                    (GlobalEnums.ElementType)Enum.Parse(typeof(GlobalEnums.ElementType),
+                    (ElementType)Enum.Parse(typeof(ElementType),
                         reader["elementtype"].ToString() ?? throw new InvalidOperationException("Element type is null."))
                 );
             }
@@ -125,7 +126,7 @@ namespace SWEN1_MCTG.Data.Repositories.Classes
                 card = new SpellCard(
                     reader["Name"].ToString() ?? throw new InvalidOperationException("Name is null."),
                     Convert.ToDouble(reader["Damage"]),
-                    (GlobalEnums.ElementType)Enum.Parse(typeof(GlobalEnums.ElementType),
+                    (ElementType)Enum.Parse(typeof(ElementType),
                         reader["elementtype"].ToString() ?? throw new InvalidOperationException("Element type is null."))
                 );
             }

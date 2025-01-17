@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using SWEN1_MCTG;
 using SWEN1_MCTG.Classes;
 using SWEN1_MCTG.Classes.Battle;
+using static SWEN1_MCTG.GlobalEnums;
 
 namespace BattleTest;
 
@@ -44,8 +45,8 @@ public class BattleTests
         string player2CardName = "Player2SpellCard";
         double player1CardDamage = 20;
         double player2CardDamage = 20;
-        GlobalEnums.ElementType player1CardElementType = GlobalEnums.ElementType.Water;
-        GlobalEnums.ElementType player2CardElementType = GlobalEnums.ElementType.Fire;
+        ElementType player1CardElementType = ElementType.Water;
+        ElementType player2CardElementType = ElementType.Fire;
 
         SpellCard player1SpellCard = new SpellCard(player1CardName, player1CardDamage, player1CardElementType);
         SpellCard player2SpellCard = new SpellCard(player2CardName, player2CardDamage, player2CardElementType);
@@ -64,8 +65,8 @@ public class BattleTests
         string player2CardName = "Player2SpellCard";
         double player1CardDamage = 20;
         double player2CardDamage = 20;
-        GlobalEnums.ElementType player1CardElementType = GlobalEnums.ElementType.Fire;
-        GlobalEnums.ElementType player2CardElementType = GlobalEnums.ElementType.Water;
+        ElementType player1CardElementType = ElementType.Fire;
+        ElementType player2CardElementType = ElementType.Water;
 
         SpellCard player1SpellCard = new SpellCard(player1CardName, player1CardDamage, player1CardElementType);
         SpellCard player2SpellCard = new SpellCard(player2CardName, player2CardDamage, player2CardElementType);
@@ -84,8 +85,8 @@ public class BattleTests
         string player2CardName = "Player2SpellCard";
         double player1CardDamage = 20;
         double player2CardDamage = 20;
-        GlobalEnums.ElementType player1CardElementType = GlobalEnums.ElementType.Fire;
-        GlobalEnums.ElementType player2CardElementType = GlobalEnums.ElementType.Fire;
+        ElementType player1CardElementType = ElementType.Fire;
+        ElementType player2CardElementType = ElementType.Fire;
 
         SpellCard player1SpellCard = new SpellCard(player1CardName, player1CardDamage, player1CardElementType);
         SpellCard player2SpellCard = new SpellCard(player2CardName, player2CardDamage, player2CardElementType);
@@ -104,9 +105,9 @@ public class BattleTests
         string player2CardName = "Player2MonsterCard";
         double player1CardDamage = 20;
         double player2CardDamage = 20;
-        GlobalEnums.ElementType player1CardElementType = GlobalEnums.ElementType.Fire;
-        GlobalEnums.ElementType player2CardElementType = GlobalEnums.ElementType.Fire;
-        GlobalEnums.MonsterType player2CardMonsterType = GlobalEnums.MonsterType.Kraken;
+        ElementType player1CardElementType = ElementType.Fire;
+        ElementType player2CardElementType = ElementType.Fire;
+        MonsterType player2CardMonsterType = MonsterType.Kraken;
         double spellDamageAgainstKraken = 0;
 
         SpellCard player1SpellCard = new SpellCard(player1CardName, player1CardDamage, player1CardElementType);
@@ -126,9 +127,9 @@ public class BattleTests
         string player2CardName = "Player2MonsterCard";
         double player1CardDamage = 20;
         double player2CardDamage = 20;
-        GlobalEnums.ElementType player1CardElementType = GlobalEnums.ElementType.Water;
-        GlobalEnums.ElementType player2CardElementType = GlobalEnums.ElementType.Fire;
-        GlobalEnums.MonsterType player2CardMonsterType = GlobalEnums.MonsterType.Goblin;
+        ElementType player1CardElementType = ElementType.Water;
+        ElementType player2CardElementType = ElementType.Fire;
+        MonsterType player2CardMonsterType = MonsterType.Goblin;
 
         SpellCard player1SpellCard = new SpellCard(player1CardName, player1CardDamage, player1CardElementType);
         MonsterCard player2MonsterCard = new MonsterCard(player2CardName, player2CardMonsterType, player2CardDamage, player2CardElementType);
@@ -147,9 +148,9 @@ public class BattleTests
         string player2CardName = "Player2MonsterCard";
         double player1CardDamage = 20;
         double player2CardDamage = 20;
-        GlobalEnums.ElementType player1CardElementType = GlobalEnums.ElementType.Fire;
-        GlobalEnums.ElementType player2CardElementType = GlobalEnums.ElementType.Fire;
-        GlobalEnums.MonsterType player2CardMonsterType = GlobalEnums.MonsterType.Goblin;
+        ElementType player1CardElementType = ElementType.Fire;
+        ElementType player2CardElementType = ElementType.Fire;
+        MonsterType player2CardMonsterType = MonsterType.Goblin;
 
         SpellCard player1SpellCard = new SpellCard(player1CardName, player1CardDamage, player1CardElementType);
         MonsterCard player2MonsterCard = new MonsterCard(player2CardName, player2CardMonsterType, player2CardDamage, player2CardElementType);
@@ -168,10 +169,10 @@ public class BattleTests
         string player2CardName = "Player2MonsterCard";
         double player1CardDamage = 20;
         double player2CardDamage = 20;
-        GlobalEnums.ElementType player1CardElementType = GlobalEnums.ElementType.Fire;
-        GlobalEnums.MonsterType player1CardMonsterType = GlobalEnums.MonsterType.Goblin;
-        GlobalEnums.ElementType player2CardElementType = GlobalEnums.ElementType.Fire;
-        GlobalEnums.MonsterType player2CardMonsterType = GlobalEnums.MonsterType.Dragon;
+        ElementType player1CardElementType = ElementType.Fire;
+        MonsterType player1CardMonsterType = MonsterType.Goblin;
+        ElementType player2CardElementType = ElementType.Fire;
+        MonsterType player2CardMonsterType = MonsterType.Dragon;
         double goblinDamageAgainstDragon = 0;
 
         MonsterCard player1MonsterCard = new MonsterCard(player1CardName, player1CardMonsterType, player1CardDamage, player1CardElementType);
@@ -191,10 +192,10 @@ public class BattleTests
         string player2CardName = "Player2MonsterCard";
         double player1CardDamage = 20;
         double player2CardDamage = 20;
-        GlobalEnums.ElementType player1CardElementType = GlobalEnums.ElementType.Fire;
-        GlobalEnums.MonsterType player1CardMonsterType = GlobalEnums.MonsterType.Ork;
-        GlobalEnums.ElementType player2CardElementType = GlobalEnums.ElementType.Fire;
-        GlobalEnums.MonsterType player2CardMonsterType = GlobalEnums.MonsterType.Wizard;
+        ElementType player1CardElementType = ElementType.Fire;
+        MonsterType player1CardMonsterType = MonsterType.Ork;
+        ElementType player2CardElementType = ElementType.Fire;
+        MonsterType player2CardMonsterType = MonsterType.Wizard;
         double orkDamageAgainstWizard = 0;
 
         MonsterCard player1MonsterCard = new MonsterCard(player1CardName, player1CardMonsterType, player1CardDamage, player1CardElementType);
@@ -214,10 +215,10 @@ public class BattleTests
         string player2CardName = "Player2MonsterCard";
         double player1CardDamage = 20;
         double player2CardDamage = 20;
-        GlobalEnums.ElementType player1CardElementType = GlobalEnums.ElementType.Fire;
-        GlobalEnums.MonsterType player1CardMonsterType = GlobalEnums.MonsterType.Dragon;
-        GlobalEnums.ElementType player2CardElementType = GlobalEnums.ElementType.Fire;
-        GlobalEnums.MonsterType player2CardMonsterType = GlobalEnums.MonsterType.FireElve;
+        ElementType player1CardElementType = ElementType.Fire;
+        MonsterType player1CardMonsterType = MonsterType.Dragon;
+        ElementType player2CardElementType = ElementType.Fire;
+        MonsterType player2CardMonsterType = MonsterType.FireElve;
         double dragonDamageAgainstFireElve = 0;
 
         MonsterCard player1MonsterCard = new MonsterCard(player1CardName, player1CardMonsterType, player1CardDamage, player1CardElementType);
@@ -238,10 +239,10 @@ public class BattleTests
         string player2CardName = "Player2MonsterCard";
         double player1CardDamage = 20;
         double player2CardDamage = 20;
-        GlobalEnums.ElementType player1CardElementType = GlobalEnums.ElementType.Fire;
-        GlobalEnums.MonsterType player1CardMonsterType = GlobalEnums.MonsterType.Knight;
-        GlobalEnums.ElementType player2CardElementType = GlobalEnums.ElementType.Fire;
-        GlobalEnums.MonsterType player2CardMonsterType = GlobalEnums.MonsterType.FireElve;
+        ElementType player1CardElementType = ElementType.Fire;
+        MonsterType player1CardMonsterType = MonsterType.Knight;
+        ElementType player2CardElementType = ElementType.Fire;
+        MonsterType player2CardMonsterType = MonsterType.FireElve;
 
         MonsterCard player1MonsterCard = new MonsterCard(player1CardName, player1CardMonsterType, player1CardDamage, player1CardElementType);
         MonsterCard player2MonsterCard = new MonsterCard(player2CardName, player2CardMonsterType, player2CardDamage, player2CardElementType);
@@ -261,8 +262,8 @@ public class BattleTests
 
         Battle testBattle = new Battle(player1, player2);
 
-        GlobalEnums.RoundResults result = testBattle.CompareDamage(player1Damage, player2Damage);
-        GlobalEnums.RoundResults victory = GlobalEnums.RoundResults.Victory;
+        RoundResults result = testBattle.CompareDamage(player1Damage, player2Damage);
+        RoundResults victory = RoundResults.Victory;
 
         Assert.AreEqual(result, victory);
     }
@@ -275,8 +276,8 @@ public class BattleTests
 
         Battle testBattle = new Battle(player1, player2);
 
-        GlobalEnums.RoundResults result = testBattle.CompareDamage(player1Damage, player2Damage);
-        GlobalEnums.RoundResults draw = GlobalEnums.RoundResults.Draw;
+        RoundResults result = testBattle.CompareDamage(player1Damage, player2Damage);
+        RoundResults draw = RoundResults.Draw;
 
         Assert.AreEqual(result, draw);
     }
@@ -289,8 +290,8 @@ public class BattleTests
 
         Battle testBattle = new Battle(player1, player2);
 
-        GlobalEnums.RoundResults result = testBattle.CompareDamage(player1Damage, player2Damage);
-        GlobalEnums.RoundResults defeat = GlobalEnums.RoundResults.Defeat;
+        RoundResults result = testBattle.CompareDamage(player1Damage, player2Damage);
+        RoundResults defeat = RoundResults.Defeat;
 
         Assert.AreEqual(result, defeat);
     }

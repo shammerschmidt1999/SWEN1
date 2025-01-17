@@ -13,7 +13,7 @@ namespace StackRepositoryTest
     [TestClass]
     public class StackRepositoryTests
     {
-        private readonly string connectionString = AppSettings.GetConnectionString("TestConnection");
+        private readonly string connectionString = AppSettings.GetConnectionString("DefaultConnection");
 
         [TestMethod]
         public async Task CreateCard_CreatesCorrectCardType()

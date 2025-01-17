@@ -1,5 +1,6 @@
 ﻿using SWEN1_MCTG.Classes;
 using SWEN1_MCTG.Data.Repositories.Classes;
+using static SWEN1_MCTG.GlobalEnums;
 
 namespace SWEN1_MCTG.Data;
 
@@ -12,7 +13,7 @@ public class PackageService : IPackageService
 
     public PackageService()
     {
-        _connectionString = AppSettings.GetConnectionString("TestConnection");
+        _connectionString = AppSettings.GetConnectionString("DefaultConnection");
         _stackRepository = new StackRepository(_connectionString);
         _cardRepository = new CardRepository(_connectionString);
         _coinPurseRepository = new CoinPurseRepository(_connectionString);
@@ -25,7 +26,7 @@ public class PackageService : IPackageService
     /// <param name="packageType"></param>
     /// <exception cref="InvalidOperationException"></exception>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public async Task PurchasePackageAsync(int userId, GlobalEnums.PackageType packageType)
+    public async Task PurchasePackageAsync(int userId, PackageType packageType)
     {
         // Get corresponding CoinPurse
         CoinPurse coinPurse = await _coinPurseRepository.GetByUserIdAsync(userId);
@@ -55,7 +56,7 @@ public class PackageService : IPackageService
         List<Card> userCardSelection = GetUserCardSelection(package.Cards, possibleDecisions);
 
         // Extract the exact coins needed for the package
-        Dictionary<GlobalEnums.CoinType, int> coinsUsed = coinPurse.ExtractCoins(package.Price);
+        Dictionary<CoinType, int> coinsUsed = coinPurse.ExtractCoins(package.Price);
 
         if (coinsUsed == null)
         {

@@ -10,6 +10,7 @@ using System.Text.Json.Nodes;
 using SWEN1_MCTG.Data.Repositories.Classes;
 using SWEN1_MCTG.Data.Repositories.Interfaces;
 using System.Text.RegularExpressions;
+using static SWEN1_MCTG.GlobalEnums;
 
 namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
 {
@@ -22,7 +23,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
 
         public UserHandler()
         {
-            _connectionString = AppSettings.GetConnectionString("TestConnection");
+            _connectionString = AppSettings.GetConnectionString("DefaultConnection");
             _userRepository = new UserRepository(_connectionString);
             _coinPurseRepository = new CoinPurseRepository(_connectionString);
             _stackRepository = new StackRepository(_connectionString);
@@ -86,7 +87,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
                         await _userRepository.AddAsync(newUser);
                         User addedUser = await _userRepository.GetByUsernameAsync(username);
 
-                        CoinPurse coinPurse = new CoinPurse(GlobalEnums.CoinType.Diamond)
+                        CoinPurse coinPurse = new CoinPurse(CoinType.Diamond)
                         {
                             UserId = addedUser.Id
                         };
@@ -201,7 +202,7 @@ namespace SWEN1_MCTG.Classes.HttpSvr.Handlers
 
                                 foreach (var coinType in newCoins)
                                 {
-                                    if (Enum.TryParse(coinType.Key, out GlobalEnums.CoinType type))
+                                    if (Enum.TryParse(coinType.Key, out CoinType type))
                                     {
                                         int amount = coinType.Value.GetValue<int>();
                                         for (int i = 0; i < amount; i++)

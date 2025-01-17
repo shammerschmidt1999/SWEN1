@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SWEN1_MCTG.Interfaces;
+using static SWEN1_MCTG.GlobalEnums;
 
 namespace SWEN1_MCTG.Classes
 {
@@ -11,7 +12,7 @@ namespace SWEN1_MCTG.Classes
     public class SpellCard : Card
     {
         // Constructor
-        public SpellCard(string name, double damage, GlobalEnums.ElementType elementType)
+        public SpellCard(string name, double damage, ElementType elementType)
             : base(name, damage, elementType)
         {
         }

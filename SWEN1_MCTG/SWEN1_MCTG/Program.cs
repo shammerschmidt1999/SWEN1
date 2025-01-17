@@ -8,7 +8,7 @@ namespace SWEN1_MCTG
     {
         static void Main(string[] args)
         {
-            string connectionString = AppSettings.GetConnectionString("TestConnection");
+            string connectionString = AppSettings.GetConnectionString("DefaultConnection");
 
             // Initialize repositories
             ITokenRepository tokenRepository = new TokenRepository(connectionString);

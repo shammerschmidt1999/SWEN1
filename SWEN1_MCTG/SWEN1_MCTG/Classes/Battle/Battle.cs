@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using SWEN1_MCTG.Interfaces;
+using static SWEN1_MCTG.GlobalEnums;
 
 namespace SWEN1_MCTG.Classes.Battle
 {
@@ -34,7 +35,7 @@ namespace SWEN1_MCTG.Classes.Battle
         }
 
         // Methods
-        public GlobalEnums.RoundResults StartBattle()
+        public RoundResults StartBattle()
         {
             // Battle until max rounds or one player has no cards left
             while (
@@ -68,15 +69,15 @@ namespace SWEN1_MCTG.Classes.Battle
             double damage2 = CalculateDamage(card2, card1, card2.Damage);
 
             // Compare the damage of both cards
-            GlobalEnums.RoundResults result = CompareDamage(damage1, damage2);
+            RoundResults result = CompareDamage(damage1, damage2);
 
-            if (result == GlobalEnums.RoundResults.Victory)
+            if (result == RoundResults.Victory)
             {
                 _player1.UserDeck.AddCardToStack(card2); // Add losers card to winners deck
                 _player2.UserDeck.Cards.Remove(card2); // Remove losers card from losers deck
                 winnerName = _player1.Username; // Set winner name
             }
-            else if (result == GlobalEnums.RoundResults.Defeat)
+            else if (result == RoundResults.Defeat)
             {
                 _player2.UserDeck.AddCardToStack(card1); // Add losers card to winners deck
                 _player1.UserDeck.Cards.Remove(card1); // Remove losers card from losers deck
@@ -133,15 +134,15 @@ namespace SWEN1_MCTG.Classes.Battle
         /// <param name="player1Damage"> Damage of player 1 </param>
         /// <param name="player2Damage"> Damage of player 2 </param>
         /// <returns> RoundResult Enum Value </returns>
-        public GlobalEnums.RoundResults CompareDamage(double player1Damage, double player2Damage)
+        public RoundResults CompareDamage(double player1Damage, double player2Damage)
         {
             if (player1Damage > player2Damage)
-                return GlobalEnums.RoundResults.Victory;
+                return RoundResults.Victory;
 
             if (player1Damage < player2Damage)
-                return GlobalEnums.RoundResults.Defeat;
+                return RoundResults.Defeat;
 
-            return GlobalEnums.RoundResults.Draw;
+            return RoundResults.Draw;
         }
 
         /// <summary>
@@ -174,24 +175,24 @@ namespace SWEN1_MCTG.Classes.Battle
         /// <param name="card2ElementType"> Type of element the first card plays against </param>
         /// <param name="card1Damage"> Damage of card1 </param>
         /// <returns> The damage with consideration of element synergies </returns>
-        public double CalculateSpellVsSpellDamage(SpellCard card1, GlobalEnums.ElementType card2ElementType, double card1Damage)
+        public double CalculateSpellVsSpellDamage(SpellCard card1, ElementType card2ElementType, double card1Damage)
         {
-            if (card1.ElementType == GlobalEnums.ElementType.Water && card2ElementType == GlobalEnums.ElementType.Fire)
+            if (card1.ElementType == ElementType.Water && card2ElementType == ElementType.Fire)
                 return card1Damage * 2;
 
-            if (card1.ElementType == GlobalEnums.ElementType.Fire && card2ElementType == GlobalEnums.ElementType.Normal)
+            if (card1.ElementType == ElementType.Fire && card2ElementType == ElementType.Normal)
                 return card1Damage * 2;
 
-            if (card1.ElementType == GlobalEnums.ElementType.Normal && card2ElementType == GlobalEnums.ElementType.Water)
+            if (card1.ElementType == ElementType.Normal && card2ElementType == ElementType.Water)
                 return card1Damage * 2;
 
-            if (card1.ElementType == GlobalEnums.ElementType.Fire && card2ElementType == GlobalEnums.ElementType.Water)
+            if (card1.ElementType == ElementType.Fire && card2ElementType == ElementType.Water)
                 return card1Damage / 2;
 
-            if (card1.ElementType == GlobalEnums.ElementType.Normal && card2ElementType == GlobalEnums.ElementType.Fire)
+            if (card1.ElementType == ElementType.Normal && card2ElementType == ElementType.Fire)
                 return card1Damage / 2;
 
-            if (card1.ElementType == GlobalEnums.ElementType.Water && card2ElementType == GlobalEnums.ElementType.Normal)
+            if (card1.ElementType == ElementType.Water && card2ElementType == ElementType.Normal)
                 return card1Damage / 2;
 
             return card1Damage;
@@ -205,10 +206,10 @@ namespace SWEN1_MCTG.Classes.Battle
         /// <returns> The damage with consideration of element synergies and monster synergies </returns>
         public double CalculateSpellVsMonsterDamage(SpellCard card1, MonsterCard card2, double card1Damage)
         {
-            if (card2.MonsterType == GlobalEnums.MonsterType.Kraken)
+            if (card2.MonsterType == MonsterType.Kraken)
                 return 0;
 
-            if (card2.MonsterType == GlobalEnums.MonsterType.Knight && card1.ElementType == GlobalEnums.ElementType.Water)
+            if (card2.MonsterType == MonsterType.Knight && card1.ElementType == ElementType.Water)
                 return 99999;
 
             return CalculateSpellVsSpellDamage(card1, card2.ElementType, card1Damage);
@@ -223,13 +224,13 @@ namespace SWEN1_MCTG.Classes.Battle
         /// <returns> The damage with consideration of monster synergies </returns>
         public double CalculateMonsterVsMonsterDamage(MonsterCard card1, MonsterCard card2, double card1Damage)
         {
-            if (card1.MonsterType == GlobalEnums.MonsterType.Goblin && card2.MonsterType == GlobalEnums.MonsterType.Dragon)
+            if (card1.MonsterType == MonsterType.Goblin && card2.MonsterType == MonsterType.Dragon)
                 return 0;
 
-            if (card1.MonsterType == GlobalEnums.MonsterType.Ork && card2.MonsterType == GlobalEnums.MonsterType.Wizard)
+            if (card1.MonsterType == MonsterType.Ork && card2.MonsterType == MonsterType.Wizard)
                 return 0;
 
-            if (card1.MonsterType == GlobalEnums.MonsterType.Dragon && card2.MonsterType == GlobalEnums.MonsterType.FireElve)
+            if (card1.MonsterType == MonsterType.Dragon && card2.MonsterType == MonsterType.FireElve)
                 return 0;
 
             return card1Damage;
@@ -239,21 +240,21 @@ namespace SWEN1_MCTG.Classes.Battle
         /// Determines the winner of the battle
         /// </summary>
         /// <returns> RoundResult enum variable representing result </returns>
-        private GlobalEnums.RoundResults DetermineWinner()
+        private RoundResults DetermineWinner()
         {
-            GlobalEnums.RoundResults result;
+            RoundResults result;
 
             if (_player1.UserDeck.Cards.Count > _player2.UserDeck.Cards.Count)
             {
-                result = GlobalEnums.RoundResults.Victory;
+                result = RoundResults.Victory;
             }
             else if (_player1.UserDeck.Cards.Count < _player2.UserDeck.Cards.Count)
             {
-                result = GlobalEnums.RoundResults.Defeat;
+                result = RoundResults.Defeat;
             }
             else
             {
-                result = GlobalEnums.RoundResults.Draw;
+                result = RoundResults.Draw;
             }
 
             return result;

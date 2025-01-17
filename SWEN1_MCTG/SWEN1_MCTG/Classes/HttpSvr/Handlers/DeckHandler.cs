@@ -14,7 +14,7 @@ public class DeckHandler : Handler, IHandler
 
     public DeckHandler()
     {
-        _connectionString = AppSettings.GetConnectionString("TestConnection");
+        _connectionString = AppSettings.GetConnectionString("DefaultConnection");
         _userRepository = new UserRepository(_connectionString);
         _stackRepository = new StackRepository(_connectionString);
     }

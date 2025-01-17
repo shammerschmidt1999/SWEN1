@@ -7,6 +7,7 @@ using SWEN1_MCTG;
 using SWEN1_MCTG.Classes;
 
 namespace CardTest;
+using static SWEN1_MCTG.GlobalEnums;
 
 [TestClass]
 public class CardTests
@@ -16,7 +17,7 @@ public class CardTests
     {
         string name = "TestCardName";
         double damage = 10;
-        GlobalEnums.ElementType elementType = GlobalEnums.ElementType.Fire;
+        ElementType elementType = ElementType.Fire;
 
         Card TestSpellCard = new SpellCard(name, damage, elementType);
 
@@ -30,8 +31,8 @@ public class CardTests
     {
         string name = "TestCardName";
         double damage = 10;
-        GlobalEnums.ElementType elementType = GlobalEnums.ElementType.Fire;
-        GlobalEnums.MonsterType monsterType = GlobalEnums.MonsterType.Ork;
+        ElementType elementType = ElementType.Fire;
+        MonsterType monsterType = MonsterType.Ork;
 
         MonsterCard TestMonsterCard = new MonsterCard(name, monsterType, damage, elementType);
 
